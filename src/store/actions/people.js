@@ -35,7 +35,7 @@ export const getLawyers = () => {
 			fetchNextPage(); // next 100
 		}, function done(err, records) {
 			if (err) {
-				console.log(err);
+				console.log('Airtable Error: ', err);
 				// dispatch(fetchLawyersFailed())
 				return;
 			}
@@ -80,7 +80,7 @@ export const getInquirers = () => {
 			fetchNextPage(); // next 100
 		}, function done(err, records) {
 			if (err) {
-				console.error(err);
+				console.log('Airtable Error: ', err);
 				// dispatch(fetchInquirersFailed())
 				return;
 			}
@@ -101,10 +101,11 @@ export const initCurrentInquirers = inqs => {
 			dispatch(setCurrentInquirers(inqs));
 			return;
 		}
+
 		// else get consultation rec id
-		const consultIds = inqs.reduce((acc, curr) => {
-			if (curr.consultations && !curr.consultationsExp) {
-				return [...acc, ...curr.consultations]
+		const consultIds = inqs.reduce((acc, inq) => {
+			if (inq.consultations && inq.consultations.length) {
+				return [...acc, ...inq.consultations]
 			}
 			return acc;
 		}, []);
@@ -113,12 +114,12 @@ export const initCurrentInquirers = inqs => {
 			RECORD_ID() = 'recwQW5JVQFCZAZt8',
 			RECORD_ID() = 'recj49jLIShvTEg6f',
 			RECORD_ID() = 'recR09DMEKd1YPfyH'
-		) */
-		let filterByFormula = 'OR(';
-		filterByFormula += consultIds.map(id => {
-			return `RECORD_ID() = '${id}'`
-		}).toString();
-		filterByFormula += ')';
+			) */
+			let filterByFormula = 'OR(';
+			filterByFormula += consultIds.map(id => {
+				return `RECORD_ID() = '${id}'`
+			}).toString();
+			filterByFormula += ')';
 
 		// get consultations from airtable & match to inquirer objects
 		const consultations = [];
@@ -158,20 +159,18 @@ export const initCurrentInquirers = inqs => {
 			}
 
 			// for each inquirer add expanded consultation property
-			// console.log('inqs', inqs)
 			const inqsWithConsult = inqs.map(inq => {
 				let inqWithConsult = null;
-				if (inq.consultations && !inq.consultationsExp) {
+				if (inq.consultations && inq.consultations.length > 0) {
 					inqWithConsult = inq.consultations.map(inqConsultId => {
 						return consultations.find(consult => {
 							return inqConsultId === consult.id;
 						})
 					});
+					inq.consultationsExp = inqWithConsult;
 				}
-				inq.consultationsExp = inqWithConsult;
 				return inq;
 			});
-			// console.log('inqsWithConsult', inqsWithConsult);
 			dispatch(setCurrentInquirers(inqsWithConsult));
 		})
 	}
@@ -187,7 +186,6 @@ export const initLawyers = lawyers => {
 }
 
 export const initInquirers = inquirers => {
-	// console.log('initInquirers', inquirers.length)
 	return {
 		type: actionTypes.INIT_INQUIRERS,
 		inquirers

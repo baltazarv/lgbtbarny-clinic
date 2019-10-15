@@ -31,33 +31,6 @@ const SUBMIT_FIELDS_DEFAULT = {
 	[consultFields.DATE]: new Date().toISOString().substr(0, 10)
 };
 
-const ConsultationsPreviousModal = props => {
-	return (
-		<Modal
-			{...props}
-			size={props.size}
-			aria-labelledby="contained-modal-title-vcenter"
-			centered
-		>
-			<Modal.Header closeButton>
-				<Modal.Title id="contained-modal-title-vcenter">
-					{props.title}
-				</Modal.Title>
-			</Modal.Header>
-			<Modal.Body>
-				<h4>{props.heading}</h4>
-				<p>
-					{props.body}
-				</p>
-			</Modal.Body>
-			<Modal.Footer>
-				<Button onClick={props.onHide}>{props.buttonsecondlabel}</Button>
-				<Button onClick={props.onHide}>{props.buttoncloselabel}</Button>
-			</Modal.Footer>
-		</Modal>
-	);
-}
-
 class InquirerForm extends Component {
 
 	constructor(props) {
@@ -68,22 +41,21 @@ class InquirerForm extends Component {
 		this.formDispositionProBono = React.createRef();
 		this.formDispositionImpact = React.createRef();
 		this.state = {
-			isInquirerInfoOpen: false,
-			formDispositionNoFurther: false,
-			isReferralDispositionChecked: false,
-			formDispositionProBono: false,
-			formDispositionImpact: false,
-			showConsultModal: false,
-
 			lawyers: [],
 			inquirers: [],
+			isInquirerInfoOpen: false,
 			situation: '',
+			showConsultModal: false,
+			showConfirmReplaceModal: false,
 			// dispositions: [],
-			refSummary: '',
+			// formDispositionNoFurther: false,
+			// formDispositionProBono: false,
+			// formDispositionImpact: false,
+			isReferralDispositionChecked: false,
 			lawTypes: [],
+			refSummary: '',
 			submitFields: SUBMIT_FIELDS_DEFAULT,
 			validated: false, // for use later
-
 			submitButtonLabel: 'Submit',
 		}
 	}
@@ -113,12 +85,95 @@ class InquirerForm extends Component {
 		}
 	}
 
-	showConsultModal = () => {
-		this.setState({ showConsultModal: true });
+	getPrevConsultation(inqId, consultId) {
+		const inquirer = this.props.currentInquirers.find(inq => {
+			return inq.id === inqId;
+		});
+		return inquirer.consultationsExp.find(consult => {
+			return consult.id === consultId;
+		});
+	}
+
+	showConsultModal = (inqId, consultId) => {
+		this.setState({
+			prevConsultation: this.getPrevConsultation(inqId, consultId),
+			showConsultModal: true,
+		});
 	}
 
 	hideConsultModal = () => {
 		this.setState({ showConsultModal: false });
+	}
+
+	showConfirmReplaceModal = (inqId, consultId) => {
+		this.hideConsultModal();
+		this.setState({ showConfirmReplaceModal: true, });
+	}
+
+	hideConfirmReplaceModal = () => {
+		this.setState({ showConfirmReplaceModal: false });
+	}
+
+	replaceWithPrevious = () => {
+		const prevConsultation = this.state.prevConsultation;
+		let consultLawyerSelectOptions = [];
+		if (prevConsultation.lawyers && prevConsultation.lawyers.length > 0) {
+			const prevConsultLawyers = prevConsultation.lawyers.map(id => {
+				return this.props.lawyers.find(lawyer => {
+					return lawyer.id === id;
+				})
+			})
+			consultLawyerSelectOptions = this.getLawyerSelectOptions(prevConsultLawyers);
+		}
+
+		let consultInquirerSelectOptions = [];
+		if (prevConsultation.inquirers && prevConsultation.inquirers.length > 0) {
+			const prevConsultInquirer = prevConsultation.inquirers.map(id => {
+				return this.props.inquirers.find(inquirer => {
+					return inquirer.id === id;
+				})
+			})
+			consultInquirerSelectOptions = this.getInquirerSelectOptions(prevConsultInquirer);
+		}
+
+		let consultLawTypeSelectOptions = [];
+		if (prevConsultation.lawTypes && prevConsultation.lawTypes.length > 0) {
+			const prevConsultLawTypes = prevConsultation.lawTypes.map(id => {
+				return this.props.lawTypes.find(lawType => {
+					return lawType.id === id;
+				})
+			})
+			consultLawTypeSelectOptions = this.getLawTypeSelectOptions(prevConsultLawTypes);
+		}
+
+		this.setState({
+			lawyers: consultLawyerSelectOptions,
+			inquirers: consultInquirerSelectOptions,
+			situation: prevConsultation.situation,
+			lawTypes: consultLawTypeSelectOptions,
+			refSummary: prevConsultation.summary,
+		})
+		this.clearDispoRadios();
+		if (prevConsultation.dispositions && prevConsultation.dispositions.length > 0) {
+			prevConsultation.dispositions.forEach(disp => {
+				const formDispositionNoFurther = this.formDispositionNoFurther.current;
+				if (disp === formDispositionNoFurther.value) {
+					formDispositionNoFurther.checked = true;
+				}
+				const formDispositionFeeBased = this.formDispositionFeeBased.current;
+				if (disp === formDispositionFeeBased.value) {
+					formDispositionFeeBased.checked = true;
+				}
+				const formDispositionProBono = this.formDispositionProBono.current;
+				if (disp === formDispositionProBono.value) {
+					formDispositionProBono.checked = true;
+				}
+				const formDispositionImpact = this.formDispositionImpact.current;
+				if (disp === formDispositionImpact.value) {
+					formDispositionImpact.checked = true;
+				}
+			});
+		}
 	}
 
 	formatName = inquirer => {
@@ -243,14 +298,18 @@ class InquirerForm extends Component {
 		this.setState({ validated: true });
 	}
 
-	clearForm = () => {
-		this.inquirerForm.current.reset(); // doesn't reset radio checked values
+	clearDispoRadios = () => {
 		this.formDispositionNoFurther.current.checked = false;
 		this.formDispositionFeeBased.current.checked = false;
 		this.formDispositionProBono.current.checked = false;
 		this.formDispositionImpact.current.checked = false;
+	}
+
+	clearForm = () => {
+		this.inquirerForm.current.reset(); // doesn't reset radio checked values
+		this.clearDispoRadios();
 		this.setState({
-			lawyers: [],
+			// lawyers: [], // keep same lawyer selected
 			inquirers: [],
 			situation: '',
 			dispositions: [],
@@ -264,12 +323,9 @@ class InquirerForm extends Component {
 		this.props.setCurrentInquirers([]);
 	}
 
-	render() {
-		console.log('state', this.state, 'consultSubmitStatus');
-
-		// format inquirers into select options
-		let inqSelectOptions = this.props.inquirers.reduce((acc, curr) => {
-			// { label: "Alligators", value: 1 },
+	// format lawyers into select options: { label: "Alligators", value: 1 },
+	getLawyerSelectOptions = (arr) => {
+		return arr.reduce((acc, curr) => {
 			if (curr.firstName || curr.lastName) {
 				const inqObj = {
 					value: curr.id,
@@ -280,9 +336,11 @@ class InquirerForm extends Component {
 				return acc;
 			}
 		}, []);
+	}
 
-		// format lawyers into select options: { label: "Alligators", value: 1 },
-		let lawyerSelectOptions = this.props.lawyers.reduce((acc, curr) => {
+	// format inquirers into select options: { label: "Alligators", value: 1 },
+	getInquirerSelectOptions = (arr) => {
+		return arr.reduce((acc, curr) => {
 			if (curr.firstName || curr.lastName) {
 				const inqObj = {
 					value: curr.id,
@@ -293,14 +351,26 @@ class InquirerForm extends Component {
 				return acc;
 			}
 		}, []);
+	}
 
-		// format type of law state into select options
-		let lawTypeOptions = this.props.lawTypes.reduce((acc, curr) => {
+	// format type of law state into select options
+	getLawTypeSelectOptions = (arr) => {
+		return arr.reduce((acc, curr) => {
 			return [...acc, { value: curr.id, label: curr.type }]
 		}, []);
+	}
 
-		// selected inquirer(s)
-		let currentInquirerInfo = 'Loading...';
+	render() {
+		// console.log('state', this.state, 'consultSubmitStatus');
+
+		let lawyerSelectOptions = this.getLawyerSelectOptions(this.props.lawyers);
+
+		let inqSelectOptions = this.getInquirerSelectOptions(this.props.inquirers);
+
+		let lawTypeOptions = this.getLawTypeSelectOptions(this.props.lawTypes);
+
+			// selected inquirer(s)
+			let currentInquirerInfo = 'Loading...';
 		if (this.props.currentInquirers) {
 			currentInquirerInfo = (
 				this.props.currentInquirers.map(inq => {
@@ -333,7 +403,14 @@ class InquirerForm extends Component {
 										<strong>Previous Consultations:</strong>
 										<ul className="mb-0">
 											{inq.consultationsExp.map(consult => {
-												return <li key={consult.id}><Button onClick={this.showConsultModal} variant="link" size="sm">{consult.name}</Button></li>
+												return <li
+													key={consult.id}
+												>
+													<Button
+														onClick={() => this.showConsultModal(inq.id, consult.id)}
+														variant="link" size="sm">{consult.name}
+													</Button>
+												</li>
 											})}
 										</ul>
 									</ListGroup.Item>
@@ -342,6 +419,45 @@ class InquirerForm extends Component {
 						</div>
 					)
 				})
+			)
+		}
+
+		// format modal window with previous consultation
+		let currentConsultationName = '';
+		let modalPrevConsultBody = null;
+		const prevConsultation = this.state.prevConsultation;
+		if (prevConsultation) {
+			currentConsultationName = `${prevConsultation.name}`;
+			let lawyers = [];
+			if (prevConsultation.lawyers) {
+				lawyers = prevConsultation.lawyers.map(consultLawyer => {
+					const lawyer = this.props.lawyers.find(lawyer => {
+						return lawyer.id === consultLawyer;
+					})
+					return this.formatName(lawyer);
+				})
+			}
+			let lawTypes = [];
+			if (prevConsultation.lawTypes) {
+				lawTypes = prevConsultation.lawTypes.map(consultType => {
+					const lawType = this.props.lawTypes.find(type => {
+						return type.id === consultType;
+					})
+					return lawType.type;
+				})
+			}
+			modalPrevConsultBody = (
+				<ul>
+					<li><strong>Consulting Lawyer:</strong> {lawyers && lawyers.length > 0 ? (lawyers.join(', ')) : ''}</li>
+
+					<li><strong>Notes: </strong>{prevConsultation.situation}</li>
+
+					<li><strong>Disposition: </strong>{prevConsultation.dispositions && prevConsultation.dispositions.length > 0 ? (prevConsultation.dispositions.join(', ')) : ''}</li>
+
+					<li><strong>Type of Law: </strong>{lawTypes.join(', ')}</li>
+
+					<li><strong>Referral Summary: </strong>{prevConsultation.summary}</li>
+				</ul>
 			)
 		}
 
@@ -531,19 +647,60 @@ class InquirerForm extends Component {
 						</Card.Body>
 					</Card>
 				</Container>
-				<ConsultationsPreviousModal
+				{/* previous consultation info */}
+				<ModalWindow
 					size="md"
 					show={this.state.showConsultModal}
-					onHide={() => this.hideConsultModal()}
 					title="Previous Consultation"
-					heading="Inquirer – Date"
-					body="Coming soon."
-					buttonsecondlabel="Edit &amp; Replace Current"
+					heading={currentConsultationName}
+					body={modalPrevConsultBody}
+					// buttonsecondlabel="Replace Current &amp; Edit"
+					buttonsecondlabel="Edit (Coming soon...)"
+					onConfirm={() => this.hideConsultModal()}
+					// onConfirm={() => this.showConfirmReplaceModal()}
 					buttoncloselabel="Close"
+					onHide={() => this.hideConsultModal()}
+				/>
+				{/* confirm replace current consultation with previous */}
+				<ModalWindow
+					size="md"
+					show={this.state.showConfirmReplaceModal}
+					title="Edit Previous Consultation?"
+					heading={currentConsultationName}
+					body={<div className="text-danger"><strong>Warning: </strong>What you have entered on the current Clinic Consultation form will be lost and replaced with the previous consultation.</div>}
+					buttonsecondlabel="Replace with Previous"
+					onConfirm={() => this.replaceWithPrevious()}
+					buttoncloselabel="Go back to Current Consultation"
+					onHide={() => this.hideConfirmReplaceModal()}
 				/>
 			</>
 		);
 	}
+}
+
+const ModalWindow = props => {
+	return (
+		<Modal
+			{...props}
+			size={props.size}
+			aria-labelledby="contained-modal-title-vcenter"
+			centered
+		>
+			<Modal.Header closeButton>
+				<Modal.Title id="contained-modal-title-vcenter">
+					{props.title}
+				</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				<h3>{props.heading}</h3>
+				{props.body}
+			</Modal.Body>
+			<Modal.Footer>
+				<Button onClick={props.onConfirm}>{props.buttonsecondlabel}</Button>
+				<Button onClick={props.onHide}>{props.buttoncloselabel}</Button>
+			</Modal.Footer>
+		</Modal>
+	);
 }
 
 const mapStateToProps = state => {
