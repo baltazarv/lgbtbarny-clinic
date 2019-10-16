@@ -69,6 +69,7 @@ class InquirerForm extends Component {
 	componentDidUpdate(prevProps) {
 		if (this.props.consultSubmitStatus.status === 'success') {
 			this.clearForm();
+			this.props.getInquirers();
 			this.props.consultationInProgress();
 		}
 	}
@@ -508,7 +509,7 @@ class InquirerForm extends Component {
 									</Form.Label>
 									<Col sm={9}>
 										<Form.Text className="text-muted">
-											Choose visitor or multiple visitors if relevant.
+											Choose visitor or multiple visitors if relevant. If the visitor does not appear, refresh the page.
 										</Form.Text>
 										<Select
 											options={inqSelectOptions}
