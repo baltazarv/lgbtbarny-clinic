@@ -1,3 +1,4 @@
+// AirTable field names
 export const FIRST_NAME = 'First Name';
 export const MIDDLE_NAME = 'Middle Name';
 export const LAST_NAME = 'Last Name';

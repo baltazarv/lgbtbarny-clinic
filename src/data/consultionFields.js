@@ -1,3 +1,4 @@
+// AirTable field names
 export const NAME = 'Name';
 export const DATE = 'Date';
 export const TYPE = 'Type';
