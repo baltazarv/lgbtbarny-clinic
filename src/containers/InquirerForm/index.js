@@ -26,6 +26,7 @@ const DISP_FEE_BASED = 'Fee-based - Lawyer Referral Network (LRN) - limited avai
 const DISP_PRO_BONO = 'Pro Bono Panel (PBP) - VERY limited availability!';
 const DISP_IMPACT = 'Highly compelling/impact litigation';
 const TYPE_CLINIC = 'Clinic';
+// AirTable fields in peopleFields and consultFields
 const SUBMIT_FIELDS_DEFAULT = {
 	[consultFields.TYPE]: TYPE_CLINIC,
 	[consultFields.DATE]: new Date().toISOString().substr(0, 10)
@@ -54,7 +55,7 @@ class InquirerForm extends Component {
 			isReferralDispositionChecked: false,
 			lawTypes: [],
 			refSummary: '',
-			submitFields: SUBMIT_FIELDS_DEFAULT,
+			submitFields: SUBMIT_FIELDS_DEFAULT, // AirTable format
 			validated: false, // for use later
 			submitButtonLabel: 'Submit',
 		}
@@ -262,7 +263,6 @@ class InquirerForm extends Component {
 		};
 		if (evt.target.checked) {
 			const value = evt.target.value;
-			// const id = evt.target.id;
 			this.setState((prevState, props) => {
 				let submitFields = { ...prevState.submitFields };
 				submitFields[consultFields.DISPOSITIONS] = [value];
@@ -309,6 +309,9 @@ class InquirerForm extends Component {
 	clearForm = () => {
 		this.inquirerForm.current.reset(); // doesn't reset radio checked values
 		this.clearDispoRadios();
+		const submitFields = SUBMIT_FIELDS_DEFAULT;
+		// keeping same lawyer selected
+		submitFields[consultFields.LAWYERS] = this.state.submitFields[consultFields.LAWYERS];
 		this.setState({
 			// lawyers: [], // keep same lawyer selected
 			inquirers: [],
@@ -316,7 +319,7 @@ class InquirerForm extends Component {
 			dispositions: [],
 			refSummary: '',
 			lawTypes: [],
-			submitFields: SUBMIT_FIELDS_DEFAULT,
+			submitFields,
 			submitButtonLabel: 'Submit Another',
 			validated: false,
 			isReferralDispositionChecked: false,
