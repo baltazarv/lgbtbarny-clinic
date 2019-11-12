@@ -1,11 +1,12 @@
 import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-	consultations: [],
+	// consultations: [],
 	consultSubmitStatus: {
 		status: 'in-progress',
 		payload: null,
 	},
+	consultsCreated: []
 }
 
 // maybe use for later // is there a need to get all consultations?
@@ -16,8 +17,9 @@ const reducer = (state = initialState, action) => {
 				...state,
 				consultSubmitStatus: {
 					status: 'success',
-					payload: action.newConsultion,
-				}
+					payload: action.newConsultation,
+				},
+				consultsCreated: [...state.consultsCreated, action.newConsultation]
 			}
 		case actionTypes.CONSULTATION_IN_PROGRESS:
 			return {
@@ -27,12 +29,11 @@ const reducer = (state = initialState, action) => {
 					payload: null
 				}
 			}
-		// not used yet
-		case actionTypes.INIT_CONSULTATIONS:
-			return {
-				...state,
-				consultations: action.consultations
-			}
+		// case actionTypes.INIT_CONSULTATIONS:
+		// 	return {
+		// 		...state,
+		// 		consultations: action.consultations
+		// 	}
 		default:
 			return state;
 	}

@@ -57,6 +57,8 @@ class InquirerForm extends Component {
 			refSummary: '',
 			submitFields: SUBMIT_FIELDS_DEFAULT, // AirTable format
 			validated: false, // for use later
+			submitSuccess: false,
+			submitError: false,
 			submitButtonLabel: 'Submit',
 		}
 	}
@@ -204,6 +206,7 @@ class InquirerForm extends Component {
 				submitFields,
 				lawyers: opt,
 				lawyerIsSelected,
+				submitError: false,
 			};
 		});
 	}
@@ -225,6 +228,7 @@ class InquirerForm extends Component {
 				submitFields,
 				inquirers: options,
 				inquirerIsSelected,
+				submitError: false,
 			};
 		});
 		// get expanded consultations, add info to inquirers, and set currentInquirers state
@@ -261,6 +265,7 @@ class InquirerForm extends Component {
 			return {
 				submitFields,
 				[name]: value,
+				submitError: false,
 			};
 		});
 	}
@@ -278,6 +283,7 @@ class InquirerForm extends Component {
 				submitFields[consultFields.DISPOSITIONS] = [value];
 				return {
 					submitFields,
+					submitError: false,
 				};
 			});
 		};
@@ -299,6 +305,7 @@ class InquirerForm extends Component {
 				submitFields,
 				lawTypes: opt,
 				lawTypeIsSelected,
+				submitError: false,
 			};
 		});
 	}
@@ -314,6 +321,15 @@ class InquirerForm extends Component {
 		if (form.checkValidity() === true && this.state.lawyerIsSelected && this.state.inquirerIsSelected && !lawTypeReqAndEmpty) {
 			this.props.createConsultation(this.state.submitFields);
 			// form.reset();
+			this.setState({
+				submitSuccess: true,
+				submitError: false,
+			})
+		} else {
+			this.setState({
+				submitSuccess: false,
+				submitError: true,
+			})
 		}
 		this.setState({ validated: true });
 	}
@@ -384,8 +400,6 @@ class InquirerForm extends Component {
 	}
 
 	render() {
-		// console.log('state', this.state, 'consultSubmitStatus');
-
 		let lawyerSelectOptions = this.getLawyerSelectOptions(this.props.lawyers);
 
 		let inqSelectOptions = this.getInquirerSelectOptions(this.props.inquirers);
@@ -484,6 +498,27 @@ class InquirerForm extends Component {
 			)
 		}
 
+		// success message
+		let successMessage = null;
+		let lastConsult = '';
+		if (this.props.consultsCreated.length > 0) {
+			lastConsult = this.props.consultsCreated[this.props.consultsCreated.length - 1][consultFields.NAME];
+			if (this.state.submitSuccess) {
+				successMessage = <Row>
+				<Col xs={8} className="mx-auto w-50 p-3 text-center font-italic text-success"><span className="font-weight-bold">{lastConsult}</span> was successfully created!</Col>
+			</Row>;
+			}
+		}
+
+		// error message
+		let errorMessage = null;
+		if (this.state.submitError) {
+			errorMessage = <Row>
+			<Col className="mx-auto w-50 p-3 text-center font-italic text-danger">More info needed.<br />
+			Please fill out <span className="font-weight-bold">empty fields in red</span> above!</Col>
+		</Row>;
+		}
+
 		return (
 			<>
 				<Container>
@@ -567,7 +602,7 @@ class InquirerForm extends Component {
 								</Form.Group>
 
 								{/* disposition */}
-								<fieldset className="mb-4">
+								<fieldset className="mb-2">
 									<Form.Group as={Row}>
 										<Form.Label as="legend" column sm={3} className="bold text-md-right">
 											Disposition<span className="text-danger">*</span>
@@ -669,9 +704,14 @@ class InquirerForm extends Component {
 									{this.state.submitButtonLabel}
 								</Button>
 							</Form>
+
+							{/* confirmation && error messages */}
+							{successMessage}
+							{errorMessage}
 						</Card.Body>
 					</Card>
 				</Container>
+
 				{/* previous consultation info */}
 				<ModalWindow
 					size="md"
@@ -679,10 +719,8 @@ class InquirerForm extends Component {
 					title="Previous Consultation"
 					heading={currentConsultationName}
 					body={modalPrevConsultBody}
-					// buttonsecondlabel="Replace Current &amp; Edit"
 					buttonsecondlabel="Edit (Coming soon...)"
 					onConfirm={() => this.hideConsultModal()}
-					// onConfirm={() => this.showConfirmReplaceModal()}
 					buttoncloselabel="Close"
 					onHide={() => this.hideConsultModal()}
 				/>
@@ -733,9 +771,9 @@ const mapStateToProps = state => {
 		lawyers: state.people.lawyers,
 		inquirers: state.people.inquirers,
 		currentInquirers: state.people.currentInquirers,
-		// consultation: state.consultations.consultations,
 		lawTypes: state.lawTypes.lawTypes,
-		consultSubmitStatus: state.consultations.consultSubmitStatus
+		consultSubmitStatus: state.consultations.consultSubmitStatus,
+		consultsCreated: state.consultations.consultsCreated
 	}
 }
 

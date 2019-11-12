@@ -15,17 +15,20 @@ export const createConsultation = submitFields => {
 				console.log('Airtable Error: ', err);
 				return;
 			}
-			dispatch(consultationCreated(records[0]));
+			// object with fields: Created On, Date, Disposition, Inquirer, Last Modified On, Lawyer, Name, Type, id
+			const consultRecord = records[0]['fields'];
+			consultRecord['id'] = records[0]['id'];
+			dispatch(consultationCreated(consultRecord));
 		})
 	}
 }
 
 // sync action creators
 
-export const consultationCreated = newConsultion => {
+export const consultationCreated = newConsultation => {
 	return {
 		type: actionTypes.CONSULTATION_CREATED,
-		newConsultion
+		newConsultation
 	}
 }
 
