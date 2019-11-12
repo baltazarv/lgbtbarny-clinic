@@ -11,11 +11,9 @@ import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
-// https://alligator.io/react/react-select/
-import Select from 'react-select';
-// import InputGroup from 'react-bootstrap/InputGroup'
-// import DropdownButton from 'react-bootstrap/DropdownButton'
-// import Dropdown from 'react-bootstrap/Dropdown'
+
+import ReactSelectWithValidation from '../../components/ReactSelectWithValidation'
+
 import styles from './InquirerForm.module.css';
 
 import * as peopleFields from '../../data/peopleFields';
@@ -43,8 +41,9 @@ class InquirerForm extends Component {
 		this.formDispositionImpact = React.createRef();
 		this.state = {
 			lawyers: [],
+			lawyerIsSelected: false,
 			inquirers: [],
-			isInquirerInfoOpen: false,
+			inquirerIsSelected: false,
 			situation: '',
 			showConsultModal: false,
 			showConfirmReplaceModal: false,
@@ -54,6 +53,7 @@ class InquirerForm extends Component {
 			// formDispositionImpact: false,
 			isReferralDispositionChecked: false,
 			lawTypes: [],
+			lawTypeIsSelected: false,
 			refSummary: '',
 			submitFields: SUBMIT_FIELDS_DEFAULT, // AirTable format
 			validated: false, // for use later
@@ -78,11 +78,11 @@ class InquirerForm extends Component {
 	static getDerivedStateFromProps(props, state) {
 		if (props.currentInquirers.length > 0) {
 			return {
-				isInquirerInfoOpen: true
+				inquirerIsSelected: true
 			}
 		} else {
 			return {
-				isInquirerInfoOpen: false
+				inquirerIsSelected: false
 			}
 		}
 	}
@@ -193,12 +193,17 @@ class InquirerForm extends Component {
 			acc.push(curr.value);
 			return acc;
 		}, []);
+		let lawyerIsSelected = false;
+		if (lawyers.length > 0) {
+			lawyerIsSelected = true;
+		}
 		this.setState((prevState, props) => {
 			let submitFields = { ...prevState.submitFields };
 			submitFields[consultFields.LAWYERS] = lawyers;
 			return {
 				submitFields,
 				lawyers: opt,
+				lawyerIsSelected,
 			};
 		});
 	}
@@ -209,12 +214,17 @@ class InquirerForm extends Component {
 			acc.push(curr.value);
 			return acc;
 		}, []);
+		let inquirerIsSelected = false;
+		if (inquirers.length > 0) {
+			inquirerIsSelected = true;
+		}
 		this.setState((prevState, props) => {
 			let submitFields = { ...prevState.submitFields };
 			submitFields[consultFields.INQUIRERS] = inquirers;
 			return {
 				submitFields,
-				inquirers: options
+				inquirers: options,
+				inquirerIsSelected,
 			};
 		});
 		// get expanded consultations, add info to inquirers, and set currentInquirers state
@@ -250,7 +260,7 @@ class InquirerForm extends Component {
 		this.setState((prevState, props) => {
 			return {
 				submitFields,
-				[name]: value
+				[name]: value,
 			};
 		});
 	}
@@ -278,12 +288,17 @@ class InquirerForm extends Component {
 			acc.push(curr.value);
 			return acc;
 		}, []);
+		let lawTypeIsSelected = false;
+		if (lawTypes.length > 0) {
+			lawTypeIsSelected = true;
+		}
 		this.setState((prevState, props) => {
 			let submitFields = { ...prevState.submitFields };
 			submitFields[consultFields.LAW_TYPES] = lawTypes;
 			return {
 				submitFields,
 				lawTypes: opt,
+				lawTypeIsSelected,
 			};
 		});
 	}
@@ -292,7 +307,11 @@ class InquirerForm extends Component {
 		evt.preventDefault();
 		evt.stopPropagation();
 		const form = evt.currentTarget;
-		if (form.checkValidity() === true) {
+		let lawTypeReqAndEmpty = false;
+		if (this.state.isReferralDispositionChecked && !this.state.lawTypeIsSelected) {
+			lawTypeReqAndEmpty = true;
+		}
+		if (form.checkValidity() === true && this.state.lawyerIsSelected && this.state.inquirerIsSelected && !lawTypeReqAndEmpty) {
 			this.props.createConsultation(this.state.submitFields);
 			// form.reset();
 		}
@@ -492,7 +511,7 @@ class InquirerForm extends Component {
 										<Form.Text className="text-muted">
 											Add your name.
 										</Form.Text>
-										<Select
+										<ReactSelectWithValidation
 											options={lawyerSelectOptions}
 											isMulti
 											required
@@ -514,7 +533,7 @@ class InquirerForm extends Component {
 										<Form.Text className="text-muted">
 											Choose visitor or multiple visitors if relevant. If the visitor does not appear, refresh the page.
 										</Form.Text>
-										<Select
+										<ReactSelectWithValidation
 											options={inqSelectOptions}
 											isMulti
 											required
@@ -526,7 +545,7 @@ class InquirerForm extends Component {
 										</Form.Control.Feedback>
 									</Col>
 								</Form.Group>
-								<Collapse in={this.state.isInquirerInfoOpen} className="mb-4">
+								<Collapse in={this.state.inquirerIsSelected} className="mb-4">
 									<div id="visitor-info" className="small">
 										{currentInquirerInfo}
 									</div>
@@ -607,7 +626,7 @@ class InquirerForm extends Component {
 												<Form.Text className="text-muted">
 													Choose any relevant types of law.
 												</Form.Text>
-												<Select
+												<ReactSelectWithValidation
 													options={lawTypeOptions}
 													isMulti
 													required
