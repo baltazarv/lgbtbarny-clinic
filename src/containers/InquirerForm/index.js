@@ -373,8 +373,8 @@ class InquirerForm extends Component {
 
 		let lawTypeOptions = this.getLawTypeSelectOptions(this.props.lawTypes);
 
-			// selected inquirer(s)
-			let currentInquirerInfo = 'Loading...';
+		// selected inquirer(s)
+		let currentInquirerInfo = 'Loading...';
 		if (this.props.currentInquirers) {
 			currentInquirerInfo = (
 				this.props.currentInquirers.map(inq => {
@@ -633,9 +633,11 @@ class InquirerForm extends Component {
 												as="textarea"
 												rows="3"
 												value={this.state.refSummary}
+												required={this.state.isReferralDispositionChecked}
 												name="refSummary"
 												onChange={this.handleInputChange}
 											/>
+											{/* <Form.Control.Feedback type="invalid">Please add summary for the referral.</Form.Control.Feedback> */}
 										</Form.Group>
 									</div>
 								</Collapse>

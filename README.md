@@ -66,3 +66,15 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+
+# Project Notes
+
+## Code
+
+Forms use React Select pull-down component:
+https://alligator.io/react/react-select/
+
+## Data
+
+Data files contain the AirTable field names.
