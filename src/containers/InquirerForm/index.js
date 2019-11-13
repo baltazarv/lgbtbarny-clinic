@@ -12,7 +12,8 @@ import Collapse from 'react-bootstrap/Collapse';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
 
-import ReactSelectWithValidation from '../../components/ReactSelectWithValidation'
+import ReactSelectWithValidation from '../../components/ReactSelectWithValidation';
+import TimerCounter from '../../components/TimerCountdown/index';
 
 import styles from './InquirerForm.module.css';
 
@@ -27,7 +28,7 @@ const TYPE_CLINIC = 'Clinic';
 // AirTable fields in peopleFields and consultFields
 const SUBMIT_FIELDS_DEFAULT = {
 	[consultFields.TYPE]: TYPE_CLINIC,
-	[consultFields.DATE]: new Date().toISOString().substr(0, 10)
+	[consultFields.DATE]: new Date().toISOString().substr(0, 10),
 };
 
 class InquirerForm extends Component {
@@ -60,6 +61,7 @@ class InquirerForm extends Component {
 			submitSuccess: false,
 			submitError: false,
 			submitButtonLabel: 'Submit',
+			timeSpent: 0,
 		}
 	}
 
@@ -399,6 +401,13 @@ class InquirerForm extends Component {
 		}, []);
 	}
 
+	getTimeSpent = (totalTime) => {
+		const minutes = (totalTime.totalSeconds / 60).toFixed(1)
+		this.setState({
+			timeSpent: minutes,
+		})
+	}
+
 	render() {
 		let lawyerSelectOptions = this.getLawyerSelectOptions(this.props.lawyers);
 
@@ -505,7 +514,8 @@ class InquirerForm extends Component {
 			lastConsult = this.props.consultsCreated[this.props.consultsCreated.length - 1][consultFields.NAME];
 			if (this.state.submitSuccess) {
 				successMessage = <Row>
-				<Col xs={8} className="mx-auto w-50 p-3 text-center font-italic text-success"><span className="font-weight-bold">{lastConsult}</span> was successfully created!</Col>
+				<Col xs={8} className="mx-auto w-50 p-3 text-center font-italic text-success"><span className="font-weight-bold">{lastConsult}</span> was successfully created!<br />
+				Time spent: {this.state.timeSpent} minutes.</Col>
 			</Row>;
 			}
 		}
@@ -517,6 +527,11 @@ class InquirerForm extends Component {
 			<Col className="mx-auto w-50 p-3 text-center font-italic text-danger">More info needed.<br />
 			Please fill out <span className="font-weight-bold">empty fields in red</span> above!</Col>
 		</Row>;
+		}
+
+		let timerCounter = null;
+		if (this.state.inquirers.length > 0) {
+			timerCounter = <TimerCounter getTimeSpent={this.getTimeSpent} />
 		}
 
 		return (
@@ -719,13 +734,14 @@ class InquirerForm extends Component {
 					title="Previous Consultation"
 					heading={currentConsultationName}
 					body={modalPrevConsultBody}
-					buttonsecondlabel="Edit (Coming soon...)"
-					onConfirm={() => this.hideConsultModal()}
+					// buttonsecondlabel="Edit (Coming soon...)"
+					// onConfirm={() => this.hideConsultModal()}
 					buttoncloselabel="Close"
 					onHide={() => this.hideConsultModal()}
 				/>
+
 				{/* confirm replace current consultation with previous */}
-				<ModalWindow
+				{/* <ModalWindow
 					size="md"
 					show={this.state.showConfirmReplaceModal}
 					title="Edit Previous Consultation?"
@@ -735,7 +751,9 @@ class InquirerForm extends Component {
 					onConfirm={() => this.replaceWithPrevious()}
 					buttoncloselabel="Go back to Current Consultation"
 					onHide={() => this.hideConfirmReplaceModal()}
-				/>
+				/> */}
+
+				{timerCounter}
 			</>
 		);
 	}
@@ -759,7 +777,7 @@ const ModalWindow = props => {
 				{props.body}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button onClick={props.onConfirm}>{props.buttonsecondlabel}</Button>
+				{/* <Button onClick={props.onConfirm}>{props.buttonsecondlabel}</Button> */}
 				<Button onClick={props.onHide}>{props.buttoncloselabel}</Button>
 			</Modal.Footer>
 		</Modal>

@@ -1,0 +1,17 @@
+.background {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    height: 68px;
+    width: 68px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.timerText {
+    color: white;
+    font-size: 18px;
+    padding-top: 21px;
+    text-align: center;
+    font-weight: 600;
+}
