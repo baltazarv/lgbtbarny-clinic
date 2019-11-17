@@ -1,44 +1,22 @@
 {
   "name": "lgbtbarny-clinic",
-  "version": "0.1.0",
-  "private": true,
-  "engines": {
-    "npm": "6.9.0",
-    "node": "10.16.0"
-  },
-  "dependencies": {
-    "airtable": "^0.7.2",
-    "bootstrap": "^4.3.1",
-    "node-sass": "^4.12.0",
-    "react": "^16.10.2",
-    "react-bootstrap": "^1.0.0-beta.14",
-    "react-dom": "^16.10.2",
-    "react-redux": "^7.1.1",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.2.0",
-    "react-select": "^2.0.0-beta.7",
-    "redux": "^4.0.4",
-    "redux-thunk": "^2.3.0"
-  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "node server.js",
+    "start-client": "cd client && npm start",
+    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build",
+    "dev": "concurrently --kill-others-on-fail \"npm start\" \"npm run start-client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "keywords": [],
+  "author": "Baltazar Villegas",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "concurrently": "^5.0.0"
   }
 }
