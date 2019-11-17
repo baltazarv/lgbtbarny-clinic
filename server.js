@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+// process.env.PORT: port injected by web host
 const port = process.env.PORT || 8080;
 
 app.get('/api/ping', (req, res) => {
