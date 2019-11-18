@@ -7,6 +7,7 @@ node_modules
 
 # production
 client/build
+/client/src/config/dev.js
 
 # misc
 .DS_Store

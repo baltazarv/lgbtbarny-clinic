@@ -1,9 +1,10 @@
-var Airtable = require('airtable');
+const Airtable = require('airtable');
+const keys = require('./config/keys');
 
 Airtable.configure({
 		endpointUrl: 'https://api.airtable.com',
-		apiKey: process.env.REACT_APP_AIRTABLE_API_KEY
+		apiKey: keys.airTableApiKey
 });
-var base = Airtable.base(process.env.REACT_APP_AIRTABLE_BASE);
+const airtableBase = Airtable.base(keys.airTableBaseKey);
 
-export default base;
+export default airtableBase;
