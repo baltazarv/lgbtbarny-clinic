@@ -15,11 +15,22 @@ import Modal from 'react-bootstrap/Modal';
 import ReactSelectWithValidation from '../../components/ReactSelectWithValidation';
 import TimerCounter from '../../components/TimerCountdown/index';
 
+import axios from 'axios';
+
 import styles from './InquirerForm.module.css';
 
 import * as peopleFields from '../../data/peopleFields';
 import * as consultFields from '../../data/consultionFields';
 
+const EMAIL_OPTIONS = {
+	from: 'LeGaL <no-reply@le-gal.org>',
+	// to: 'baltazarv@gmail.com',
+	subject: 'Thank you for visiting the Tuesday Night Clinic of the LGBT Bar Association of Greater New York',
+	defaultBody: 'Thank you for visiting the Tuesday Night Clinic of the LGBT Bar Association of Greater New York.  Please find below specific information, if any, provided to you by our volunteer lawyers.',
+	filename: 'email-visitor.html',
+}
+
+// consultation values
 const DISP_NO_FURTHER = 'No further action required or available. Info/counsel provided.';
 const DISP_FEE_BASED = 'Fee-based - Lawyer Referral Network (LRN) - limited availability';
 const DISP_PRO_BONO = 'Pro Bono Panel (PBP) - VERY limited availability!';
@@ -29,6 +40,7 @@ const TYPE_CLINIC = 'Clinic';
 const SUBMIT_FIELDS_DEFAULT = {
 	[consultFields.TYPE]: TYPE_CLINIC,
 	[consultFields.DATE]: new Date().toISOString().substr(0, 10),
+	[consultFields.EMAIL_TEXT_SENT]: EMAIL_OPTIONS.defaultBody,
 };
 
 class InquirerForm extends Component {
@@ -47,20 +59,18 @@ class InquirerForm extends Component {
 			inquirerIsSelected: false,
 			situation: '',
 			showConsultModal: false,
-			showConfirmReplaceModal: false,
-			// dispositions: [],
-			// formDispositionNoFurther: false,
-			// formDispositionProBono: false,
-			// formDispositionImpact: false,
+			emailEditModalShown: false,
 			isReferralDispositionChecked: false,
 			lawTypes: [],
 			lawTypeIsSelected: false,
 			refSummary: '',
+			emailMessage: '',
+			emailMessageTemp: '',
 			submitFields: SUBMIT_FIELDS_DEFAULT, // AirTable format
 			validated: false, // for use later
 			submitSuccess: false,
 			submitError: false,
-			submitButtonLabel: 'Submit',
+			submitButtonLabel: 'Submit & Send Email to Visitor',
 			timeSpent: 0,
 		}
 	}
@@ -69,6 +79,9 @@ class InquirerForm extends Component {
 		this.props.getLawyers();
 		this.props.getInquirers();
 		this.props.getLawTypes();
+		this.setState({
+			emailMessage: EMAIL_OPTIONS.defaultBody,
+		})
 	}
 
 	componentDidUpdate(prevProps) {
@@ -111,13 +124,29 @@ class InquirerForm extends Component {
 		this.setState({ showConsultModal: false });
 	}
 
-	showConfirmReplaceModal = (inqId, consultId) => {
-		this.hideConsultModal();
-		this.setState({ showConfirmReplaceModal: true, });
+	showEmailEditModal = () => {
+		this.setState(state => {
+			return {
+				emailMessageTemp: state.emailMessage,
+				emailEditModalShown: true,
+			}
+		});
 	}
 
-	hideConfirmReplaceModal = () => {
-		this.setState({ showConfirmReplaceModal: false });
+	cancelEditModal = () => {
+		this.setState({ emailEditModalShown: false });
+	}
+
+	saveEditModal = async () => {
+		this.setState(state => {
+			const submitFields = {...state.submitFields};
+			submitFields[consultFields.EMAIL_TEXT_SENT] = state.emailMessageTemp;
+			return {
+				submitFields,
+				emailMessage: state.emailMessageTemp,
+				emailEditModalShown: false,
+			}
+		});
 	}
 
 	replaceWithPrevious = () => {
@@ -260,6 +289,7 @@ class InquirerForm extends Component {
 			case 'refSummary':
 				submitFields[consultFields.REF_SUMMARY] = value;
 				break;
+			// 'emailMessage': updated on saveEditModal
 			default:
 		}
 
@@ -322,7 +352,7 @@ class InquirerForm extends Component {
 		}
 		if (form.checkValidity() === true && this.state.lawyerIsSelected && this.state.inquirerIsSelected && !lawTypeReqAndEmpty) {
 			this.props.createConsultation(this.state.submitFields);
-			// form.reset();
+			this.sendEmail(); // add error handling if email cannot be sent
 			this.setState({
 				submitSuccess: true,
 				submitError: false,
@@ -334,6 +364,14 @@ class InquirerForm extends Component {
 			})
 		}
 		this.setState({ validated: true });
+	}
+
+	sendEmail = () => {
+		const options = {...EMAIL_OPTIONS};
+		options['customText'] = this.state.emailMessage;
+		options['to'] = this.props.currentInquirers[0].email;
+		axios.post('/api/v1/sendemail', options)
+		// .then(() => {});
 	}
 
 	clearDispoRadios = () => {
@@ -357,9 +395,10 @@ class InquirerForm extends Component {
 			refSummary: '',
 			lawTypes: [],
 			submitFields,
-			submitButtonLabel: 'Submit Another',
+			submitButtonLabel: 'Submit & Send Email to Another Visitor',
 			validated: false,
 			isReferralDispositionChecked: false,
+			emailMessage: EMAIL_OPTIONS.defaultBody,
 		});
 		this.props.setCurrentInquirers([]);
 	}
@@ -417,7 +456,7 @@ class InquirerForm extends Component {
 
 		// selected inquirer(s)
 		let currentInquirerInfo = 'Loading...';
-		if (this.props.currentInquirers) {
+		if (this.props.currentInquirers.length > 0) {
 			currentInquirerInfo = (
 				this.props.currentInquirers.map(inq => {
 					return (
@@ -444,7 +483,7 @@ class InquirerForm extends Component {
 									</ListGroup.Item>
 								) : null}
 								{/* consultations */}
-								{inq.consultationsExp ? (
+								{inq && inq.consultationsExp ? (
 									<ListGroup.Item>
 										<strong>Previous Consultations:</strong>
 										<ul className="mb-0">
@@ -473,7 +512,7 @@ class InquirerForm extends Component {
 		let modalPrevConsultBody = null;
 		const prevConsultation = this.state.prevConsultation;
 		if (prevConsultation) {
-			currentConsultationName = `${prevConsultation.name}`;
+			currentConsultationName = <h3>{prevConsultation.name}</h3>;
 			let lawyers = [];
 			if (prevConsultation.lawyers) {
 				lawyers = prevConsultation.lawyers.map(consultLawyer => {
@@ -507,6 +546,53 @@ class InquirerForm extends Component {
 			)
 		}
 
+		// edit visitor email modal
+		let linkToEmailEditModal = null;
+		let emailEditModalTitle = null;
+		let emailEditModalHead = null;
+		let emailEditModalBody = null;
+		if (this.state.inquirerIsSelected) {
+			const firstCurrInquirer = this.props.currentInquirers[0];
+			const firstCurrInqName = `${firstCurrInquirer.firstName} ${firstCurrInquirer.lastName}`;
+			if (firstCurrInquirer.email) {
+
+				linkToEmailEditModal = <Row>
+					<Col>
+					<Button
+						onClick={() => this.showEmailEditModal()}
+						variant="link" size="md" className="mb-3">
+							Add Custom Message to Email for {firstCurrInqName}
+					</Button>
+					</Col>
+				</Row>;
+
+				emailEditModalTitle = `Edit Email for ${firstCurrInqName}`;
+
+				emailEditModalHead = <div className="text-muted small">
+					<span className="font-weight-bold">from:</span> {EMAIL_OPTIONS.from}<br />
+					<span className="font-weight-bold">to:</span> {firstCurrInquirer.email}<br />
+					<span className="font-weight-bold">subject:</span> {EMAIL_OPTIONS.subject}<br/><br />
+					<span className="font-weight-bold">body:</span> {EMAIL_OPTIONS.message}
+				</div>
+
+				emailEditModalBody = <div>
+					{/* custom email message */}
+					<Form.Group controlId="emailMessageTemp">
+						<Form.Control
+							style={{fontSize: '0.8em'}}
+							as="textarea"
+							rows="7"
+							value={this.state.emailMessageTemp}
+							name="emailMessageTemp"
+							onChange={this.handleInputChange}
+							/>
+					</Form.Group>
+				</div>
+			} else {
+				linkToEmailEditModal = <div className="text-danger mb-3">Email address not entered for {firstCurrInqName} - will not receive email.</div>
+			}
+		}
+
 		// success message
 		let successMessage = null;
 		let lastConsult = '';
@@ -514,9 +600,9 @@ class InquirerForm extends Component {
 			lastConsult = this.props.consultsCreated[this.props.consultsCreated.length - 1][consultFields.NAME];
 			if (this.state.submitSuccess) {
 				successMessage = <Row>
-				<Col xs={8} className="mx-auto w-50 p-3 text-center font-italic text-success"><span className="font-weight-bold">{lastConsult}</span> was successfully created!<br />
-				Time spent: {this.state.timeSpent} minutes.</Col>
-			</Row>;
+					<Col xs={8} className="mx-auto w-50 p-3 text-center font-italic text-success"><span className="font-weight-bold">{lastConsult}</span> was successfully created!<br />
+						Time spent: {this.state.timeSpent} minutes.</Col>
+				</Row>;
 			}
 		}
 
@@ -524,9 +610,9 @@ class InquirerForm extends Component {
 		let errorMessage = null;
 		if (this.state.submitError) {
 			errorMessage = <Row>
-			<Col className="mx-auto w-50 p-3 text-center font-italic text-danger">More info needed.<br />
-			Please fill out <span className="font-weight-bold">empty fields in red</span> above!</Col>
-		</Row>;
+				<Col className="mx-auto w-50 p-3 text-center font-italic text-danger">More info needed.<br />
+					Please fill out <span className="font-weight-bold">empty fields in red</span> above!</Col>
+			</Row>;
 		}
 
 		let timerCounter = null;
@@ -706,21 +792,25 @@ class InquirerForm extends Component {
 												name="refSummary"
 												onChange={this.handleInputChange}
 											/>
-											{/* <Form.Control.Feedback type="invalid">Please add summary for the referral.</Form.Control.Feedback> */}
 										</Form.Group>
 									</div>
 								</Collapse>
+								{linkToEmailEditModal}
+								<Row className="justify-content-start">
+									<Col>
+										{/* submit */}
+										<Button
+											variant="primary"
+											type="submit"
+										>
+											{this.state.submitButtonLabel}
+										</Button>
+									</Col>
+								</Row>
 
-								{/* submit */}
-								<Button
-									variant="primary"
-									type="submit"
-								>
-									{this.state.submitButtonLabel}
-								</Button>
 							</Form>
 
-							{/* confirmation && error messages */}
+							{/* confirmation & error messages */}
 							{successMessage}
 							{errorMessage}
 						</Card.Body>
@@ -728,60 +818,54 @@ class InquirerForm extends Component {
 				</Container>
 
 				{/* previous consultation info */}
-				<ModalWindow
-					size="md"
+				<Modal
 					show={this.state.showConsultModal}
-					title="Previous Consultation"
-					heading={currentConsultationName}
-					body={modalPrevConsultBody}
-					// buttonsecondlabel="Edit (Coming soon...)"
-					// onConfirm={() => this.hideConsultModal()}
-					buttoncloselabel="Close"
-					onHide={() => this.hideConsultModal()}
-				/>
-
-				{/* confirm replace current consultation with previous */}
-				{/* <ModalWindow
+					onHide={this.hideConsultModal}
 					size="md"
-					show={this.state.showConfirmReplaceModal}
-					title="Edit Previous Consultation?"
-					heading={currentConsultationName}
-					body={<div className="text-danger"><strong>Warning: </strong>What you have entered on the current Clinic Consultation form will be lost and replaced with the previous consultation.</div>}
-					buttonsecondlabel="Replace with Previous"
-					onConfirm={() => this.replaceWithPrevious()}
-					buttoncloselabel="Go back to Current Consultation"
-					onHide={() => this.hideConfirmReplaceModal()}
-				/> */}
+					aria-labelledby="contained-modal-title-vcenter"
+					centered
+				>
+					<Modal.Header closeButton>
+						<Modal.Title id="contained-modal-title-vcenter">
+							Previous Consultation
+						</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						{currentConsultationName}
+						{modalPrevConsultBody}
+					</Modal.Body>
+					<Modal.Footer>
+						<Button onClick={this.hideConsultModal}>Close</Button>
+					</Modal.Footer>
+				</Modal>
+
+				{/* edit email modal */}
+				<Modal
+					show={this.state.emailEditModalShown}
+					onHide={this.cancelEditModal}
+					size="md"
+					aria-labelledby="contained-modal-title-vcenter"
+					centered
+				>
+					<Modal.Header closeButton>
+						<Modal.Title id="contained-modal-title-vcenter">
+							{emailEditModalTitle}
+						</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						{emailEditModalHead}
+						{emailEditModalBody}
+					</Modal.Body>
+					<Modal.Footer>
+						<Button onClick={this.cancelEditModal}>Cancel</Button>
+						<Button onClick={this.saveEditModal}>Save</Button>
+					</Modal.Footer>
+				</Modal>
 
 				{timerCounter}
 			</>
 		);
 	}
-}
-
-const ModalWindow = props => {
-	return (
-		<Modal
-			{...props}
-			size={props.size}
-			aria-labelledby="contained-modal-title-vcenter"
-			centered
-		>
-			<Modal.Header closeButton>
-				<Modal.Title id="contained-modal-title-vcenter">
-					{props.title}
-				</Modal.Title>
-			</Modal.Header>
-			<Modal.Body>
-				<h3>{props.heading}</h3>
-				{props.body}
-			</Modal.Body>
-			<Modal.Footer>
-				{/* <Button onClick={props.onConfirm}>{props.buttonsecondlabel}</Button> */}
-				<Button onClick={props.onHide}>{props.buttoncloselabel}</Button>
-			</Modal.Footer>
-		</Modal>
-	);
 }
 
 const mapStateToProps = state => {

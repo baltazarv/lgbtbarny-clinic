@@ -10,3 +10,5 @@ export const SITUATION = 'Inquirer\'s Situation';
 export const DISPOSITIONS = 'Disposition'; // array
 export const REF_SUMMARY = 'Referral Summary';
 export const LAW_TYPES = 'Type Of Law'; // array
+
+export const EMAIL_TEXT_SENT = 'Email Text Sent';

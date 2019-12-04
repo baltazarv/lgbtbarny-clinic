@@ -11,28 +11,6 @@ import logo from './assets/images/logo.png';
 
 class App extends React.Component {
 
-	// test server
-	constructor(props) {
-		super(props);
-		this.state = {
-			testResponse: "",
-		}
-	}
-
-	componentDidMount() {
-		this.getTestResponse()
-			.then(testResponse => this.setState({ testResponse }))
-			.catch(err => console.log('ERR', err));
-	}
-
-	getTestResponse = async () => {
-		const resp = await fetch('/api/ping');
-		const body = await resp.json();
-		if (resp.status !== 200) throw Error(body.message);
-		return body;
-	}
-
-
 	render() {
 		return (
 			<>
@@ -44,7 +22,7 @@ class App extends React.Component {
 							width="auto"
 							height="30"
 							className="d-inline-block align-top"
-						/>{' Clinic Forms'} {this.state.testResponse}
+						/>{' Clinic Forms'}
 					</Navbar.Brand>
 					<Navbar.Collapse className="justify-content-end">
 						<Nav>

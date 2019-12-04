@@ -1,17 +1,44 @@
 const express = require('express');
 const path = require('path');
+const bodyParser = require('body-parser');
+const nunjucks = require('nunjucks');
 const app = express();
 // process.env.PORT: port injected by web host
 const port = process.env.PORT || 8080;
 
-app.get('/api/ping', (req, res) => {
-	console.log('pong');
-	res.json('pong');
+const Email = require('./utils/Email');
+/* to read file from server */
+// const getTemplate = require('./utils/getTemplate');
+const env = nunjucks.configure(['views', 'views/email'], {
+	autoescape: true,
+	express: app,
+});
+
+app.use(bodyParser.json());
+
+app.post('/api/v1/sendemail', async (req, res) => {
+	try {
+		/** if need to read file from server, require './utils/getTemplate' **/
+		// const template = await getTemplate(req.body.filename);
+
+		const template = nunjucks.render('email-visitor.html', {custommsg: req.body.customText});
+		const email = new Email(template, req.body).send();
+
+		res.status(200).json({
+			status: 'success',
+			message: 'Email sent to Mailtrap'
+		})
+
+	} catch(err) {
+		console.log('post err', err);
+	}
 });
 
 if (process.env.NODE_ENV === 'production') {
+	// will serve a specific requested asset
 	app.use(express.static(path.join(__dirname, 'client/build')));
-	app.get('*', function (req, res) {
+	// or else will serve index.html (catch-all case)
+	app.get('*', (req, res) => {
 		res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 	});
 }
