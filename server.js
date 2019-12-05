@@ -51,5 +51,14 @@ if (process.env.NODE_ENV === 'production') {
 	app.get('*', (req, res) => {
 		res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 	});
+
+	// basic HTTP authentication
+	const auth = require('http-auth');
+	const basic = auth.basic({
+		realm: 'LeGaL Clinic',
+		file: __dirname + '/.htpasswd'
+	});
+	app.use(auth.connect(basic));
 }
+
 app.listen(port, () => console.log(`App listening on http://localhost:${port}`));
