@@ -2,7 +2,13 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const nunjucks = require('nunjucks');
+const dotenv = require('dotenv')
 const app = express();
+
+dotenv.config({
+	path: './config.env'
+});
+
 // process.env.PORT: port injected by web host
 const port = process.env.PORT || 8080;
 
@@ -21,7 +27,11 @@ app.post('/api/v1/sendemail', async (req, res) => {
 		/** if need to read file from server, require './utils/getTemplate' **/
 		// const template = await getTemplate(req.body.filename);
 
-		const template = nunjucks.render('email-visitor.html', {custommsg: req.body.customText});
+
+		const customTxtHtmlBR = req.body.customText.replace(/(\r\n|\n|\r)/g, '<br />')
+		const template = nunjucks.render('email-visitor.html', {
+			custommsg: customTxtHtmlBR
+		});
 		const email = new Email(template, req.body).send();
 
 		res.status(200).json({
@@ -29,7 +39,7 @@ app.post('/api/v1/sendemail', async (req, res) => {
 			message: 'Email sent to Mailtrap'
 		})
 
-	} catch(err) {
+	} catch (err) {
 		console.log('post err', err);
 	}
 });

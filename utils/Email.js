@@ -19,7 +19,6 @@ module.exports = class Email {
 			pass: keys.emailPass,
 		}
 
-		console.log('process.env.NODE_ENV', process.env.NODE_ENV)
 
 		if (process.env.NODE_ENV === 'production') {
 			// SendGrid
@@ -31,8 +30,8 @@ module.exports = class Email {
 
 		// Mailtrap
 		return nodemailer.createTransport({
-			host: keys.emailHost,
-			port: keys.emailPort,
+			host: keys.mailtrapHost,
+			port: keys.mailtrapPort,
 			auth,
 		});
 	}

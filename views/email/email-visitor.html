@@ -1,5 +1,5 @@
 {% extends "default.html" %}
-{% set preheader = "Tuesday Night Clinic of the LGBT Bar Association of Greater New York" %}
+<!-- {% set preheader = "Tuesday Night Clinic of the LGBT Bar Association of Greater New York" %} -->
 
 {% block content %}
               <!-- START MAIN CONTENT AREA -->
@@ -9,7 +9,7 @@
                     <tr>
                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
                         <!-- <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Thank you for visiting the Tuesday Night Clinic of the LGBT Bar Association of Greater New York.  Please find below specific information, if any, provided to you by our volunteer lawyers.</p> -->
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">{{custommsg}}</p>
+                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">{{custommsg|safe}}</p>
                       </td>
                     </tr>
                   </table>

@@ -352,7 +352,7 @@ class InquirerForm extends Component {
 		}
 		if (form.checkValidity() === true && this.state.lawyerIsSelected && this.state.inquirerIsSelected && !lawTypeReqAndEmpty) {
 			this.props.createConsultation(this.state.submitFields);
-			this.sendEmail(); // add error handling if email cannot be sent
+			this.sendEmail(); // add error handling
 			this.setState({
 				submitSuccess: true,
 				submitError: false,
