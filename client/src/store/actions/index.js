@@ -1,6 +1,5 @@
 export {
 	getInquirers,
-	initCurrentInquirers,
 	setCurrentInquirers,
 	getLawyers,
 } from './people';
@@ -10,7 +9,7 @@ export {
 } from './lawtypes';
 
 export {
+	getCurrInqPastConsults,
 	createConsultation,
 	consultationInProgress,
-	// initConsultations
 } from './consultations';

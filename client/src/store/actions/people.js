@@ -2,17 +2,16 @@ import * as actionTypes from './actionTypes';
 import airtableBase from '../../airtableBase';
 
 import * as peopleFields from '../../data/peopleFields';
-import * as consultFields from '../../data/consultionFields';
+// move constants to client/src/data?
 const PEOPLE_TABLE = 'People';
 const INQUIRERS_VIEW = 'Inquirers';
 const LAWYERS_VIEW = 'Lawyers';
-const CONSULT_TABLE = 'Consultations';
 
 // async action creators
 
 export const getLawyers = () => {
 	return dispatch => {
-		let lawyers =[];
+		let lawyers = [];
 		airtableBase(PEOPLE_TABLE).select({
 			fields: [
 				peopleFields.FIRST_NAME,
@@ -88,93 +87,6 @@ export const getInquirers = () => {
 			}
 			dispatch(initInquirers(inquirers));
 		});
-	}
-}
-
-// check for expanded consultation info on inquirers
-//	adds property if missing
-export const initCurrentInquirers = inqs => {
-	return dispatch => {
-		// if expanded consultation info already added to all inquirers, init inquirers
-		const hasConsultations = inqs.every(inq => {
-			return (inq.consultations && inq.consultationsExp);
-		})
-		if (hasConsultations) {
-			dispatch(setCurrentInquirers(inqs));
-			return;
-		}
-
-		// else get consultation rec id
-		const consultIds = inqs.reduce((acc, inq) => {
-			if (inq.consultations && inq.consultations.length) {
-				return [...acc, ...inq.consultations]
-			}
-			return acc;
-		}, []);
-		/* filterByFormula
-		OR(
-			RECORD_ID() = 'recwQW5JVQFCZAZt8',
-			RECORD_ID() = 'recj49jLIShvTEg6f',
-			RECORD_ID() = 'recR09DMEKd1YPfyH'
-			) */
-			let filterByFormula = 'OR(';
-			filterByFormula += consultIds.map(id => {
-				return `RECORD_ID() = '${id}'`
-			}).toString();
-			filterByFormula += ')';
-
-		// get consultations from airtable & match to inquirer objects
-		const consultations = [];
-		airtableBase(CONSULT_TABLE).select({
-			filterByFormula: filterByFormula,
-			fields: [
-				consultFields.NAME,
-				consultFields.DATE,
-				consultFields.LAWYERS,
-				consultFields.INQUIRERS,
-				consultFields.SITUATION,
-				consultFields.DISPOSITIONS,
-				consultFields.REF_SUMMARY,
-				consultFields.LAW_TYPES,
-				consultFields.STATUS
-			]
-		}).eachPage(function page(records, fetchNextPage) {
-			records.forEach(rec => {
-				consultations.push({
-					id: rec.id,
-					name: rec.get(consultFields.NAME),
-					date: rec.get(consultFields.DATE),
-					lawyers: rec.get(consultFields.LAWYERS),
-					inquirers: rec.get(consultFields.INQUIRERS),
-					situation: rec.get(consultFields.SITUATION),
-					dispositions: rec.get(consultFields.DISPOSITIONS),
-					summary: rec.get(consultFields.REF_SUMMARY),
-					lawTypes: rec.get(consultFields.LAW_TYPES),
-					status: rec.get(consultFields.STATUS),
-				});
-			})
-			fetchNextPage();
-		}, function done(err) {
-			if(err) {
-				console.log('Airtable Error: ', err);
-				return;
-			}
-
-			// for each inquirer add expanded consultation property
-			const inqsWithConsult = inqs.map(inq => {
-				let inqWithConsult = null;
-				if (inq.consultations && inq.consultations.length > 0) {
-					inqWithConsult = inq.consultations.map(inqConsultId => {
-						return consultations.find(consult => {
-							return inqConsultId === consult.id;
-						})
-					});
-					inq.consultationsExp = inqWithConsult;
-				}
-				return inq;
-			});
-			dispatch(setCurrentInquirers(inqsWithConsult));
-		})
 	}
 }
 

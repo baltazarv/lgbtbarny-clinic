@@ -62,7 +62,8 @@ class InquirerForm extends Component {
 			inquirers: [],
 			inquirerIsSelected: false,
 			situation: '',
-			showConsultModal: false,
+			prevConsultSelected: false,
+			consultModalShown: false,
 			emailEditModalShown: false,
 			isReferralDispositionChecked: false,
 			lawTypes: [],
@@ -114,24 +115,18 @@ class InquirerForm extends Component {
 		}
 	}
 
-	getPrevConsultation(inqId, consultId) {
-		const inquirer = this.props.currentInquirers.find(inq => {
-			return inq.id === inqId;
-		});
-		return inquirer.consultationsExp.find(consult => {
+	showConsultModal = (consultId) => {
+		const prevConsultSelected = this.props.currInqsPastConsults.find(consult => {
 			return consult.id === consultId;
 		});
-	}
-
-	showConsultModal = (inqId, consultId) => {
 		this.setState({
-			prevConsultation: this.getPrevConsultation(inqId, consultId),
-			showConsultModal: true,
+			prevConsultSelected,
+			consultModalShown: true,
 		});
 	}
 
 	hideConsultModal = () => {
-		this.setState({ showConsultModal: false });
+		this.setState({ consultModalShown: false });
 	}
 
 	showEmailEditModal = () => {
@@ -257,7 +252,8 @@ class InquirerForm extends Component {
 				currentInquirers = [...currentInquirers, inquirerChoice];
 			});
 		}
-		this.props.initCurrentInquirers(currentInquirers);
+		this.props.setCurrentInquirers(currentInquirers);
+		this.props.getCurrInqPastConsults(currentInquirers);
 	}
 
 	// inquirer situation (notes) & ref summary" text area
@@ -399,6 +395,7 @@ class InquirerForm extends Component {
 			emailBodyModifyConfirmed: false,
 		});
 		this.props.setCurrentInquirers([]);
+		// no need to call this.props.setCurrInqPastConsults([]);
 	}
 
 	// format lawyers into select options: { label: "Alligators", value: 1 },
@@ -452,6 +449,47 @@ class InquirerForm extends Component {
 
 		let lawTypeOptions = this.getLawTypeSelectOptions(this.props.lawTypes);
 
+		// selected inquirer's past consultations
+		const renderPastConsults = inqId => {
+			// wait till prop is populated
+			if (this.props.currInqsPastConsults.length < 1) {
+				return null;
+			} else {
+				// get consultation for inquirer id passed
+				const consultsForInq = this.props.currInqsPastConsults.reduce((acc, curr) => {
+					if (curr.inquirers.some(inq => inq === inqId)) {
+						acc.push(curr);
+					}
+					return acc;
+				}, []);
+				if (consultsForInq.length > 0) {
+					return <ListGroup.Item>
+					<strong>Previous Consultations:</strong>
+					<ul className="mb-0">
+						{consultsForInq.map(consult => {
+							const lawyers = consult.lawyers.reduce((acc, curr) => {
+								const lawyerInfo = this.props.lawyers.find(_lawyer => curr === _lawyer.id);
+								acc.push(lawyerInfo.firstName + ' ' + lawyerInfo.lastName);
+								return acc;
+							}, []);
+							return <li
+								key={consult.id}
+							>
+								<Button
+									onClick={() => this.showConsultModal(consult.id)}
+									variant="link" size="sm">
+										{consult.name} with {lawyers.join(', ')}
+								</Button>
+							</li>
+							})}
+						</ul>
+					</ListGroup.Item>
+				} else {
+					return null;
+				}
+			}
+		}
+
 		// selected inquirer(s)
 		let currentInquirerInfo = 'Loading...';
 		if (this.props.currentInquirers.length > 0) {
@@ -480,24 +518,10 @@ class InquirerForm extends Component {
 										<strong>Repeat Visit(s):</strong> Yes
 									</ListGroup.Item>
 								) : null}
+
 								{/* consultations */}
-								{inq && inq.consultationsExp ? (
-									<ListGroup.Item>
-										<strong>Previous Consultations:</strong>
-										<ul className="mb-0">
-											{inq.consultationsExp.map(consult => {
-												return <li
-													key={consult.id}
-												>
-													<Button
-														onClick={() => this.showConsultModal(inq.id, consult.id)}
-														variant="link" size="sm">{consult.name}
-													</Button>
-												</li>
-											})}
-										</ul>
-									</ListGroup.Item>
-								) : null}
+								{renderPastConsults(inq.id)}
+
 							</ListGroup>
 						</div>
 					)
@@ -508,7 +532,7 @@ class InquirerForm extends Component {
 		// format modal window with previous consultation
 		let currentConsultationName = '';
 		let modalPrevConsultBody = null;
-		const prevConsultation = this.state.prevConsultation;
+		const prevConsultation = this.state.prevConsultSelected;
 		if (prevConsultation) {
 			currentConsultationName = <h3>{prevConsultation.name}</h3>;
 			let lawyers = [];
@@ -846,7 +870,7 @@ class InquirerForm extends Component {
 
 				{/* previous consultation info */}
 				<Modal
-					show={this.state.showConsultModal}
+					show={this.state.consultModalShown}
 					onHide={this.hideConsultModal}
 					size="md"
 					aria-labelledby="contained-modal-title-vcenter"
@@ -900,6 +924,7 @@ const mapStateToProps = state => {
 		lawyers: state.people.lawyers,
 		inquirers: state.people.inquirers,
 		currentInquirers: state.people.currentInquirers,
+		currInqsPastConsults: state.consultations.currInqsPastConsults,
 		lawTypes: state.lawTypes.lawTypes,
 		consultSubmitStatus: state.consultations.consultSubmitStatus,
 		consultsCreated: state.consultations.consultsCreated
@@ -910,8 +935,8 @@ const mapDispatchToProps = dispatch => {
 	return {
 		getLawyers: () => dispatch(actions.getLawyers()),
 		getInquirers: () => dispatch(actions.getInquirers()),
-		initCurrentInquirers: inqs => dispatch(actions.initCurrentInquirers(inqs)),
-		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)), // called when clearing form
+		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)),
+		getCurrInqPastConsults: inqs => dispatch(actions.getCurrInqPastConsults(inqs)),
 		getLawTypes: () => dispatch(actions.getLawTypes()),
 		createConsultation: consult => dispatch(actions.createConsultation(consult)),
 		consultationInProgress: () => dispatch(actions.consultationInProgress()),
