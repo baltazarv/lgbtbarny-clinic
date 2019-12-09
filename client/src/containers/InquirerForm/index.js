@@ -22,11 +22,15 @@ import styles from './InquirerForm.module.css';
 import * as peopleFields from '../../data/peopleFields';
 import * as consultFields from '../../data/consultionFields';
 
+import { renderToStaticMarkup } from 'react-dom/server';
+import jsxToPlainText from '../../utils/jsxToPlainText';
+
 const EMAIL_OPTIONS = {
 	from: 'LeGaL <no-reply@le-gal.org>',
 	// to: 'baltazarv@gmail.com',
 	subject: 'Thank you for visiting the Tuesday Night Clinic of the LGBT Bar Association of Greater New York',
-	defaultBody: 'Thank you for visiting the Tuesday Night Clinic of the LGBT Bar Association of Greater New York.  Please find below specific information, if any, provided to you by our volunteer lawyers.',
+	bodyPre: 'Thank you for visiting tonight\'s Clinic. If the volunteer lawyer with whom you had a consultation indicated that specific information would be provided, please find that information below.',
+	bodyPost: <span>Our Clinic provides brief, on-the-spot legal services, so <strong><em>we are unable to provide ongoing follow-up or to guarantee that any referrals that might be made to our Lawyer Referral Network will be picked up</em></strong> for consultation or representation. If a referral is picked up, however, you and the prospective lawyer(s) will receive email notification so that you can be in touch. Please also feel free to return to the Clinic for other legal questions.</span>,
 	filename: 'email-visitor.html',
 }
 
@@ -40,7 +44,7 @@ const TYPE_CLINIC = 'Clinic';
 const SUBMIT_FIELDS_DEFAULT = {
 	[consultFields.TYPE]: TYPE_CLINIC,
 	[consultFields.DATE]: new Date().toISOString().substr(0, 10),
-	[consultFields.EMAIL_TEXT_SENT]: EMAIL_OPTIONS.defaultBody,
+	[consultFields.EMAIL_TEXT_SENT]: `${EMAIL_OPTIONS.bodyPre}<br /><br />${renderToStaticMarkup(EMAIL_OPTIONS.bodyPost)}`,
 };
 
 class InquirerForm extends Component {
@@ -64,8 +68,14 @@ class InquirerForm extends Component {
 			lawTypes: [],
 			lawTypeIsSelected: false,
 			refSummary: '',
-			emailMessage: '',
+			// appears on textarea:
 			emailMessageTemp: '',
+			// custom message saved:
+			emailMessage: '',
+			// switch to textarea containing default text?
+			emailBodyDefaultModified: false,
+			// default text added to custom text and saved?
+			emailBodyModifyConfirmed: false,
 			submitFields: SUBMIT_FIELDS_DEFAULT, // AirTable format
 			validated: false, // for use later
 			submitSuccess: false,
@@ -80,7 +90,7 @@ class InquirerForm extends Component {
 		this.props.getInquirers();
 		this.props.getLawTypes();
 		this.setState({
-			emailMessage: EMAIL_OPTIONS.defaultBody,
+			emailMessage: '',
 		})
 	}
 
@@ -133,82 +143,50 @@ class InquirerForm extends Component {
 		});
 	}
 
+	editEmailBodyDefault = () => {
+		const bodyPostString = jsxToPlainText(EMAIL_OPTIONS.bodyPost);
+		this.setState(state => {
+			return {
+				emailBodyDefaultModified: true,
+				emailMessageTemp: EMAIL_OPTIONS.bodyPre + '\n\n' + (state.emailMessageTemp ? state.emailMessageTemp + '\n\n' : '') + bodyPostString
+			}
+		})
+		this.setState({
+		})
+	}
+
+	cancelCustomEmailDefault = () => {
+		this.setState({
+			emailBodyDefaultModified: false,
+			emailBodyModifyConfirmed: false,
+		})
+	}
+
 	cancelEditModal = () => {
-		this.setState({ emailEditModalShown: false });
+		this.setState(state => {
+			let emailBodyDefaultModified = state.emailBodyDefaultModified;
+			if(state.emailBodyDefaultModified && !state.emailBodyModifyConfirmed) emailBodyDefaultModified = false;
+			return {
+				emailEditModalShown: false,
+				emailBodyDefaultModified,
+				emailMessageTemp: '',
+			}
+		})
 	}
 
 	saveEditModal = async () => {
+		let emailBodyModifyConfirmed = false;
+		if(this.state.emailBodyDefaultModified) emailBodyModifyConfirmed = true;
 		this.setState(state => {
 			const submitFields = {...state.submitFields};
 			submitFields[consultFields.EMAIL_TEXT_SENT] = state.emailMessageTemp;
 			return {
 				submitFields,
+				emailBodyModifyConfirmed,
 				emailMessage: state.emailMessageTemp,
 				emailEditModalShown: false,
 			}
 		});
-	}
-
-	replaceWithPrevious = () => {
-		const prevConsultation = this.state.prevConsultation;
-		let consultLawyerSelectOptions = [];
-		if (prevConsultation.lawyers && prevConsultation.lawyers.length > 0) {
-			const prevConsultLawyers = prevConsultation.lawyers.map(id => {
-				return this.props.lawyers.find(lawyer => {
-					return lawyer.id === id;
-				})
-			})
-			consultLawyerSelectOptions = this.getLawyerSelectOptions(prevConsultLawyers);
-		}
-
-		let consultInquirerSelectOptions = [];
-		if (prevConsultation.inquirers && prevConsultation.inquirers.length > 0) {
-			const prevConsultInquirer = prevConsultation.inquirers.map(id => {
-				return this.props.inquirers.find(inquirer => {
-					return inquirer.id === id;
-				})
-			})
-			consultInquirerSelectOptions = this.getInquirerSelectOptions(prevConsultInquirer);
-		}
-
-		let consultLawTypeSelectOptions = [];
-		if (prevConsultation.lawTypes && prevConsultation.lawTypes.length > 0) {
-			const prevConsultLawTypes = prevConsultation.lawTypes.map(id => {
-				return this.props.lawTypes.find(lawType => {
-					return lawType.id === id;
-				})
-			})
-			consultLawTypeSelectOptions = this.getLawTypeSelectOptions(prevConsultLawTypes);
-		}
-
-		this.setState({
-			lawyers: consultLawyerSelectOptions,
-			inquirers: consultInquirerSelectOptions,
-			situation: prevConsultation.situation,
-			lawTypes: consultLawTypeSelectOptions,
-			refSummary: prevConsultation.summary,
-		})
-		this.clearDispoRadios();
-		if (prevConsultation.dispositions && prevConsultation.dispositions.length > 0) {
-			prevConsultation.dispositions.forEach(disp => {
-				const formDispositionNoFurther = this.formDispositionNoFurther.current;
-				if (disp === formDispositionNoFurther.value) {
-					formDispositionNoFurther.checked = true;
-				}
-				const formDispositionFeeBased = this.formDispositionFeeBased.current;
-				if (disp === formDispositionFeeBased.value) {
-					formDispositionFeeBased.checked = true;
-				}
-				const formDispositionProBono = this.formDispositionProBono.current;
-				if (disp === formDispositionProBono.value) {
-					formDispositionProBono.checked = true;
-				}
-				const formDispositionImpact = this.formDispositionImpact.current;
-				if (disp === formDispositionImpact.value) {
-					formDispositionImpact.checked = true;
-				}
-			});
-		}
 	}
 
 	formatName = inquirer => {
@@ -251,6 +229,13 @@ class InquirerForm extends Component {
 		let inquirerIsSelected = false;
 		if (inquirers.length > 0) {
 			inquirerIsSelected = true;
+		} else {
+			this.setState({
+				emailMessageTemp: '',
+				emailMessage: '',
+				emailBodyDefaultModified: false,
+				emailBodyModifyConfirmed: false,
+				})
 		}
 		this.setState((prevState, props) => {
 			let submitFields = { ...prevState.submitFields };
@@ -351,7 +336,10 @@ class InquirerForm extends Component {
 			lawTypeReqAndEmpty = true;
 		}
 		if (form.checkValidity() === true && this.state.lawyerIsSelected && this.state.inquirerIsSelected && !lawTypeReqAndEmpty) {
-			this.props.createConsultation(this.state.submitFields);
+			// newlines html to plain text
+			const cleanSubmitFields = {...this.state.submitFields};
+			cleanSubmitFields[consultFields.EMAIL_TEXT_SENT] = this.state.emailMessage.replace(/<br>|<br \/>/g, '\n').replace(/<[^>]*>/g, ""); // plain text to html replacement on server
+			this.props.createConsultation(cleanSubmitFields);
 			this.sendEmail(); // add error handling
 			this.setState({
 				submitSuccess: true,
@@ -368,8 +356,15 @@ class InquirerForm extends Component {
 
 	sendEmail = () => {
 		const options = {...EMAIL_OPTIONS};
-		options['customText'] = this.state.emailMessage;
+		// save newlines as html <br /> tags
+		const customTextHtml = this.state.emailMessage.replace(/(\r\n|\n|\r)/g, '<br />');
+		if(this.state.emailBodyModifyConfirmed) {
+			options['customText'] = customTextHtml;
+		} else {
+			options['customText'] = EMAIL_OPTIONS.bodyPre + '<br /><br />' + customTextHtml + (this.state.emailMessage ? '<br /><br />' : '') + renderToStaticMarkup(EMAIL_OPTIONS.bodyPost);
+		}
 		options['to'] = this.props.currentInquirers[0].email;
+		// console.log('EMAIL:', options['customText']);
 		axios.post('/api/v1/sendemail', options)
 		// .then(() => {});
 	}
@@ -398,7 +393,10 @@ class InquirerForm extends Component {
 			submitButtonLabel: 'Submit & Send Email to Another Visitor',
 			validated: false,
 			isReferralDispositionChecked: false,
-			emailMessage: EMAIL_OPTIONS.defaultBody,
+			emailMessageTemp: '',
+			emailMessage: '',
+			emailBodyDefaultModified: false,
+			emailBodyModifyConfirmed: false,
 		});
 		this.props.setCurrentInquirers([]);
 	}
@@ -555,13 +553,16 @@ class InquirerForm extends Component {
 			const firstCurrInquirer = this.props.currentInquirers[0];
 			const firstCurrInqName = `${firstCurrInquirer.firstName} ${firstCurrInquirer.lastName}`;
 			if (firstCurrInquirer.email) {
-
+				let customEmailBtnLabel = `Add Custom Message to Email for ${firstCurrInqName}`;
+				if (this.state.emailMessage) {
+					customEmailBtnLabel = `Custom Message to Email ${firstCurrInqName} Added`;
+				}
 				linkToEmailEditModal = <Row>
 					<Col>
 					<Button
 						onClick={() => this.showEmailEditModal()}
 						variant="link" size="md" className="mb-3">
-							Add Custom Message to Email for {firstCurrInqName}
+							{customEmailBtnLabel}
 					</Button>
 					</Col>
 				</Row>;
@@ -575,19 +576,45 @@ class InquirerForm extends Component {
 					<span className="font-weight-bold">body:</span> {EMAIL_OPTIONS.message}
 				</div>
 
-				emailEditModalBody = <div>
-					{/* custom email message */}
-					<Form.Group controlId="emailMessageTemp">
+				// custom email message
+				const customEmailTxtArea = (rows = 4) => <Form.Group controlId="emailMessageTemp">
 						<Form.Control
 							style={{fontSize: '0.8em'}}
 							as="textarea"
-							rows="7"
+							rows={rows}
 							value={this.state.emailMessageTemp}
 							name="emailMessageTemp"
 							onChange={this.handleInputChange}
 							/>
 					</Form.Group>
-				</div>
+				if (!this.state.emailBodyDefaultModified) {
+					emailEditModalBody = <div>
+						<div className={styles.emailBody}>
+							<div className="text-muted small mb-3">{EMAIL_OPTIONS.bodyPre}</div>
+							{customEmailTxtArea(4)}
+							<div className="text-muted small mt-3">{EMAIL_OPTIONS.bodyPost}</div>
+						</div>
+						<Button
+							onClick={() => this.editEmailBodyDefault()} size="sm" className="btn btn-sm btn-warning mt-3">
+								Edit Entire Email Body
+						</Button>
+					</div>
+				} else {
+					let editMsgBtn = null;
+					if (!this.state.emailBodyModifyConfirmed) {
+						editMsgBtn = <Button
+							onClick={this.cancelCustomEmailDefault} size="sm" className="btn btn-sm  mt-3">
+								Edit Custom Message Only
+						</Button>
+					}
+					emailEditModalBody = <div>
+						<div className={styles.emailBody}>
+							{customEmailTxtArea(11)}
+						</div>
+						{editMsgBtn}
+					</div>
+				}
+
 			} else {
 				linkToEmailEditModal = <div className="text-danger mb-3">Email address not entered for {firstCurrInqName} - will not receive email.</div>
 			}

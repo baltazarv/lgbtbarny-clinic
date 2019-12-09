@@ -35,12 +35,9 @@ app.post('/api/v1/sendemail', async (req, res) => {
 		/** if need to read file from server, require './utils/getTemplate' **/
 		// const template = await getTemplate(req.body.filename);
 
-		const customTxtHtmlBR = req.body.customText.replace(
-			/(\r\n|\n|\r)/g,
-			'<br />'
-		);
+		// custom text sent with HTML markup, incl <BR> newlines
 		const template = nunjucks.render('email-visitor.html', {
-			custommsg: customTxtHtmlBR
+			custommsg: req.body.customText
 		});
 		new Email(template, req.body).send();
 
