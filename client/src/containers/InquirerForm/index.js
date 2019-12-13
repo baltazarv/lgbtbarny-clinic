@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../store/actions/index';
 
-import Container from 'react-bootstrap/Container';
+import axios from 'axios';
+
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
@@ -10,19 +11,18 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
 import ListGroup from 'react-bootstrap/ListGroup';
-import Modal from 'react-bootstrap/Modal';
 
+import PrevConsultationModal from '../../components/modals/PrevConsultationModal';
+import EditEmailModal from '../../components/modals/EditEmailModal';
 import ReactSelectWithValidation from '../../components/ReactSelectWithValidation';
 import TimerCounter from '../../components/TimerCountdown/index';
-
-import axios from 'axios';
-
-import styles from './InquirerForm.module.css';
+// import styles from './InquirerForm.module.css';
 
 import * as peopleFields from '../../data/peopleFields';
 import * as consultFields from '../../data/consultionFields';
 
 import { renderToStaticMarkup } from 'react-dom/server';
+import { formatInquirerName } from '../../utils/textUtils';
 import jsxToPlainText from '../../utils/jsxToPlainText';
 
 const EMAIL_OPTIONS = {
@@ -182,14 +182,6 @@ class InquirerForm extends Component {
 				emailEditModalShown: false,
 			}
 		});
-	}
-
-	formatName = inquirer => {
-		const firstName = inquirer.firstName;
-		const middleName = inquirer.middleName;
-		const otherNames = inquirer.otherNames;
-		const lastName = inquirer.lastName;
-		return (firstName ? firstName : '') + (middleName ? ' ' + middleName : '') + ' ' + (lastName ? lastName : '') + (otherNames ? ' (' + otherNames + ')' : '')
 	}
 
 	// form control event handlers
@@ -360,7 +352,6 @@ class InquirerForm extends Component {
 			options['customText'] = EMAIL_OPTIONS.bodyPre + '<br /><br />' + customTextHtml + (this.state.emailMessage ? '<br /><br />' : '') + renderToStaticMarkup(EMAIL_OPTIONS.bodyPost);
 		}
 		options['to'] = this.props.currentInquirers[0].email;
-		// console.log('EMAIL:', options['customText']);
 		axios.post('/api/v1/sendemail', options)
 		// .then(() => {});
 	}
@@ -404,7 +395,7 @@ class InquirerForm extends Component {
 			if (curr.firstName || curr.lastName) {
 				const inqObj = {
 					value: curr.id,
-					label: this.formatName(curr),
+					label: formatInquirerName(curr),
 				}
 				return [...acc, inqObj]
 			} else {
@@ -419,7 +410,7 @@ class InquirerForm extends Component {
 			if (curr.firstName || curr.lastName) {
 				const inqObj = {
 					value: curr.id,
-					label: this.formatName(curr),
+					label: formatInquirerName(curr),
 				}
 				return [...acc, inqObj]
 			} else {
@@ -498,7 +489,7 @@ class InquirerForm extends Component {
 					return (
 						<div key={inq.id}>
 							{/* inquirer name */}
-							<Card.Footer><strong>Information for:</strong> {this.formatName(inq)}</Card.Footer>
+							<Card.Footer><strong>Information for:</strong> {formatInquirerName(inq)}</Card.Footer>
 							{/* inquirer info */}
 							<ListGroup className="mb-3">
 								{/* gender pronouns */}
@@ -529,50 +520,8 @@ class InquirerForm extends Component {
 			)
 		}
 
-		// format modal window with previous consultation
-		let currentConsultationName = '';
-		let modalPrevConsultBody = null;
-		const prevConsultation = this.state.prevConsultSelected;
-		if (prevConsultation) {
-			currentConsultationName = <h3>{prevConsultation.name}</h3>;
-			let lawyers = [];
-			if (prevConsultation.lawyers) {
-				lawyers = prevConsultation.lawyers.map(consultLawyer => {
-					const lawyer = this.props.lawyers.find(lawyer => {
-						return lawyer.id === consultLawyer;
-					})
-					return this.formatName(lawyer);
-				})
-			}
-			let lawTypes = [];
-			if (prevConsultation.lawTypes) {
-				lawTypes = prevConsultation.lawTypes.map(consultType => {
-					const lawType = this.props.lawTypes.find(type => {
-						return type.id === consultType;
-					})
-					return lawType.type;
-				})
-			}
-			modalPrevConsultBody = (
-				<ul>
-					<li><strong>Consulting Lawyer:</strong> {lawyers && lawyers.length > 0 ? (lawyers.join(', ')) : ''}</li>
-
-					<li><strong>Notes: </strong>{prevConsultation.situation}</li>
-
-					<li><strong>Disposition: </strong>{prevConsultation.dispositions && prevConsultation.dispositions.length > 0 ? (prevConsultation.dispositions.join(', ')) : ''}</li>
-
-					<li><strong>Type of Law: </strong>{lawTypes.join(', ')}</li>
-
-					<li><strong>Referral Summary: </strong>{prevConsultation.summary}</li>
-				</ul>
-			)
-		}
-
-		// edit visitor email modal
+		// link to open modal to edit email
 		let linkToEmailEditModal = null;
-		let emailEditModalTitle = null;
-		let emailEditModalHead = null;
-		let emailEditModalBody = null;
 		if (this.state.inquirerIsSelected) {
 			const firstCurrInquirer = this.props.currentInquirers[0];
 			const firstCurrInqName = `${firstCurrInquirer.firstName} ${firstCurrInquirer.lastName}`;
@@ -590,55 +539,6 @@ class InquirerForm extends Component {
 					</Button>
 					</Col>
 				</Row>;
-
-				emailEditModalTitle = `Edit Email for ${firstCurrInqName}`;
-
-				emailEditModalHead = <div className="text-muted small">
-					<span className="font-weight-bold">from:</span> {EMAIL_OPTIONS.from}<br />
-					<span className="font-weight-bold">to:</span> {firstCurrInquirer.email}<br />
-					<span className="font-weight-bold">subject:</span> {EMAIL_OPTIONS.subject}<br/><br />
-					<span className="font-weight-bold">body:</span> {EMAIL_OPTIONS.message}
-				</div>
-
-				// custom email message
-				const customEmailTxtArea = (rows = 4) => <Form.Group controlId="emailMessageTemp">
-						<Form.Control
-							style={{fontSize: '0.8em'}}
-							as="textarea"
-							rows={rows}
-							value={this.state.emailMessageTemp}
-							name="emailMessageTemp"
-							onChange={this.handleInputChange}
-							/>
-					</Form.Group>
-				if (!this.state.emailBodyDefaultModified) {
-					emailEditModalBody = <div>
-						<div className={styles.emailBody}>
-							<div className="text-muted small mb-3">{EMAIL_OPTIONS.bodyPre}</div>
-							{customEmailTxtArea(4)}
-							<div className="text-muted small mt-3">{EMAIL_OPTIONS.bodyPost}</div>
-						</div>
-						<Button
-							onClick={() => this.editEmailBodyDefault()} size="sm" className="btn btn-sm btn-warning mt-3">
-								Edit Entire Email Body
-						</Button>
-					</div>
-				} else {
-					let editMsgBtn = null;
-					if (!this.state.emailBodyModifyConfirmed) {
-						editMsgBtn = <Button
-							onClick={this.cancelCustomEmailDefault} size="sm" className="btn btn-sm  mt-3">
-								Edit Custom Message Only
-						</Button>
-					}
-					emailEditModalBody = <div>
-						<div className={styles.emailBody}>
-							{customEmailTxtArea(11)}
-						</div>
-						{editMsgBtn}
-					</div>
-				}
-
 			} else {
 				linkToEmailEditModal = <div className="text-danger mb-3">Email address not entered for {firstCurrInqName} - will not receive email.</div>
 			}
@@ -673,245 +573,220 @@ class InquirerForm extends Component {
 
 		return (
 			<>
-				<Container>
-					<Card className={styles.cardContainer}>
-						<Card.Header></Card.Header>
-						<Card.Body>
-							<Form
-								noValidate
-								validated={this.state.validated}
-								onSubmit={this.handleSubmit}
-								ref={this.inquirerForm}
-							>
-								<h1 className="h1">Clinic Consultation</h1>
-								<div className="mb-3 small">
-									Please insert the information you collected for each client that you spoke to. Give a summary of the client's issue and indicate whether or not they need a referral.
-								</div>
-								<p className="text-danger small">*Required</p>
+				<Form
+					noValidate
+					validated={this.state.validated}
+					onSubmit={this.handleSubmit}
+					ref={this.inquirerForm}
+				>
+					<h1 className="h1">Clinic Consultation</h1>
+					<div className="mb-3 small">
+						Please insert the information you collected for each client that you spoke to. Give a summary of the client's issue and indicate whether or not they need a referral.
+					</div>
+					<p className="text-danger small">*Required</p>
 
-								{/* lawyers */}
-								<Form.Group as={Row} controlId="inquirerPulldown">
-									<Form.Label column sm={3} className="text-md-right">
-										Lawyer(s)<span className="text-danger">*</span>
-									</Form.Label>
-									<Col sm={9}>
-										<Form.Text className="text-muted">
-											Add your name.
-										</Form.Text>
-										<ReactSelectWithValidation
-											options={lawyerSelectOptions}
-											isMulti
-											required
-											value={this.state.lawyers}
-											onChange={opt => this.handleLawyerSelectChange(opt)}
-										/>
-										<Form.Control.Feedback type="invalid">
-											Please choose a visitor.
-										</Form.Control.Feedback>
-									</Col>
-								</Form.Group>
+					{/* lawyers */}
+					<Form.Group as={Row} controlId="inquirerPulldown">
+						<Form.Label column sm={3} className="text-md-right">
+							Lawyer(s)<span className="text-danger">*</span>
+						</Form.Label>
+						<Col sm={9}>
+							<Form.Text className="text-muted">
+								Add your name.
+							</Form.Text>
+							<ReactSelectWithValidation
+								options={lawyerSelectOptions}
+								isMulti
+								required
+								value={this.state.lawyers}
+								onChange={opt => this.handleLawyerSelectChange(opt)}
+							/>
+							<Form.Control.Feedback type="invalid">
+								Please choose a visitor.
+							</Form.Control.Feedback>
+						</Col>
+					</Form.Group>
 
-								{/* inquirers */}
-								<Form.Group as={Row} controlId="inquirerPulldown">
-									<Form.Label column sm={3} className="text-md-right">
-										Visitor(s)<span className="text-danger">*</span>
-									</Form.Label>
-									<Col sm={9}>
-										<Form.Text className="text-muted">
-											Choose visitor or multiple visitors if relevant. If the visitor does not appear, refresh the page.
-										</Form.Text>
-										<ReactSelectWithValidation
-											options={inqSelectOptions}
-											isMulti
-											required
-											value={this.state.inquirers}
-											onChange={opt => this.handleInquirerSelectChange(opt)}
-										/>
-										<Form.Control.Feedback type="invalid">
-											Please choose a visitor.
-										</Form.Control.Feedback>
-									</Col>
-								</Form.Group>
-								<Collapse in={this.state.inquirerIsSelected} className="mb-4">
-									<div id="visitor-info" className="small">
-										{currentInquirerInfo}
-									</div>
-								</Collapse>
+					{/* inquirers */}
+					<Form.Group as={Row} controlId="inquirerPulldown">
+						<Form.Label column sm={3} className="text-md-right">
+							Visitor(s)<span className="text-danger">*</span>
+						</Form.Label>
+						<Col sm={9}>
+							<Form.Text className="text-muted">
+								Choose visitor or multiple visitors if relevant. If the visitor does not appear, refresh the page.
+							</Form.Text>
+							<ReactSelectWithValidation
+								options={inqSelectOptions}
+								isMulti
+								required
+								value={this.state.inquirers}
+								onChange={opt => this.handleInquirerSelectChange(opt)}
+							/>
+							<Form.Control.Feedback type="invalid">
+								Please choose a visitor.
+							</Form.Control.Feedback>
+						</Col>
+					</Form.Group>
+					<Collapse in={this.state.inquirerIsSelected} className="mb-4">
+						<div id="visitor-info" className="small">
+							{currentInquirerInfo}
+						</div>
+					</Collapse>
 
-								{/* inquirer's summary (notes) */}
-								<Form.Group controlId="notes">
-									<Form.Label className="bold mb-0">Notes</Form.Label>
-									<Form.Text className="text-muted mt-0 mb-1">
-										Please describe the factual situation as well as the legal assessment.
+					{/* inquirer's summary (notes) */}
+					<Form.Group controlId="notes">
+						<Form.Label className="bold mb-0">Notes</Form.Label>
+						<Form.Text className="text-muted mt-0 mb-1">
+							Please describe the factual situation as well as the legal assessment.
+						</Form.Text>
+						<Form.Control
+							as="textarea"
+							rows="5"
+							value={this.state.situation}
+							name="situation"
+							onChange={this.handleInputChange}
+						/>
+					</Form.Group>
+
+					{/* disposition */}
+					<fieldset className="mb-2">
+						<Form.Group as={Row}>
+							<Form.Label as="legend" column sm={3} className="bold text-md-right">
+								Disposition<span className="text-danger">*</span>
+							</Form.Label>
+							<Col sm={9}>
+								<Form.Check
+									type="radio"
+									label={DISP_NO_FURTHER}
+									value={DISP_NO_FURTHER}
+									name="formDispositionRadios"
+									required
+									id="formDispositionNoFurther"
+									ref={this.formDispositionNoFurther}
+									onChange={evt => this.dispoRadioOnChange(evt)}
+								/>
+								<Form.Check
+									type="radio"
+									label={DISP_FEE_BASED}
+									value={DISP_FEE_BASED}
+									name="formDispositionRadios"
+									id="formDispositionFeeBased"
+									ref={this.formDispositionFeeBased}
+									onChange={evt => this.dispoRadioOnChange(evt)}
+								/>
+								<Form.Check
+									type="radio"
+									label={DISP_PRO_BONO}
+									value={DISP_PRO_BONO}
+									name="formDispositionRadios"
+									id="formDispositionProBono"
+									ref={this.formDispositionProBono}
+									onChange={evt => this.dispoRadioOnChange(evt)}
+								/>
+								<Form.Check
+									type="radio"
+									label={DISP_IMPACT}
+									value={DISP_IMPACT}
+									name="formDispositionRadios"
+									id="formDispositionImpact"
+									ref={this.formDispositionImpact}
+									onChange={evt => this.dispoRadioOnChange(evt)}
+								/>
+							</Col>
+						</Form.Group>
+					</fieldset>
+					<Collapse in={this.state.isReferralDispositionChecked}>
+						<div id="referrals">
+							<div className="mb-2"><em>If LRN or PBP is chosen above, please fill out the following for to allow for this case to be referred.</em></div>
+
+							{/* type of law */}
+							<Form.Group as={Row} controlId="typeOfLawPulldown">
+								<Form.Label column sm={4} className="bold text-md-right">
+									Type Of Law<span className="text-danger">*</span>
+								</Form.Label>
+								<Col sm={8}>
+									<Form.Text className="text-muted">
+										Choose any relevant types of law.
 									</Form.Text>
-									<Form.Control
-										as="textarea"
-										rows="5"
-										value={this.state.situation}
-										name="situation"
-										onChange={this.handleInputChange}
+									<ReactSelectWithValidation
+										options={lawTypeOptions}
+										isMulti
+										required
+										value={this.state.lawTypes}
+										onChange={opt => this.handleTypeOfLawSelectChange(opt)}
 									/>
-								</Form.Group>
+									<Form.Control.Feedback type="invalid">
+										Please the type of law.
+									</Form.Control.Feedback>
+								</Col>
+							</Form.Group>
 
-								{/* disposition */}
-								<fieldset className="mb-2">
-									<Form.Group as={Row}>
-										<Form.Label as="legend" column sm={3} className="bold text-md-right">
-											Disposition<span className="text-danger">*</span>
-										</Form.Label>
-										<Col sm={9}>
-											<Form.Check
-												type="radio"
-												label={DISP_NO_FURTHER}
-												value={DISP_NO_FURTHER}
-												name="formDispositionRadios"
-												required
-												id="formDispositionNoFurther"
-												ref={this.formDispositionNoFurther}
-												onChange={evt => this.dispoRadioOnChange(evt)}
-											/>
-											<Form.Check
-												type="radio"
-												label={DISP_FEE_BASED}
-												value={DISP_FEE_BASED}
-												name="formDispositionRadios"
-												id="formDispositionFeeBased"
-												ref={this.formDispositionFeeBased}
-												onChange={evt => this.dispoRadioOnChange(evt)}
-											/>
-											<Form.Check
-												type="radio"
-												label={DISP_PRO_BONO}
-												value={DISP_PRO_BONO}
-												name="formDispositionRadios"
-												id="formDispositionProBono"
-												ref={this.formDispositionProBono}
-												onChange={evt => this.dispoRadioOnChange(evt)}
-											/>
-											<Form.Check
-												type="radio"
-												label={DISP_IMPACT}
-												value={DISP_IMPACT}
-												name="formDispositionRadios"
-												id="formDispositionImpact"
-												ref={this.formDispositionImpact}
-												onChange={evt => this.dispoRadioOnChange(evt)}
-											/>
-										</Col>
-									</Form.Group>
-								</fieldset>
-								<Collapse in={this.state.isReferralDispositionChecked}>
-									<div id="referrals">
-										<div className="mb-2"><em>If LRN or PBP is chosen above, please fill out the following for to allow for this case to be referred.</em></div>
+							{/* ref summary */}
+							<Form.Group controlId="notes">
+								<Form.Label className="bold mb-0">
+									Referral Summary<span className="text-danger">*</span>
+								</Form.Label>
+								<Form.Text className="text-muted mt-0 mb-1">
+									If LRN or PBP is chosen above, add a one- or two-sentence referral summary that can be used independently of the Notes above in order to make a referral to our network.<br /><br />
+									Model: "Clinic visitor seeks attorney for representation in landlord-tenant matter.  Person is able to pay to retain a lawyer."
+								</Form.Text>
+								<Form.Control
+									as="textarea"
+									rows="3"
+									value={this.state.refSummary}
+									required={this.state.isReferralDispositionChecked}
+									name="refSummary"
+									onChange={this.handleInputChange}
+								/>
+							</Form.Group>
+						</div>
+					</Collapse>
+					{linkToEmailEditModal}
+					<Row className="justify-content-start">
+						<Col>
+							{/* submit */}
+							<Button
+								variant="primary"
+								type="submit"
+							>
+								{this.state.submitButtonLabel}
+							</Button>
+						</Col>
+					</Row>
 
-										{/* type of law */}
-										<Form.Group as={Row} controlId="typeOfLawPulldown">
-											<Form.Label column sm={4} className="bold text-md-right">
-												Type Of Law<span className="text-danger">*</span>
-											</Form.Label>
-											<Col sm={8}>
-												<Form.Text className="text-muted">
-													Choose any relevant types of law.
-												</Form.Text>
-												<ReactSelectWithValidation
-													options={lawTypeOptions}
-													isMulti
-													required
-													value={this.state.lawTypes}
-													onChange={opt => this.handleTypeOfLawSelectChange(opt)}
-												/>
-												<Form.Control.Feedback type="invalid">
-													Please the type of law.
-												</Form.Control.Feedback>
-											</Col>
-										</Form.Group>
+				</Form>
 
-										{/* ref summary */}
-										<Form.Group controlId="notes">
-											<Form.Label className="bold mb-0">
-												Referral Summary<span className="text-danger">*</span>
-											</Form.Label>
-											<Form.Text className="text-muted mt-0 mb-1">
-												If LRN or PBP is chosen above, add a one- or two-sentence referral summary that can be used independently of the Notes above in order to make a referral to our network.<br /><br />
-												Model: "Clinic visitor seeks attorney for representation in landlord-tenant matter.  Person is able to pay to retain a lawyer."
-											</Form.Text>
-											<Form.Control
-												as="textarea"
-												rows="3"
-												value={this.state.refSummary}
-												required={this.state.isReferralDispositionChecked}
-												name="refSummary"
-												onChange={this.handleInputChange}
-											/>
-										</Form.Group>
-									</div>
-								</Collapse>
-								{linkToEmailEditModal}
-								<Row className="justify-content-start">
-									<Col>
-										{/* submit */}
-										<Button
-											variant="primary"
-											type="submit"
-										>
-											{this.state.submitButtonLabel}
-										</Button>
-									</Col>
-								</Row>
-
-							</Form>
-
-							{/* confirmation & error messages */}
-							{successMessage}
-							{errorMessage}
-						</Card.Body>
-					</Card>
-				</Container>
+				{/* confirmation & error messages */}
+				{successMessage}
+				{errorMessage}
 
 				{/* previous consultation info */}
-				<Modal
+				<PrevConsultationModal
 					show={this.state.consultModalShown}
 					onHide={this.hideConsultModal}
-					size="md"
-					aria-labelledby="contained-modal-title-vcenter"
-					centered
-				>
-					<Modal.Header closeButton>
-						<Modal.Title id="contained-modal-title-vcenter">
-							Previous Consultation
-						</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						{currentConsultationName}
-						{modalPrevConsultBody}
-					</Modal.Body>
-					<Modal.Footer>
-						<Button onClick={this.hideConsultModal}>Close</Button>
-					</Modal.Footer>
-				</Modal>
+					prevConsultSelected={this.state.prevConsultSelected}
+					lawyers={this.props.lawyers}
+					lawTypes={this.props.lawTypes}
+					onClick={this.hideConsultModal}
+				/>
 
 				{/* edit email modal */}
-				<Modal
+				<EditEmailModal
+					inquirerIsSelected={this.state.inquirerIsSelected}
+					inquirers={this.props.currentInquirers}
+					emailOptions={EMAIL_OPTIONS}
+					emailMessageTemp={this.state.emailMessageTemp}
+					emailBodyDefaultModified={this.state.emailBodyDefaultModified}
+					editEmailBodyDefault={this.editEmailBodyDefault}
+					emailBodyModifyConfirmed={this.state.emailBodyModifyConfirmed}
+					cancelCustomEmailDefault={this.cancelCustomEmailDefault}
 					show={this.state.emailEditModalShown}
+					onChange={this.handleInputChange}
 					onHide={this.cancelEditModal}
-					size="md"
-					aria-labelledby="contained-modal-title-vcenter"
-					centered
-				>
-					<Modal.Header closeButton>
-						<Modal.Title id="contained-modal-title-vcenter">
-							{emailEditModalTitle}
-						</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						{emailEditModalHead}
-						{emailEditModalBody}
-					</Modal.Body>
-					<Modal.Footer>
-						<Button onClick={this.cancelEditModal}>Cancel</Button>
-						<Button onClick={this.saveEditModal}>Save</Button>
-					</Modal.Footer>
-				</Modal>
+					cancelEditModal={this.cancelEditModal}
+					saveEditModal={this.saveEditModal}
+				/>
 
 				{timerCounter}
 			</>

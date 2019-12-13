@@ -1,16 +1,3 @@
-.cardContainer {
-	max-width: 640px;
-	-webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
-	box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
-	border: 0;
-	margin: 100px auto 0 auto;
-}
-
-.emailBody {
-	border: 1px solid #ccc;
-	padding: .9em;
-}
-
 /* specificity problems: not possible to add on CSS modules */
 /* .editEmailText {
 	font-size: 0.8em;

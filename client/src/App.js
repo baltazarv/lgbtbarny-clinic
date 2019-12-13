@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import InquirerForm from './containers/InquirerForm/index';
+import Clinics from './containers/clinics/';
 
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
@@ -32,7 +32,7 @@ class App extends React.Component {
 					</Navbar.Collapse>
 				</Navbar>
 				<Switch>
-					<Route path="/consultation" component={InquirerForm} />
+					<Route path="/consultation" component={Clinics} />
 					<Redirect to="/consultation" />
 				</Switch>
 			</>
