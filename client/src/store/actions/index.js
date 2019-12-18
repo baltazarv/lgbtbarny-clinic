@@ -13,3 +13,8 @@ export {
 	createConsultation,
 	consultationInProgress,
 } from './consultations';
+
+export {
+	getClinicSettings,
+	setCurrentClinic,
+} from './clinic';

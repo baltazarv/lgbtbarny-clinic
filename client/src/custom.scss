@@ -27,13 +27,28 @@ $list-group-item-padding-y: 0.35rem;
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.btn-primary {
+	color: #fff;
+}
+
+// bootstrap/scss/_navbar.scss
+
+.nav-link {
+	// color: #fff; // .navbar-dark
+	margin-left: 0.8em;
+}
+
+.navbar-nav .nav-link.active {
+	background: white;
+	color: #00A8F8;
+	border-radius: calc(0.35rem - 1px);
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+	color: #00A8F8;
+}
+
 // bootstrap/scss/_type.scss
-
-// h1, .h1 {
-// 	font-size: 2.1rem;
-// }
-
-// bootstrap/scss/_card.scss
 
 .card {
 	border: 0;

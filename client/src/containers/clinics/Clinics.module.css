@@ -3,5 +3,16 @@
 	-webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
 	box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
 	border: 0;
-	margin: 100px auto 0 auto;
+	margin: 75px auto 0 auto;
+}
+
+.clinicToolbar {
+	/* padding: 0.3em; */
+	background-color: #39C1FA;
+	border-bottom: 2px solid #ffa9a1;
+	border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+}
+
+.clinicToggleBtn {
+	color: #fff;
 }

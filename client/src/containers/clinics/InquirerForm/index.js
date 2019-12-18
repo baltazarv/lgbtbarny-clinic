@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../../store/actions/index';
-
 import axios from 'axios';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -12,18 +11,17 @@ import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-import PrevConsultationModal from '../../components/modals/PrevConsultationModal';
-import EditEmailModal from '../../components/modals/EditEmailModal';
-import ReactSelectWithValidation from '../../components/ReactSelectWithValidation';
-import TimerCounter from '../../components/TimerCountdown/index';
+import * as actions from '../../../store/actions/index';
+import PrevConsultationModal from '../../../components/modals/PrevConsultationModal';
+import EditEmailModal from '../../../components/modals/EditEmailModal';
+import ReactSelectWithValidation from '../../../components/ReactSelectWithValidation';
+import TimerCounter from '../../../components/TimerCountdown/index';
 // import styles from './InquirerForm.module.css';
 
-import * as peopleFields from '../../data/peopleFields';
-import * as consultFields from '../../data/consultionFields';
-
-import { renderToStaticMarkup } from 'react-dom/server';
-import { formatInquirerName } from '../../utils/textUtils';
-import jsxToPlainText from '../../utils/jsxToPlainText';
+import * as peopleFields from '../../../data/peopleFields';
+import * as consultFields from '../../../data/consultionFields';
+import { formatInquirerName } from '../../../utils/textUtils';
+import jsxToPlainText from '../../../utils/jsxToPlainText';
 
 const EMAIL_OPTIONS = {
 	from: 'LeGaL <no-reply@le-gal.org>',
@@ -87,9 +85,6 @@ class InquirerForm extends Component {
 	}
 
 	componentDidMount() {
-		this.props.getLawyers();
-		this.props.getInquirers();
-		this.props.getLawTypes();
 		this.setState({
 			emailMessage: '',
 		})
@@ -571,6 +566,11 @@ class InquirerForm extends Component {
 			timerCounter = <TimerCounter getTimeSpent={this.getTimeSpent} />
 		}
 
+		let formTitle = '';
+		if (this.props.clinicSettings && this.props.clinicSettings[this.props.currentClinic]) {
+			formTitle = this.props.clinicSettings[this.props.currentClinic].title;
+		}
+
 		return (
 			<>
 				<Form
@@ -579,7 +579,7 @@ class InquirerForm extends Component {
 					onSubmit={this.handleSubmit}
 					ref={this.inquirerForm}
 				>
-					<h1 className="h1">Clinic Consultation</h1>
+				<h1 className="h1">{formTitle} Consultation</h1>
 					<div className="mb-3 small">
 						Please insert the information you collected for each client that you spoke to. Give a summary of the client's issue and indicate whether or not they need a referral.
 					</div>
@@ -802,17 +802,16 @@ const mapStateToProps = state => {
 		currInqsPastConsults: state.consultations.currInqsPastConsults,
 		lawTypes: state.lawTypes.lawTypes,
 		consultSubmitStatus: state.consultations.consultSubmitStatus,
-		consultsCreated: state.consultations.consultsCreated
+		consultsCreated: state.consultations.consultsCreated,
+		clinicSettings: state.clinics.clinicSettings,
+		currentClinic: state.clinics.currentClinic,
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		getLawyers: () => dispatch(actions.getLawyers()),
-		getInquirers: () => dispatch(actions.getInquirers()),
 		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)),
 		getCurrInqPastConsults: inqs => dispatch(actions.getCurrInqPastConsults(inqs)),
-		getLawTypes: () => dispatch(actions.getLawTypes()),
 		createConsultation: consult => dispatch(actions.createConsultation(consult)),
 		consultationInProgress: () => dispatch(actions.consultationInProgress()),
 	}
