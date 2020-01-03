@@ -438,7 +438,7 @@ class InquirerForm extends Component {
 		// selected inquirer's past consultations
 		const renderPastConsults = inqId => {
 			// wait till prop is populated
-			if (this.props.currInqsPastConsults.length < 1) {
+			if (!this.props.currInqsPastConsults || this.props.currInqsPastConsults.length < 1) {
 				return null;
 			} else {
 				// get consultation for inquirer id passed
@@ -453,18 +453,30 @@ class InquirerForm extends Component {
 					<strong>Previous Consultations:</strong>
 					<ul className="mb-0">
 						{consultsForInq.map(consult => {
-							const lawyers = consult.lawyers.reduce((acc, curr) => {
-								const lawyerInfo = this.props.lawyers.find(_lawyer => curr === _lawyer.id);
-								acc.push(lawyerInfo.firstName + ' ' + lawyerInfo.lastName);
-								return acc;
-							}, []);
+							let lawyerInfo = '';
+							let lawyers = consult.lawyers;
+							if (lawyers) { // some consultations did not have lawyers added
+								let lawyerNames = consult.lawyers.reduce((acc, curr) => {
+									const lawyerName = this.props.lawyers.find(_lawyer => curr === _lawyer.id);
+									// if someone was added for the lawyer who isn't really a lawyer
+										// lawyerName cannot be found
+									if(lawyerName) {
+										acc.push(lawyerName.firstName + ' ' + lawyerName.lastName);
+									}
+									return acc;
+								}, []);
+								if (lawyerNames.length > 0) {
+									lawyerInfo = `with ${lawyerNames.join(', ')}`
+
+								}
+							}
 							return <li
 								key={consult.id}
 							>
 								<Button
 									onClick={() => this.showConsultModal(consult.id)}
 									variant="link" size="sm">
-										{consult.name} with {lawyers.join(', ')}
+										{consult.name} {lawyerInfo}
 								</Button>
 							</li>
 							})}
