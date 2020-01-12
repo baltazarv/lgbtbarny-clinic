@@ -10,13 +10,13 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
 import ListGroup from 'react-bootstrap/ListGroup';
+import ReactSelectWithValidation from '../../../components/ReactSelectWithValidation';
 
 import * as actions from '../../../store/actions/index';
 import PrevConsultationModal from '../../../components/modals/PrevConsultationModal';
 import EditEmailModal from '../../../components/modals/EditEmailModal';
-import ReactSelectWithValidation from '../../../components/ReactSelectWithValidation';
 import TimerCounter from '../../../components/TimerCountdown/index';
-// import styles from './InquirerForm.module.css';
+// import styles from './ConsultationForm.module.css';
 
 import * as peopleFields from '../../../data/peopleFields';
 import * as consultFields from '../../../data/consultionFields';
@@ -155,7 +155,7 @@ class InquirerForm extends Component {
 	cancelEditModal = () => {
 		this.setState(state => {
 			let emailBodyDefaultModified = state.emailBodyDefaultModified;
-			if(state.emailBodyDefaultModified && !state.emailBodyModifyConfirmed) emailBodyDefaultModified = false;
+			if (state.emailBodyDefaultModified && !state.emailBodyModifyConfirmed) emailBodyDefaultModified = false;
 			return {
 				emailEditModalShown: false,
 				emailBodyDefaultModified,
@@ -166,9 +166,9 @@ class InquirerForm extends Component {
 
 	saveEditModal = async () => {
 		let emailBodyModifyConfirmed = false;
-		if(this.state.emailBodyDefaultModified) emailBodyModifyConfirmed = true;
+		if (this.state.emailBodyDefaultModified) emailBodyModifyConfirmed = true;
 		this.setState(state => {
-			const submitFields = {...state.submitFields};
+			const submitFields = { ...state.submitFields };
 			submitFields[consultFields.EMAIL_TEXT_SENT] = state.emailMessageTemp;
 			return {
 				submitFields,
@@ -217,7 +217,7 @@ class InquirerForm extends Component {
 				emailMessage: '',
 				emailBodyDefaultModified: false,
 				emailBodyModifyConfirmed: false,
-				})
+			})
 		}
 		this.setState((prevState, props) => {
 			let submitFields = { ...prevState.submitFields };
@@ -320,7 +320,7 @@ class InquirerForm extends Component {
 		}
 		if (form.checkValidity() === true && this.state.lawyerIsSelected && this.state.inquirerIsSelected && !lawTypeReqAndEmpty) {
 			// newlines html to plain text
-			const cleanSubmitFields = {...this.state.submitFields};
+			const cleanSubmitFields = { ...this.state.submitFields };
 			cleanSubmitFields[consultFields.EMAIL_TEXT_SENT] = this.state.emailMessage.replace(/<br>|<br \/>/g, '\n').replace(/<[^>]*>/g, ""); // plain text to html replacement on server
 			this.props.createConsultation(cleanSubmitFields);
 			this.sendEmail(); // add error handling
@@ -338,10 +338,10 @@ class InquirerForm extends Component {
 	}
 
 	sendEmail = () => {
-		const options = {...EMAIL_OPTIONS};
+		const options = { ...EMAIL_OPTIONS };
 		// save newlines as html <br /> tags
 		const customTextHtml = this.state.emailMessage.replace(/(\r\n|\n|\r)/g, '<br />');
-		if(this.state.emailBodyModifyConfirmed) {
+		if (this.state.emailBodyModifyConfirmed) {
 			options['customText'] = customTextHtml;
 		} else {
 			options['customText'] = EMAIL_OPTIONS.bodyPre + '<br /><br />' + customTextHtml + (this.state.emailMessage ? '<br /><br />' : '') + renderToStaticMarkup(EMAIL_OPTIONS.bodyPost);
@@ -450,35 +450,35 @@ class InquirerForm extends Component {
 				}, []);
 				if (consultsForInq.length > 0) {
 					return <ListGroup.Item>
-					<strong>Previous Consultations:</strong>
-					<ul className="mb-0">
-						{consultsForInq.map(consult => {
-							let lawyerInfo = '';
-							let lawyers = consult.lawyers;
-							if (lawyers) { // some consultations did not have lawyers added
-								let lawyerNames = consult.lawyers.reduce((acc, curr) => {
-									const lawyerName = this.props.lawyers.find(_lawyer => curr === _lawyer.id);
-									// if someone was added for the lawyer who isn't really a lawyer
+						<strong>Previous Consultations:</strong>
+						<ul className="mb-0">
+							{consultsForInq.map(consult => {
+								let lawyerInfo = '';
+								let lawyers = consult.lawyers;
+								if (lawyers) { // some consultations did not have lawyers added
+									let lawyerNames = consult.lawyers.reduce((acc, curr) => {
+										const lawyerName = this.props.lawyers.find(_lawyer => curr === _lawyer.id);
+										// if someone was added for the lawyer who isn't really a lawyer
 										// lawyerName cannot be found
-									if(lawyerName) {
-										acc.push(lawyerName.firstName + ' ' + lawyerName.lastName);
-									}
-									return acc;
-								}, []);
-								if (lawyerNames.length > 0) {
-									lawyerInfo = `with ${lawyerNames.join(', ')}`
+										if (lawyerName) {
+											acc.push(lawyerName.firstName + ' ' + lawyerName.lastName);
+										}
+										return acc;
+									}, []);
+									if (lawyerNames.length > 0) {
+										lawyerInfo = `with ${lawyerNames.join(', ')}`
 
+									}
 								}
-							}
-							return <li
-								key={consult.id}
-							>
-								<Button
-									onClick={() => this.showConsultModal(consult.id)}
-									variant="link" size="sm">
+								return <li
+									key={consult.id}
+								>
+									<Button
+										onClick={() => this.showConsultModal(consult.id)}
+										variant="link" size="sm">
 										{consult.name} {lawyerInfo}
-								</Button>
-							</li>
+									</Button>
+								</li>
 							})}
 						</ul>
 					</ListGroup.Item>
@@ -539,11 +539,11 @@ class InquirerForm extends Component {
 				}
 				linkToEmailEditModal = <Row>
 					<Col>
-					<Button
-						onClick={() => this.showEmailEditModal()}
-						variant="link" size="md" className="mb-3">
+						<Button
+							onClick={() => this.showEmailEditModal()}
+							variant="link" size="md" className="mb-3">
 							{customEmailBtnLabel}
-					</Button>
+						</Button>
 					</Col>
 				</Row>;
 			} else {
@@ -578,27 +578,22 @@ class InquirerForm extends Component {
 			timerCounter = <TimerCounter getTimeSpent={this.getTimeSpent} />
 		}
 
-		let formTitle = '';
-		if (this.props.clinicSettings && this.props.clinicSettings[this.props.currentClinic]) {
-			formTitle = this.props.clinicSettings[this.props.currentClinic].title;
-		}
-
 		return (
 			<>
+				<h1 className="h2"><em>{this.props.clinicTitle}</em> Consultation</h1>
+				<div className="mb-3 small">
+					Please insert the information you collected for each visitor that you spoke to. Give a summary of the visitor's issue and indicate whether or not they need a referral.
+				</div>
+				<p className="text-danger small">*Required</p>
 				<Form
 					noValidate
 					validated={this.state.validated}
 					onSubmit={this.handleSubmit}
 					ref={this.inquirerForm}
 				>
-				<h1 className="h1">{formTitle} Consultation</h1>
-					<div className="mb-3 small">
-						Please insert the information you collected for each client that you spoke to. Give a summary of the client's issue and indicate whether or not they need a referral.
-					</div>
-					<p className="text-danger small">*Required</p>
 
 					{/* lawyers */}
-					<Form.Group as={Row} controlId="inquirerPulldown">
+					<Form.Group as={Row} controlId="lawyerPulldown">
 						<Form.Label column sm={3} className="text-md-right">
 							Lawyer(s)<span className="text-danger">*</span>
 						</Form.Label>
@@ -647,7 +642,7 @@ class InquirerForm extends Component {
 					</Collapse>
 
 					{/* inquirer's summary (notes) */}
-					<Form.Group controlId="notes">
+					<Form.Group controlId="situation">
 						<Form.Label className="bold mb-0">Notes</Form.Label>
 						<Form.Text className="text-muted mt-0 mb-1">
 							Please describe the factual situation as well as the legal assessment.
@@ -735,7 +730,7 @@ class InquirerForm extends Component {
 							</Form.Group>
 
 							{/* ref summary */}
-							<Form.Group controlId="notes">
+							<Form.Group controlId="summary">
 								<Form.Label className="bold mb-0">
 									Referral Summary<span className="text-danger">*</span>
 								</Form.Label>

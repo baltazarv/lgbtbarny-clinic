@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Link, withRouter, Redirect } from 'react-router-dom';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
@@ -8,23 +8,56 @@ import Card from 'react-bootstrap/Card';
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
+
 import styles from './Clinics.module.css';
-import InquirerForm from './InquirerForm';
+import ConsultationForm from './forms/ConsultationForm';
+import Intake from './forms/Intake';
+import ReferralsForm from './forms/ReferralsForm';
 
 import * as actions from '../../store/actions'
 import logo from '../../assets/images/logo.png';
+import bgImageIntake from '../../assets/images/bg-intake.png';
+import bgImageConsult from '../../assets/images/bg-consultation.png';
+import bgImageReferrals from '../../assets/images/bg-referrals.png';
 
 class Clinics extends Component {
+	state = {
+		bgImageStyle: null,
+	}
+
 	componentDidMount() {
+		this.setBgImageStyle();
 		this.props.getLawyers();
 		this.props.getInquirers();
 		this.props.getLawTypes();
 		this.props.getClinicSettings();
 	}
 
+  componentDidUpdate(prevProps) {
+    if (this.props.location !== prevProps.location) {
+      this.setBgImageStyle();
+    }
+	}
+
 	onClinicToggle = val => {
-		// console.log(this.props.clinicSettings)
 		this.props.setCurrentClinic(val)
+	}
+
+	setBgImageStyle = () => {
+		let img = bgImageConsult;
+		const pathname = this.props.location.pathname;
+		if (pathname === '/intake') {
+			img = bgImageIntake
+		} else if (pathname === '/referrals') {
+			img = bgImageReferrals;
+		}
+		let imgStyle = {
+			background: `url(${img}) repeat-x top center fixed`,
+			backgroundSize: "auto 278px",
+		}
+		this.setState({
+			bgImageStyle: imgStyle,
+		})
 	}
 
 	render() {
@@ -32,8 +65,46 @@ class Clinics extends Component {
 		if (this.props.clinicSettings && this.props.clinicSettings[this.props.currentClinic]) {
 			clinicTitle = this.props.clinicSettings[this.props.currentClinic].title;
 		}
+
+		let redirectRoute = <Redirect path="/" to="/intake" />
+
+		// jersey clinic students cannot do consultations, intake only
+		let consultNavLink = null;
+		let consultRoute = null;
+		if (this.props.currentClinic !== 'nj') {
+			consultNavLink = <Nav.Link as={Link} to="/consultation" eventKey="/consultation" >Consultation</Nav.Link>
+			consultRoute = <Route path="/consultation" render={() => <ConsultationForm clinicTitle={clinicTitle} />} />
+		}
+
+		// youth clinics do intake & consultation at same time
+		if (this.props.currentClinic === 'youth') {
+			redirectRoute = <Redirect path="/"
+				to="/consultation" />
+		}
+		let intakeNavLink = null;
+		let intakeRoute = null;
+		if (this.props.currentClinic !== 'youth') {
+			intakeNavLink = <Nav.Link as={Link} to="/intake" eventKey="/intake" defaultChecked>Intake</Nav.Link>
+			intakeRoute = <Route path="/intake" render={() => <Intake clinicTitle={clinicTitle} />} />
+		}
+
+		let clinicToggleBtns = null;
+		if (this.props.clinicSettings) {
+			clinicToggleBtns = Object.entries(this.props.clinicSettings).map((clinic, index) => {
+				let key = clinic[0], value = clinic[1];
+				let style = {}
+				if (index !== 2) {
+					style = {
+						borderRight: "1px solid rgb(255, 255, 255, .5)",
+						borderLeft: "1px solid rgb(255, 255, 255, .5)",
+					}
+				}
+				return <ToggleButton key={index} value={key} className="btn-sm" style={style}>{value.buttonLabel}</ToggleButton>
+			})
+		}
+
 		return (
-			<>
+			<div style={this.state.bgImageStyle}>
 				<Navbar bg="primary" variant="dark" className={styles.navBar}>
 					<Navbar.Brand href="/">
 						<img
@@ -45,10 +116,14 @@ class Clinics extends Component {
 						/>&nbsp;&nbsp;&nbsp;{clinicTitle}
 					</Navbar.Brand>
 					<Navbar.Collapse className="justify-content-end">
-						<Nav defaultActiveKey="/consultation">
-							<Nav.Link href="/setup">Setup</Nav.Link>
-							<Nav.Link href="/consultation" defaultChecked>Consultation</Nav.Link>
-							<Nav.Link href="/referrals">Referrals</Nav.Link>
+						<Nav
+							activeKey={this.props.location.pathname}
+						// defaultActiveKey="intake"
+						// onSelect={selectKey => console.log(selectKey)}
+						>
+							{intakeNavLink}
+							{consultNavLink}
+							<Nav.Link as={Link} to="/referrals" eventKey="/referrals" >Referrals</Nav.Link>
 						</Nav>
 					</Navbar.Collapse>
 				</Navbar>
@@ -57,19 +132,23 @@ class Clinics extends Component {
 						{/* Card.Header with top border */}
 						<ButtonToolbar className={styles.clinicToolbar}>
 							<ToggleButtonGroup type="radio" name="options" defaultValue="tuesday" onChange={this.onClinicToggle}>
-								<ToggleButton value="tuesday" className="btn-sm">Tues Night Clinic</ToggleButton>
-								<ToggleButton value="youth" className="btn-sm">Youth Qlinic</ToggleButton>
+								{clinicToggleBtns}
 							</ToggleButtonGroup>
 						</ButtonToolbar>
 						<Card.Body>
 							<Switch>
-								<Route path="/consultation" component={InquirerForm} />
-								<Redirect to="/consultation" />
+								{intakeRoute}
+								{consultRoute}
+								<Route
+									path="/referrals"
+									render={() => <ReferralsForm clinicTitle={clinicTitle} />}
+								/>
+								{redirectRoute}
 							</Switch>
 						</Card.Body>
 					</Card>
 				</Container>
-			</>
+			</div>
 		)
 	}
 }
@@ -91,4 +170,4 @@ const mapDispatchToProps = dispatch => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Clinics);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Clinics));

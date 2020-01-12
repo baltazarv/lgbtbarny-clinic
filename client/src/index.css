@@ -5,9 +5,4 @@
 
 body {
 	margin: 0;
-	background: url('./assets/images/bg-main-short.png') repeat-x top center fixed;
-	-webkit-background-size: auto;
-	-moz-background-size: auto;
-	-o-background-size: auto;
-	background-size: auto 278px;
 }
