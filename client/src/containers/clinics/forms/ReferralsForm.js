@@ -6,7 +6,7 @@ class ReferralsForm extends Component {
 
 		return (
 			<>
-				<h1 className="h1"><span className="font-italic">{this.props.clinicTitle}</span> Referrals</h1>
+				<h1 className="h2"><span className="font-italic">{this.props.clinicTitle}</span> Referrals</h1>
 				Referrals
 			</>
 		)

@@ -1,3 +1,18 @@
+# Dependencies
+
+Forms use React Select pull-down component:
+* https://alligator.io/react/react-select/
+* https://github.com/JedWatson/react-select
+* [Styles](https://react-select.com/styles)
+
+For React Select to work with Formik:
+* https://gist.github.com/hubgit/e394e9be07d95cd5e774989178139ae8
+* [Formik Select Example](https://codesandbox.io/s/vxv6Q4z5)
+* [Formik 1.2 x React Select Example](https://codesandbox.io/s/jRzE53pqR)
+
+# Data
+
+Data files contain the AirTable field names.
 # Proxying API Requests in Development
 
 >Note: this feature is available with `react-scripts@0.2.3` and higher.
@@ -158,7 +173,7 @@ module.exports = function(app) {
 
 ```
 const proxy = require('http-proxy-middleware');
- 
+
 module.exports = function(app) {
   app.use(proxy('/auth/google', { target: 'http://localhost:5000' }));
   app.use(proxy('/api/**', { target: 'http://localhost:5000' }));
@@ -170,7 +185,7 @@ module.exports = function(app) {
 
 # Create React App README
 
-Can be used for better 
+Can be used for better
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -240,15 +255,3 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
-
-
-# Project Notes
-
-## Code
-
-Forms use React Select pull-down component:
-https://alligator.io/react/react-select/
-
-## Data
-
-Data files contain the AirTable field names.

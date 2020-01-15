@@ -3,19 +3,20 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Card from 'react-bootstrap/Card';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Collapse from 'react-bootstrap/Collapse';
-import ListGroup from 'react-bootstrap/ListGroup';
-import ReactSelectWithValidation from '../../../components/ReactSelectWithValidation';
+import { Row, Col, Card, Form, Button, Collapse, ListGroup } from 'react-bootstrap';
+import ReactSelectWithValidation from '../../../components/forms/fields/ReactSelectWithValidation';
 
+// forms
+import LawyerAddForm from '../../../components/forms/LawyerAddForm';
+import VisitorAddForm from '../../../components/forms/VisitorAddForm';
+
+// modals
 import * as actions from '../../../store/actions/index';
+import FormModal from '../../../components/modals/FormModal';
 import PrevConsultationModal from '../../../components/modals/PrevConsultationModal';
 import EditEmailModal from '../../../components/modals/EditEmailModal';
 import TimerCounter from '../../../components/TimerCountdown/index';
+
 // import styles from './ConsultationForm.module.css';
 
 import * as peopleFields from '../../../data/peopleFields';
@@ -61,6 +62,8 @@ class InquirerForm extends Component {
 			inquirerIsSelected: false,
 			situation: '',
 			prevConsultSelected: false,
+			lawyerAddModalShown: false,
+			visitorAddModalShown: false,
 			consultModalShown: false,
 			emailEditModalShown: false,
 			isReferralDispositionChecked: false,
@@ -83,6 +86,8 @@ class InquirerForm extends Component {
 			timeSpent: 0,
 		}
 	}
+
+	// lifecycle methods
 
 	componentDidMount() {
 		this.setState({
@@ -110,6 +115,8 @@ class InquirerForm extends Component {
 		}
 	}
 
+	// modal handlers
+
 	showConsultModal = (consultId) => {
 		const prevConsultSelected = this.props.currInqsPastConsults.find(consult => {
 			return consult.id === consultId;
@@ -132,6 +139,32 @@ class InquirerForm extends Component {
 			}
 		});
 	}
+
+	showLawyerAddModal = () => {
+		this.setState({
+			lawyerAddModalShown: true,
+		})
+	}
+
+	hideLawyerAddModal = () => {
+		this.setState({
+			lawyerAddModalShown: false,
+		})
+	}
+
+	showVisitorAddModal = () => {
+		this.setState({
+			visitorAddModalShown: true,
+		})
+	}
+
+	hideVisitorAddModal = () => {
+		this.setState({
+			visitorAddModalShown: false,
+		})
+	}
+
+	// email methods
 
 	editEmailBodyDefault = () => {
 		const bodyPostString = jsxToPlainText(EMAIL_OPTIONS.bodyPost);
@@ -599,19 +632,32 @@ class InquirerForm extends Component {
 						</Form.Label>
 						<Col sm={9}>
 							<Form.Text className="text-muted">
-								Add your name.
+								Select your name.
 							</Form.Text>
-							<ReactSelectWithValidation
-								options={lawyerSelectOptions}
-								isMulti
-								required
-								value={this.state.lawyers}
-								onChange={opt => this.handleLawyerSelectChange(opt)}
-							/>
+							<Row>
+								<Col xs={10}>
+									<ReactSelectWithValidation
+										options={lawyerSelectOptions}
+										isMulti
+										required
+										value={this.state.lawyers}
+										onChange={opt => this.handleLawyerSelectChange(opt)}
+									/>
+								</Col>
+								<Col xs={2} className="justify-content-left">
+									<Button onClick={() => this.showLawyerAddModal()} size="sm">+</Button>
+								</Col>
+							</Row>
+							<div className="text-right text-muted">
+								<small>If lawyer not on pulldown, click</small> <strong>+</strong> <small>above to add.</small>
+							</div>
 							<Form.Control.Feedback type="invalid">
 								Please choose a visitor.
 							</Form.Control.Feedback>
 						</Col>
+						{/* <Col sm={1}>
+
+						</Col> */}
 					</Form.Group>
 
 					{/* inquirers */}
@@ -623,13 +669,23 @@ class InquirerForm extends Component {
 							<Form.Text className="text-muted">
 								Choose visitor or multiple visitors if relevant. If the visitor does not appear, refresh the page.
 							</Form.Text>
-							<ReactSelectWithValidation
-								options={inqSelectOptions}
-								isMulti
-								required
-								value={this.state.inquirers}
-								onChange={opt => this.handleInquirerSelectChange(opt)}
-							/>
+							<Row>
+								<Col xs={10}>
+									<ReactSelectWithValidation
+										options={inqSelectOptions}
+										isMulti
+										required
+										value={this.state.inquirers}
+										onChange={opt => this.handleInquirerSelectChange(opt)}
+									/>
+								</Col>
+								<Col xs={2} className="justify-content-left">
+									<Button onClick={() => this.showVisitorAddModal()} size="sm">+</Button>
+								</Col>
+							</Row>
+							<div className="text-right text-muted">
+								<small>If visitor not in the system, click</small> <strong>+</strong> <small>above to add.</small>
+							</div>
 							<Form.Control.Feedback type="invalid">
 								Please choose a visitor.
 							</Form.Control.Feedback>
@@ -767,6 +823,27 @@ class InquirerForm extends Component {
 				{/* confirmation & error messages */}
 				{successMessage}
 				{errorMessage}
+
+				{/* modal to add lawyer */}
+				<FormModal
+					show={this.state.lawyerAddModalShown}
+					onHide={this.hideLawyerAddModal}
+					header="Add Lawyer"
+					body={<LawyerAddForm
+						onHide={this.hideLawyerAddModal}
+					/>}
+				/>
+
+				{/* modal to add visitor */}
+				<FormModal
+					show={this.state.visitorAddModalShown}
+					onHide={this.hideVisitorAddModal}
+					header="Add a New Visitor"
+					body={<VisitorAddForm
+						onHide={this.hideVisitorAddModal}
+					/>}
+					size="lg"
+				/>
 
 				{/* previous consultation info */}
 				<PrevConsultationModal
