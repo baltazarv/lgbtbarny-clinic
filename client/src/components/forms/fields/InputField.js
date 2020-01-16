@@ -5,7 +5,7 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import { useField, ErrorMessage } from 'formik'; // , useFormikContext
-import { reqAsterisk } from './formElements';
+import { reqAsterisk } from '../formElements';
 
 const InputField = ({
 	label,
@@ -60,14 +60,14 @@ const InputField = ({
 		<>
 			<Form.Group controlId={name}>
 				{/* <label htmlFor={props.id || props.name}>{label}</label> */}
-				{_reqAsterisk}{formLabel}&nbsp;
+				{formLabel}{label && _reqAsterisk}
 				{infoTxt}
 				<Form.Control
 					{...field}
 					{...props}
 					// onBlur={handleBlur}
 					style={controlStyle}
-				/>
+				/>{!label && _reqAsterisk}
 				{/* {meta.touched && meta.error ? (
 					<div className="error" style={{ color: "red" }}>{meta.error}</div>
 				) : null} */}

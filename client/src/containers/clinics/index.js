@@ -12,7 +12,7 @@ import ToggleButton from 'react-bootstrap/ToggleButton';
 import styles from './Clinics.module.css';
 import ConsultationForm from './forms/ConsultationForm';
 import Intake from './forms/Intake';
-import ReferralsForm from './forms/ReferralsForm';
+import Referrals from './forms/Referrals';
 
 import * as actions from '../../store/actions'
 import logo from '../../assets/images/logo.png';
@@ -141,7 +141,7 @@ class Clinics extends Component {
 								{consultRoute}
 								<Route
 									path="/referrals"
-									render={() => <ReferralsForm clinicTitle={clinicTitle} />}
+									render={() => <Referrals clinicTitle={clinicTitle} />}
 								/>
 								{redirectRoute}
 							</Switch>

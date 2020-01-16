@@ -1,5 +1,7 @@
 # Dependencies
 
+## React Select
+
 Forms use React Select pull-down component:
 * https://alligator.io/react/react-select/
 * https://github.com/JedWatson/react-select
@@ -9,6 +11,10 @@ For React Select to work with Formik:
 * https://gist.github.com/hubgit/e394e9be07d95cd5e774989178139ae8
 * [Formik Select Example](https://codesandbox.io/s/vxv6Q4z5)
 * [Formik 1.2 x React Select Example](https://codesandbox.io/s/jRzE53pqR)
+
+## Formik
+
+Great pattern for integration of checkbox and radio components with Formik: [react_formik_yup_checkbox_validation](https://gist.github.com/mrtony/c1ba5f8ec4122d2866b292fc36152d34)
 
 # Data
 

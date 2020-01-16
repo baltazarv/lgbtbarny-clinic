@@ -1,7 +1,3 @@
-/** TO-DO:
- * get from MultiSelectField > delete
- */
-
 /**
  * Props for react-select:
  * * option: { value: 'xxx', label: 'Baltazar Villegas' }
@@ -22,7 +18,7 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
 // import { ErrorMessage } from 'formik';
-import { reqAsterisk } from './formElements';
+import { reqAsterisk } from '../formElements';
 
 class SelectField extends Component {
 

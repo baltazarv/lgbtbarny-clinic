@@ -9,7 +9,7 @@
  * */
 import React, { useState } from 'react';
 import { Form, Row, Col, Card } from 'react-bootstrap';
-import { reqAsterisk } from '../../../components/forms/fields/formElements';
+import { reqAsterisk } from '../../../components/forms/formElements';
 import VisitorSelectForm from '../../../components/forms/VisitorSelectForm'
 import VisitorAddForm from '../../../components/forms/VisitorAddForm';
 
@@ -35,7 +35,7 @@ const Intake = props => {
 	const repeatInstructions = () => {
 		const style = "mb-3 small";
 		if (isRepeat) {
-			return <Col className={style}>&nbsp;<strong>Yes &mdash; </strong> Find visitor from pulldown and update info:</Col>
+			return <Col className={style}>&nbsp;<strong>Yes &mdash; </strong> Find visitor from pulldown to verify and update info:</Col>
 		}
 		return <Col className={style}>&nbsp;<strong>No &mdash; </strong> Enter new visitor:</Col>
 	};
@@ -57,7 +57,6 @@ const Intake = props => {
 			<Row>
 				<Col>
 					<Form.Group className="mb-2">
-						{reqAsterisk}
 						<Form.Label className="mb-0">Have you been to the clinic before?&nbsp;&nbsp;</Form.Label>
 						<span className="ml-2">
 							No&nbsp;&nbsp;<Form.Check

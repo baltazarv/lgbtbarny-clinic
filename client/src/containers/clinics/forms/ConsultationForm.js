@@ -617,7 +617,7 @@ class InquirerForm extends Component {
 				<div className="mb-3 small">
 					Please insert the information you collected for each visitor that you spoke to. Give a summary of the visitor's issue and indicate whether or not they need a referral.
 				</div>
-				<p className="text-danger small">*Required</p>
+				<p className="text-danger small">*<sup> &ndash; </sup>Required</p>
 				<Form
 					noValidate
 					validated={this.state.validated}
