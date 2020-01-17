@@ -8,23 +8,32 @@
  *    * new visitor form – imported VisitorAddForm
  * */
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
-import { reqAsterisk } from '../../../components/forms/formElements';
-import VisitorSelectForm from '../../../components/forms/VisitorSelectForm'
+import Select from '../../../components/forms/fields/Select';
 import VisitorAddForm from '../../../components/forms/VisitorAddForm';
+import { getPeopleIntoSelectOptions, getRecordsFromSelection } from '../../../data/dataTransforms';
+import * as actions from '../../../store/actions/index';
 
 const Intake = props => {
 	const { clinicTitle } = props;
 	const [isRepeat, setIsRepeat] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
+	const [selectVisitorOptions, setSelectVisitorOptions] = useState([]);
 
-	const handleRepeatSwitch = props => {
+	const handleRepeatSwitch = () => {
 		setIsRepeat(!isRepeat);
+		// populate select pulldown
+		if (props.inquirers && props.inquirers.length > 0) {
+			setSelectVisitorOptions(getPeopleIntoSelectOptions(props.inquirers));
+		}
 	}
 
 	const handleVisitorSelect = selection => {
-		// condition for single select value - not array
-		console.log('handleVisitorSelect', selection)
+		// get full airtable record
+		const inqRecSelected = getRecordsFromSelection(selection, props.inquirers);
+		props.setCurrentInquirers(inqRecSelected);
+		// props.getCurrInqPastConsults(inqRecSelected);
 		if (selection && selection.value) {
 			setIsEditing(true);
 		} else {
@@ -40,7 +49,7 @@ const Intake = props => {
 		return <Col className={style}>&nbsp;<strong>No &mdash; </strong> Enter new visitor:</Col>
 	};
 
-	// add to global style sheet
+	// TO-DO: add to global style sheet
 	const cardStyle = {
 		backgroundClip: "border-box",
 		border: "1px solid rgba(0, 0, 0, 0.125)",
@@ -81,19 +90,40 @@ const Intake = props => {
 				<div className="mb-3">
 					<Card className={cardStyle}>
 						<Card.Body>
-							<VisitorSelectForm
+							<Select
+								name="visitor"
+								options={selectVisitorOptions}
+								defaultValue=""
 								onChange={handleVisitorSelect}
+								label="Repeat Visitor"
 								isDisabled={isEditing}
+								required={true}
 							/>
 						</Card.Body>
 					</Card>
 				</div>
 			}{isRepeat && isEditing &&
 				( // pump in visitor info
-					<VisitorAddForm />)
+					<VisitorAddForm
+						editData={props.currentInquirers}
+					/>
+				)
 			}
 		</>
 	);
 };
 
-export default Intake;
+const mapStateToProps = state => {
+	return {
+		inquirers: state.people.inquirers,
+		currentInquirers: state.people.currentInquirers,
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)),
+		getCurrInqPastConsults: inqs => dispatch(actions.getCurrInqPastConsults(inqs)),
+	}
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Intake);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { formatInquirerName } from '../../utils/textUtils';
+import { formatName } from '../../data/dataTransforms'
 
 const PrevConsultationModal = props => {
 	const { prevConsultSelected,lawyers, lawTypes, show, onHide, onClick } = props;
@@ -17,7 +17,7 @@ const PrevConsultationModal = props => {
 				const lawyer = lawyers.find(lawyer => {
 					return lawyer.id === consultLawyer;
 				})
-				return formatInquirerName(lawyer);
+				return formatName(lawyer);
 			})
 		}
 		let _lawTypes = [];

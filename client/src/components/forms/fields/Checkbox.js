@@ -1,3 +1,9 @@
+/**
+ * If used with CheckboxGroup:
+ * * each checkbox will have a value of true or false,
+ * * If only one Checkbox, CheckboxGroup will have string value.
+ * * But if more than one, CheckboxGroup will have array value.
+ */
 import React from "react";
 import classNames from "classnames";
 import { InputFeedback } from '../formElements';

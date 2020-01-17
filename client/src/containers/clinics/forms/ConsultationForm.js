@@ -21,7 +21,7 @@ import TimerCounter from '../../../components/TimerCountdown/index';
 
 import * as peopleFields from '../../../data/peopleFields';
 import * as consultFields from '../../../data/consultionFields';
-import { formatInquirerName } from '../../../utils/textUtils';
+import { getPeopleIntoSelectOptions, formatName, getRecordsFromSelection } from '../../../data/dataTransforms';
 import jsxToPlainText from '../../../utils/jsxToPlainText';
 
 const EMAIL_OPTIONS = {
@@ -252,6 +252,7 @@ class InquirerForm extends Component {
 				emailBodyModifyConfirmed: false,
 			})
 		}
+		// save current inquirer into redux state
 		this.setState((prevState, props) => {
 			let submitFields = { ...prevState.submitFields };
 			submitFields[consultFields.INQUIRERS] = inquirers;
@@ -262,18 +263,10 @@ class InquirerForm extends Component {
 				submitError: false,
 			};
 		});
-		// get expanded consultations, add info to inquirers, and set currentInquirers state
-		let currentInquirers = [];
-		if (options.length > 0) {
-			options.forEach(opt => {
-				const inquirerChoice = this.props.inquirers.find(inq => {
-					return inq.id === opt.value;
-				})
-				currentInquirers = [...currentInquirers, inquirerChoice];
-			});
-		}
-		this.props.setCurrentInquirers(currentInquirers);
-		this.props.getCurrInqPastConsults(currentInquirers);
+		let inqRecSelected = [];
+		inqRecSelected = getRecordsFromSelection(options, this.props.inquirers);
+		this.props.setCurrentInquirers(inqRecSelected);
+		this.props.getCurrInqPastConsults(inqRecSelected);
 	}
 
 	// inquirer situation (notes) & ref summary" text area
@@ -417,36 +410,6 @@ class InquirerForm extends Component {
 		// no need to call this.props.setCurrInqPastConsults([]);
 	}
 
-	// format lawyers into select options: { label: "Alligators", value: 1 },
-	getLawyerSelectOptions = (arr) => {
-		return arr.reduce((acc, curr) => {
-			if (curr.firstName || curr.lastName) {
-				const inqObj = {
-					value: curr.id,
-					label: formatInquirerName(curr),
-				}
-				return [...acc, inqObj]
-			} else {
-				return acc;
-			}
-		}, []);
-	}
-
-	// format inquirers into select options: { label: "Alligators", value: 1 },
-	getInquirerSelectOptions = (arr) => {
-		return arr.reduce((acc, curr) => {
-			if (curr.firstName || curr.lastName) {
-				const inqObj = {
-					value: curr.id,
-					label: formatInquirerName(curr),
-				}
-				return [...acc, inqObj]
-			} else {
-				return acc;
-			}
-		}, []);
-	}
-
 	// format type of law state into select options
 	getLawTypeSelectOptions = (arr) => {
 		return arr.reduce((acc, curr) => {
@@ -462,9 +425,9 @@ class InquirerForm extends Component {
 	}
 
 	render() {
-		let lawyerSelectOptions = this.getLawyerSelectOptions(this.props.lawyers);
+		let lawyerSelectOptions = getPeopleIntoSelectOptions(this.props.lawyers);
 
-		let inqSelectOptions = this.getInquirerSelectOptions(this.props.inquirers);
+		let inqSelectOptions = getPeopleIntoSelectOptions(this.props.inquirers);
 
 		let lawTypeOptions = this.getLawTypeSelectOptions(this.props.lawTypes);
 
@@ -526,10 +489,11 @@ class InquirerForm extends Component {
 		if (this.props.currentInquirers.length > 0) {
 			currentInquirerInfo = (
 				this.props.currentInquirers.map(inq => {
+					// console.log('this.props.currentInquirers', this.props.currentInquirers, inq)
 					return (
 						<div key={inq.id}>
 							{/* inquirer name */}
-							<Card.Footer><strong>Information for:</strong> {formatInquirerName(inq)}</Card.Footer>
+							<Card.Footer><strong>Information for:</strong> {formatName(inq)}</Card.Footer>
 							{/* inquirer info */}
 							<ListGroup className="mb-3">
 								{/* gender pronouns */}
@@ -761,7 +725,7 @@ class InquirerForm extends Component {
 					</fieldset>
 					<Collapse in={this.state.isReferralDispositionChecked}>
 						<div id="referrals">
-							<div className="mb-2"><em>If LRN or PBP is chosen above, please fill out the following for to allow for this case to be referred.</em></div>
+							<div className="mb-2"><em>If LRN or PBP is chosen above, please fill out the following to help refer this case.</em></div>
 
 							{/* type of law */}
 							<Form.Group as={Row} controlId="typeOfLawPulldown">

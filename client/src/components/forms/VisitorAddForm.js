@@ -8,74 +8,65 @@ import Checkbox from './fields/Checkbox';
 import RadioButton from './fields/RadioButton';
 import TextArea from './fields/TextArea';
 import { reqAsterisk } from './formElements';
-
-
+import * as peopleFields from '../../data/peopleFields';
 import InputField from './fields/InputField'
 
-const initialValues = {
-	firstName: '',
-	middleName: '',
-	lastName: '',
-	preferName: '',
-	email: '',
-	phone: '',
-	location: '',
-	gender: '',
-	pronouns: [],
-	income: '',
-	terms: [],
-	notes: '',
-	signature: '',
+let initialValues = {
+	[peopleFields.local.FIRST_NAME]: '',
+	[peopleFields.local.MIDDLE_NAME]: '',
+	[peopleFields.local.LAST_NAME]: '',
+	[peopleFields.local.OTHER_NAMES]: '',
+	[peopleFields.local.EMAIL]: '',
+	[peopleFields.local.PHONE]: '',
+	[peopleFields.local.ADDRESS]: '',
+	[peopleFields.local.GENDER]: '',
+	[peopleFields.local.PRONOUNS]: [], // multi-checkbox array
+	[peopleFields.local.INCOME]: '',
+	[peopleFields.local.INTAKE_NOTES]: '',
+	[peopleFields.local.TERMS]: '', // single-checkbox string
+	[peopleFields.local.SIGNATURE]: '',
 }
 
 const validate = (values, props) => {
 	const errors = {};
 
-	console.log('values', values, 'errors', errors)
+	// console.log('values', values, 'errors', errors)
 
-	if (!values.firstName) {
-		errors.firstName = 'First name is required.';
+	if (!values[peopleFields.local.FIRST_NAME]) {
+		errors[peopleFields.local.FIRST_NAME] = 'First name is required.';
 	}
 
-	if (!values.lastName) {
-		errors.lastName = 'Last name is required.';
+	if (!values[peopleFields.local.LAST_NAME]) {
+		errors[peopleFields.local.LAST_NAME] = 'Last name is required.';
 	}
 
-	if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email) && values.email) {
-		errors.email = 'Invalid email address.';
+	if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values[peopleFields.local.EMAIL]) && values[peopleFields.local.EMAIL]) {
+		errors[peopleFields.local.EMAIL] = 'Invalid email address.';
 	}
 
-	if (!/^\D?(\d{3})\D?\D?(\d{3})\D?(\d{4})$/i.test(values.phone) && values.phone) {
-		errors.phone = "Invalid phone number."
+	if (!/^\D?(\d{3})\D?\D?(\d{3})\D?(\d{4})$/i.test(values[peopleFields.local.PHONE]) && values[peopleFields.local.PHONE]) {
+		errors[peopleFields.local.PHONE] = "Invalid phone number."
 	}
 
-	if (!values.email && !values.phone) {
-		errors.email = 'Enter an email address or...';
-		errors.phone = 'If no email, enter a phone #.'; // would be good to know if email was touched
+	if (!values[peopleFields.local.EMAIL] && !values[peopleFields.local.PHONE]) {
+		errors[peopleFields.local.EMAIL] = 'Enter an email address or...';
+		errors[peopleFields.local.PHONE] = 'If no email, enter a phone #.';
 	}
 
-	if (!values.location) {
-		errors.location = 'City, State, Zip is is required.';
+	if (!values[peopleFields.local.ADDRESS]) {
+		errors[peopleFields.local.ADDRESS] = 'City, State, Zip is is required.';
 	}
 
-	// if (!values.pronouns || values.pronouns.length < 1) {
-	// 	errors.pronouns = 'Indicating a gender pronoun is not required.';
-	// }
-
-	if (!values.income) {
-		errors.income = 'Annual household needs to be indicated.';
+	if (!values[peopleFields.local.INCOME]) {
+		errors[peopleFields.local.INCOME] = 'Annual household needs to be indicated.';
 	}
 
-	// if (!values.notes) {
-	// 	errors.notes = 'Notes are encouraged but not required.';
-	// }
-
-	if (!values.terms.includes('termsAgree')) {
-		errors.terms = 'You must accept the terms and conditions.';
+	if (!values[peopleFields.local.TERMS]) {
+		errors[peopleFields.local.TERMS] = 'You must accept the terms and conditions.';
 	}
 
-	if (!values.signature) {
-		errors.signature = 'You must enter a digital signature.';
+	if (!values[peopleFields.local.SIGNATURE]) {
+		errors[peopleFields.local.SIGNATURE] = 'You must enter a digital signature.';
 	}
 
 	return errors;
@@ -96,11 +87,12 @@ const VisitorAddForm = props => {
 		touched,
 		setFieldValue,
 		setFieldTouched,
+		isSubmitting,
 		// dirty,
-		// isSubmitting,
 		// handleChange,
 		// handleBlur,
 		// handleReset,
+		editData, //currentInquirers
 	} = props;
 
 	// add to global style sheet
@@ -112,8 +104,8 @@ const VisitorAddForm = props => {
 
 	const termsAcceptClasses = {
 		label: classNames({
-			'font-weight-bold': !errors.terms || !touched.terms,
-			'text-danger': errors.terms && touched.terms,
+			'font-weight-bold': !errors[peopleFields.local.TERMS] || !touched[peopleFields.local.TERMS],
+			'text-danger': errors[peopleFields.local.TERMS] && touched[peopleFields.local.TERMS],
 		})
 	}
 
@@ -126,7 +118,7 @@ const VisitorAddForm = props => {
 				<Form.Row>
 					<Col sm={5}>
 						<InputField
-							name="firstName"
+							name={peopleFields.local.FIRST_NAME}
 							type="text"
 							placeholder="First Name"
 							required={true}
@@ -138,7 +130,7 @@ const VisitorAddForm = props => {
 					</Col>
 					<Col sm={2}>
 						<InputField
-							name="middleName"
+							name={peopleFields.local.MIDDLE_NAME}
 							type="text"
 							placeholder="Middle Name"
 							style={{
@@ -149,7 +141,7 @@ const VisitorAddForm = props => {
 					</Col>
 					<Col sm={5}>
 						<InputField
-							name="lastName"
+							name={peopleFields.local.LAST_NAME}
 							type="text"
 							placeholder="Last Name"
 							required={true}
@@ -161,7 +153,7 @@ const VisitorAddForm = props => {
 					</Col>
 				</Form.Row>
 				<InputField
-					name="preferName"
+					name={peopleFields.local.OTHER_NAMES}
 					type="text"
 					label="Preferred Name(s)"
 					placeholder="Preferred Name(s)"
@@ -178,12 +170,12 @@ const VisitorAddForm = props => {
 						<Form.Row>
 							<Col md={7}>
 								<InputField
-									name="email"
+									name={peopleFields.local.EMAIL}
 									type="email"
 									label="Email Address"
 									placeholder="email@address.com"
 									// onBlur={handleBlur}
-									required={!values.phone}
+									required={!values[peopleFields.local.PHONE]}
 									style={{
 										width: "100%",
 										display: "inline",
@@ -192,12 +184,12 @@ const VisitorAddForm = props => {
 							</Col>
 							<Col md={5}>
 								<InputField
-									name="phone"
+									name={peopleFields.local.PHONE}
 									type="text"
 									label="Phone #"
 									placeholder="123-456-7890"
 									// onBlur={handleBlur}
-									required={!values.email}
+									required={!values[peopleFields.local.EMAIL]}
 									style={{
 										width: "100%",
 										display: "inline",
@@ -208,9 +200,9 @@ const VisitorAddForm = props => {
 					</Card.Body>
 				</Card>
 				<InputField
-					name="location"
+					name={peopleFields.local.ADDRESS}
 					type="text"
-					label="City, State, Zip"
+					label={peopleFields.ADDRESS}
 					placeholder="NY, NY 10001"
 					required={true}
 					style={{
@@ -220,9 +212,9 @@ const VisitorAddForm = props => {
 				/>
 				<div className="mb-4">
 					<InputField
-						name="gender"
+						name={peopleFields.local.GENDER}
 						type="text"
-						label="Gender and/or Sexuality"
+						label={peopleFields.GENDER}
 						placeholder="queer, trans, non-binary, pansexual, CIS, lesbian, gay / male, female"
 						style={{
 							width: "98%",
@@ -230,45 +222,45 @@ const VisitorAddForm = props => {
 					/>
 				</div>
 				<CheckboxGroup
-					id="pronouns"
+					id={peopleFields.local.PRONOUNS} // id=local parent
 					label="Gender Pronouns"
-					value={values.pronouns}
-					error={errors.pronouns}
-					touched={touched.pronouns}
+					value={values[peopleFields.local.PRONOUNS]}
+					error={errors[peopleFields.local.PRONOUNS]}
+					touched={touched[peopleFields.local.PRONOUNS]}
 					onChange={setFieldValue}
 					onBlur={setFieldTouched}
 				>
 					<Field
 						component={Checkbox}
-						name="pronouns"
-						id="she"
-						label="She/Her/Hers"
+						name={peopleFields.local.PRONOUNS} // name=local parent
+						id={peopleFields.PRONOUNS_SHE} // id=child
+						label={peopleFields.PRONOUNS_SHE}
 					/>
 					<Field
 						component={Checkbox}
-						name="pronouns"
-						id="they"
-						label="They/Them/Theirs"
+						name={peopleFields.local.PRONOUNS}
+						id={peopleFields.PRONOUNS_THEY}
+						label={peopleFields.PRONOUNS_THEY}
 					/>
 					<Field
 						component={Checkbox}
-						name="pronouns"
-						id="he"
-						label="He/Him/His"
+						name={peopleFields.local.PRONOUNS}
+						id={peopleFields.PRONOUNS_HE}
+						label={peopleFields.PRONOUNS_HE}
 					/>
 					<Field
 						component={Checkbox}
-						name="pronouns"
-						id="other"
-						label="Other"
+						name={peopleFields.local.PRONOUNS}
+						id={peopleFields.PRONOUNS_OTHER}
+						label={peopleFields.PRONOUNS_OTHER}
 					/>
 				</CheckboxGroup>
 				<RadioButtonGroup
-					id="income"
+					id={peopleFields.local.INCOME}
 					label="Annual Household Income"
-					value={values.income}
-					error={errors.income}
-					touched={touched.income}
+					value={values[peopleFields.local.INCOME]}
+					error={errors[peopleFields.local.INCOME]}
+					touched={touched[peopleFields.local.INCOME]}
 					required={true}
 				>
 					<small className="mb-2 text-muted d-block">
@@ -276,96 +268,94 @@ const VisitorAddForm = props => {
 					</small>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="under20k"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_UNDER_20K}
 						label="Under $20,000"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="20to40k"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_20K}
 						label="$20,000 - $40,000"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="40to60k"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_40K}
 						label="$40,000 - $60,000"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="60to80k"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_60K}
 						label="$60,000 - $80,000"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="80to100k"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_80K}
 						label="$80,000 - $100,000"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="over100k"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_100K}
 						label="$100,000+"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="unemployed"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_UNEMPLOYED}
 						label="Unemployed"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="unableToWork"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_UNABLE}
 						label="Unable To Work"
 					/>
 					<Field
 						component={RadioButton}
-						name="income"
-						id="declineAnswer"
+						name={peopleFields.local.INCOME}
+						id={peopleFields.INCOME_NO_ANSWER}
 						label="Decline To Answer"
 					/>
 				</RadioButtonGroup>
 				<div className="mb-4">
 					<Field
 						component={TextArea}
-						name="notes"
-						id="notes"
-						label="Intake Notes"
+						name={peopleFields.local.INTAKE_NOTES}
+						id={peopleFields.local.INTAKE_NOTES}
+						label={peopleFields.INTAKE_NOTES}
 						placeholder="Type of law related to visit? Anything the attorneys should know?"
 						rows={2}
 					/>
 				</div>
 				<CheckboxGroup
-					id="terms"
-					label="Acknowledgment"
-					value={values.terms}
-					error={errors.terms}
-					touched={touched.terms}
+					id={peopleFields.local.TERMS} // id=local parent
+					label={peopleFields.TERMS}
+					description="I understand that LeGaL does not provide representation, nor will LeGaL or the volunteer attorney become my legal representative by virtue of the Clinic consultation. I understand that the assistance provided by the volunteer attorney is limited to the Clinic session. I understand that the volunteer attorney is not obligated to provide information or referrals outside the Clinic. I understand that abusive behavior towards any of the Clinic staff or others waiting for the Clinic may result in my being barred from the Clinic."
+					value={values[peopleFields.local.TERMS]}
+					error={errors[peopleFields.local.TERMS]}
+					touched={touched[peopleFields.local.TERMS]}
 					onChange={setFieldValue}
 					onBlur={setFieldTouched}
 					required={true}
 					className="mb-4"
 				>
-					<div className="mb-2 small">
-						I understand that LeGaL does not provide representation, nor will LeGaL or the volunteer attorney become my legal representative by virtue of the Clinic consultation. I understand that the assistance provided by the volunteer attorney is limited to the Clinic session. I understand that the volunteer attorney is not obligated to provide information or referrals outside the Clinic. I understand that abusive behavior towards any of the Clinic staff or others waiting for the Clinic may result in my being barred from the Clinic.
-					</div>
 					<Field
 						component={Checkbox}
-						name="terms"
-						id="termsAgree"
-						label="I understand and agree to the terms and conditions of the clinic."
+						name={peopleFields.local.TERMS} // name=local parent
+						id={peopleFields.TERMS_AGREE} // id=child
+						label={peopleFields.TERMS_AGREE}
 						className={termsAcceptClasses}
 					/>
 				</CheckboxGroup>
 				<div className="mb-4">
 					<InputField
-						name="signature"
+						name={peopleFields.local.SIGNATURE}
 						type="text"
-						label="Digital Signature"
+						label={peopleFields.SIGNATURE}
 						info="Please write your name below, serving as your digital signature."
 						placeholder="Full Name"
 						required={true}
@@ -374,11 +364,21 @@ const VisitorAddForm = props => {
 						}}
 					/>
 				</div>
+				{/* HANDLE RESET! */}
+				{/* <button
+					type="button"
+					className="outline"
+					onClick={handleReset}
+					disabled={!dirty || isSubmitting}
+				>
+					Reset
+				</button> */}
 				<Row className="justify-content-start">
 					<Col>
 						<Button
 							variant="primary"
 							type="submit"
+							disabled={isSubmitting}
 						>
 							Submit
 						</Button>
@@ -390,8 +390,27 @@ const VisitorAddForm = props => {
 }
 
 export default withFormik({
-	mapPropsToValues: () => (initialValues),
+	mapPropsToValues: ({
+		editData
+	}) => {
+		if (editData) {
+			const firstVisitor = editData[0];
+			Object.keys(firstVisitor).forEach(field => {
+				// for object properties that match...
+				if (initialValues.hasOwnProperty(field)) {
+					// if array replace all items
+					if (Array.isArray(firstVisitor[field])) {
+						initialValues[field].splice(0, initialValues[field].length, ...firstVisitor[field]);
+					} else {
+						initialValues[field] = firstVisitor[field];
+					}
+				}
+			});
+		}
+		return initialValues;
+	},
 	validate,
 	handleSubmit,
 	displayName: 'visitorForm',
+	// enableReinitialize: true,
 })(VisitorAddForm);

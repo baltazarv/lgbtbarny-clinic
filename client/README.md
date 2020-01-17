@@ -3,9 +3,11 @@
 ## React Select
 
 Forms use React Select pull-down component:
+* [Documentation](https://react-select.com/)
+* [Styles](https://react-select.com/styles)
 * https://alligator.io/react/react-select/
 * https://github.com/JedWatson/react-select
-* [Styles](https://react-select.com/styles)
+
 
 For React Select to work with Formik:
 * https://gist.github.com/hubgit/e394e9be07d95cd5e774989178139ae8
