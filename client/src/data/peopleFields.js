@@ -1,6 +1,9 @@
-// AirTable field names
-// these vars and local vars used on `/client/src/components/forms/VisitorAddForm.js`
-export const REPEAT_VISIT = 'Repeat Visit?'; // TO-DO: set
+// TODO: move to ./peopleData.js
+// AirTable table, table view, and field names
+export const REPEAT_VISIT = 'Repeat Visit?';
+export const TYPE = 'Type';
+// export const HOW_FOUND = 'How Found Clinic';
+// name
 export const FIRST_NAME = 'First Name';
 export const MIDDLE_NAME = 'Middle Name';
 export const LAST_NAME = 'Last Name';
@@ -33,7 +36,7 @@ export const TERMS_AGREE = 'I understand and agree to the terms and conditions o
 export const SIGNATURE = 'Digital Signature';
 export const CONSULTATIONS = 'Consultations';
 
-// when data is fetched from `/client/src/store/actions/people.js`, vars from DB are saved to local vars
+// TEMP - delete soon
 export const local = {
 	REPEAT_VISIT: 'repeat',
 	FIRST_NAME: 'firstName',

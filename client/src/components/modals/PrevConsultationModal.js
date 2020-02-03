@@ -1,19 +1,20 @@
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import * as consultFields from '../../data/consultionFields';
+import * as lawTypeData from '../../data/lawTypeData';
 import { formatName } from '../../data/dataTransforms'
 
 const PrevConsultationModal = props => {
-	const { prevConsultSelected,lawyers, lawTypes, show, onHide, onClick } = props;
+	const { consultSelected, lawyers, lawTypes, show, onHide, onClick } = props;
 
 	let currentConsultationName = '';
 	let modalPrevConsultBody = null;
-	const prevConsultation = prevConsultSelected;
-	if (prevConsultation) {
-		currentConsultationName = <h3>{prevConsultation.name}</h3>;
+	if (consultSelected) {
+		currentConsultationName = <h3>{consultSelected[consultFields.NAME]}</h3>;
 		let _lawyers = [];
-		if (prevConsultation.lawyers) {
-			_lawyers = prevConsultation.lawyers.map(consultLawyer => {
-				// props.lawyers.find...
+		if (consultSelected[consultFields.LAWYERS]) {
+			_lawyers = consultSelected[consultFields.LAWYERS].map(consultLawyer => {
+				// props[consultFields.LAWYERS].find...
 				const lawyer = lawyers.find(lawyer => {
 					return lawyer.id === consultLawyer;
 				})
@@ -21,26 +22,28 @@ const PrevConsultationModal = props => {
 			})
 		}
 		let _lawTypes = [];
-		if (prevConsultation.lawTypes) {
-			_lawTypes = prevConsultation.lawTypes.map(consultType => {
-				// props.lawTypes.find...
+		// console.log('law types', consultSelected[consultFields.LAW_TYPES], 'full', lawTypes)
+		if (consultSelected[consultFields.LAW_TYPES]) {
+			_lawTypes = consultSelected[consultFields.LAW_TYPES].map(consultType => {
 				const lawType = lawTypes.find(type => {
+					// console.log('type', type.id, 'vs consultType', consultType)
 					return type.id === consultType;
 				})
-				return lawType.type;
+				return lawType[lawTypeData.NAME];
 			})
 		}
+		// console.log('_lawTypes', _lawTypes)
 		modalPrevConsultBody = (
 			<ul>
 				<li><strong>Consulting Lawyer:</strong> {_lawyers && _lawyers.length > 0 ? (_lawyers.join(', ')) : ''}</li>
 
-				<li><strong>Notes: </strong>{prevConsultation.situation}</li>
+				<li><strong>Notes: </strong>{consultSelected[consultFields.SITUATION]}</li>
 
-				<li><strong>Disposition: </strong>{prevConsultation.dispositions && prevConsultation.dispositions.length > 0 ? (prevConsultation.dispositions.join(', ')) : ''}</li>
+				<li><strong>Disposition: </strong>{consultSelected[consultFields.DISPOSITIONS] && consultSelected[consultFields.DISPOSITIONS].length > 0 ? (consultSelected[consultFields.DISPOSITIONS].join(', ')) : ''}</li>
 
 				<li><strong>Type of Law: </strong>{_lawTypes.join(', ')}</li>
 
-				<li><strong>Referral Summary: </strong>{prevConsultation.summary}</li>
+				<li><strong>Referral Summary: </strong>{consultSelected[consultFields.REF_SUMMARY]}</li>
 			</ul>
 		)
 	}

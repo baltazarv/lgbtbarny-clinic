@@ -1,41 +1,69 @@
 import * as actionTypes from './actionTypes';
 import airtableBase from '../../airtableBase';
-
 import * as peopleFields from '../../data/peopleFields'; //
-import { PEOPLE_TABLE, INQUIRERS_VIEW, LAWYERS_VIEW } from '../../data/tableNames';
+import { PEOPLE_TABLE, INQUIRERS_VIEW, LAWYERS_VIEW } from '../../data/peopleData';
+import { recordForUpdate } from '../../data/dataTransforms';
 
 // async action creators
 
 export const getLawyers = () => {
 	return dispatch => {
-		let lawyers = [];
-		airtableBase(PEOPLE_TABLE).select({
-			fields: [
-				peopleFields.FIRST_NAME,
-				peopleFields.MIDDLE_NAME,
-				peopleFields.LAST_NAME,
-				peopleFields.OTHER_NAMES,
-			],
-			view: LAWYERS_VIEW
-			// filterByFormula: 'Type = "Lawyer"'
-		}).eachPage(function page(records, fetchNextPage) {
-			records.forEach(record => {
-				lawyers.push({
-					id: record.id,
-					firstName: record.get(peopleFields.FIRST_NAME),
-					middleName: record.get(peopleFields.MIDDLE_NAME),
-					lastName: record.get(peopleFields.LAST_NAME),
-					otherNames: record.get(peopleFields.OTHER_NAMES),
+		return new Promise((resolve, reject) => {
+			let lawyers = [];
+			airtableBase(PEOPLE_TABLE).select({
+				fields: [
+					peopleFields.FIRST_NAME,
+					peopleFields.MIDDLE_NAME,
+					peopleFields.LAST_NAME,
+					peopleFields.OTHER_NAMES,
+				],
+				view: LAWYERS_VIEW
+				// filterByFormula: 'Type = "Lawyer"'
+			}).eachPage(function page(records, fetchNextPage) {
+				records.forEach(record => {
+					const _record = record.fields;
+					_record.id = record.id;
+					lawyers.push(_record);
 				});
+				fetchNextPage(); // next 100
+			}, function done(err, records) {
+				if (err) {
+					console.error('Airtable Error: ', err);
+					return reject('Airtable Error: ', err);
+				}
+				dispatch(initLawyers(lawyers));
+				return resolve(lawyers);
 			});
-			fetchNextPage(); // next 100
-		}, function done(err, records) {
-			if (err) {
-				console.log('Airtable Error: ', err);
-				// dispatch(fetchLawyersFailed())
-				return;
-			}
-			dispatch(initLawyers(lawyers))
+		})
+	}
+}
+
+export const createLawyer = lawyer => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			let payload = {
+				...lawyer,
+				[peopleFields.TYPE]: [
+					"Lawyer"
+				],
+				[peopleFields.REPEAT_VISIT]: 'Yes',
+			};
+			airtableBase(PEOPLE_TABLE).create(payload, function (error, record) {
+				if (error) {
+					console.error('Airtable Error:', error);
+					return reject({
+						status: 'failed',
+						error,
+					});
+				}
+				let lawyer = {...record.fields, id: record.id};
+				dispatch(addLawyer(lawyer));
+				return resolve({
+					status: 'success',
+					type: 'createLawyer',
+					payload: lawyer,
+				})
+			});
 		});
 	}
 }
@@ -66,24 +94,9 @@ export const getInquirers = () => {
 			// filterByFormula: 'Type = "Inquirer"'
 		}).eachPage(function page(records, fetchNextPage) {
 			records.forEach(function (record) {
-				inquirers.push({
-					id: record.id,
-					[peopleFields.local.REPEAT_VISIT]: record.get(peopleFields.REPEAT_VISIT),
-					[peopleFields.local.FIRST_NAME]: record.get(peopleFields.FIRST_NAME),
-					[peopleFields.local.MIDDLE_NAME]: record.get(peopleFields.MIDDLE_NAME),
-					[peopleFields.local.LAST_NAME]: record.get(peopleFields.LAST_NAME),
-					[peopleFields.local.OTHER_NAMES]: record.get(peopleFields.OTHER_NAMES),
-					[peopleFields.local.EMAIL]: record.get(peopleFields.EMAIL),
-					[peopleFields.local.PHONE]: record.get(peopleFields.PHONE),
-					[peopleFields.local.ADDRESS]: record.get(peopleFields.ADDRESS),
-					[peopleFields.local.GENDER]: record.get(peopleFields.GENDER),
-					[peopleFields.local.PRONOUNS]: record.get(peopleFields.PRONOUNS),
-					[peopleFields.local.INCOME]: record.get(peopleFields.INCOME),
-					[peopleFields.local.INTAKE_NOTES]: record.get(peopleFields.INTAKE_NOTES),
-					[peopleFields.local.TERMS]: record.get(peopleFields.TERMS),
-					[peopleFields.local.SIGNATURE]: record.get(peopleFields.SIGNATURE),
-					[peopleFields.local.CONSULTATIONS]: record.get(peopleFields.CONSULTATIONS)
-				});
+				const _record = record.fields;
+				_record.id = record.id;
+				inquirers.push(_record);
 			});
 			fetchNextPage(); // next 100
 		}, function done(err, records) {
@@ -97,12 +110,76 @@ export const getInquirers = () => {
 	}
 }
 
+export const createInquirer = inquirer => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			let payload = {
+				...inquirer,
+				[peopleFields.TYPE]: [
+					"Inquirer"
+				],
+				[peopleFields.REPEAT_VISIT]: 'Yes',
+			};
+			airtableBase(PEOPLE_TABLE).create(payload, function (error, record) {
+				if (error) {
+					console.error('Airtable Error:', error);
+					return reject({
+						status: 'failed',
+						error,
+					});
+				}
+				dispatch(addInquirer(inquirer));
+				return resolve({
+					status: 'success',
+					type: 'createInquirer',
+					payload: record,
+				});
+			});
+		})
+	}
+}
+
+export const updateInquirer = info => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			let payload = recordForUpdate(info);
+			// replace (vs update) will perform a destructive update and clear all unspecified cell values.
+			airtableBase(PEOPLE_TABLE).update([payload], function (error, record) {
+				if (error) {
+					console.error('Airtable Error:', error);
+					return reject({
+						status: 'failed',
+						error,
+					});
+				}
+				// could getInquirers(), but expensive
+				const _record = record[0].fields;
+				_record.id = record[0].id;
+				dispatch(updateInquirers(_record)); // _record
+				return resolve({
+					status: 'success',
+					type: 'updateInquirer',
+					payload: record, // record
+				})
+			});
+		});
+	}
+}
+
+
 // sync action creators
 
 export const initLawyers = lawyers => {
 	return {
 		type: actionTypes.INIT_LAWYERS,
 		lawyers
+	}
+}
+
+export const addLawyer = lawyer => {
+	return {
+		type: actionTypes.ADD_LAWYER,
+		lawyer
 	}
 }
 
@@ -113,6 +190,24 @@ export const initInquirers = inquirers => {
 	}
 }
 
+export const addInquirer = inquirer => {
+	return {
+		type: actionTypes.ADD_INQUIRER,
+		inquirer
+	}
+}
+
+// take updated inquirer and replace with new info
+export const updateInquirers = inquirer => {
+	return {
+		type: actionTypes.UPDATE_INQUIRERS,
+		inquirer
+	}
+}
+
+// REMOVE
+
+// select an inquirer to send between screens
 export const setCurrentInquirers = currentInquirers => {
 	return {
 		type: actionTypes.SET_CURRENT_INQUIRERS,

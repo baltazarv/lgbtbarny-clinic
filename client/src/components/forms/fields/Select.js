@@ -1,3 +1,5 @@
+/** TO-DO: rename `VisitorSelect` after commit as is */
+
 /**
  * Props for react-select:
  * * option: { value: 'xxx', label: 'Baltazar Villegas' }
@@ -10,7 +12,7 @@
  *
  * Props for component functionality:
  *  * onChange: func to call when handle change
- *  * disabled: to add *
+ *  * disabled: to add required asterisk
  *  * label: to add field label
  *  *
  */
@@ -23,21 +25,23 @@ import classNames from 'classnames';
 const Select = ({
 	options,
 	defaultValue,
+	value,
 	label,
+	info,
 	onChange,
 	onBlur,
 	required,
+	isMulti,
 	isDisabled,
 	name,
+	resetValue,
 }) => {
-	let [value, setValue] = useState(null);
+	// let [value, setValue] = useState(null);
 	let [touched, setTouched] = useState(false);
 	let [error, setError] = useState(null);
 
 	const handleChange = selection => {
-		setValue(selection);
 		setError(validate());
-		// setTouched(true);
 		if (onChange) onChange(selection);
 	}
 
@@ -63,21 +67,26 @@ const Select = ({
 	})
 
 	let formLabel = null;
+	let inputCols = 12;
 	if (label) {
 		formLabel = (<Form.Label column sm={4} className="text-md-right">
 			{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
 		</Form.Label>);
+		inputCols = 8;
 	}
+
+	let infoTxt = null;
+	if (info) infoTxt = <Form.Text className="text-muted mt-0 mb-1">{info}</Form.Text>
 
 	const customStyles = {
 		control: (provided, state) => {
 			let borderColor = 'hsl(0,0%,80%)';
-			if(error && touched) borderColor = 'red';
+			if (error && touched) borderColor = 'red';
 			return { ...provided, borderColor };
 		},
 		placeholder: (provided, state) => {
 			let color = '#212529';
-			if(error && touched) {
+			if (error && touched) {
 				color = 'red';
 			}
 			return { ...provided, color };
@@ -92,16 +101,21 @@ const Select = ({
 		<>
 			<Form.Group as={Row} controlId={name} className="mb-0">
 				{formLabel}
-				<Col sm={8}>
+				<Col sm={inputCols}>
+					{infoTxt}
 					<ReactSelect
+						// key={}
 						options={options}
 						defaultValue={defaultValue}
 						onChange={handleChange}
 						onBlur={handleBlur}
 						isClearable
-						// isMulti
+						isMulti={isMulti}
 						// isDisabled={disabled}
 						styles={customStyles}
+						// isLoading={true} // Is the select in a state of loading (async)
+						// ref={selectField}
+						value={value} // setting this clears the value when unmounting
 					/>
 				</Col>
 			</Form.Group>

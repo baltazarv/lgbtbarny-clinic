@@ -2,9 +2,6 @@ const nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 const htmlToText = require('html-to-text');
 
-const fs = require('fs');
-const path = require('path');
-
 module.exports = class Email {
 	constructor(template, options) {
 		this.from = options.from;
@@ -13,12 +10,18 @@ module.exports = class Email {
 		this.html = template;
 	}
 
+	/**
+	 * Credentials:
+	 * * development: Mailtrap un/pw in /config/keys.
+	 * * production: sendgrid in .env vars.
+	 */
 	createTransport() {
 		const auth = {
 			user: keys.emailUser,
 			pass: keys.emailPass,
 		}
 
+		console.log('ENV', process.env.NODE_ENV, 'AUTH', auth)
 
 		if (process.env.NODE_ENV === 'production') {
 			// SendGrid
@@ -37,11 +40,10 @@ module.exports = class Email {
 	}
 
 	async send() {
-		// add error handling
-		if (!this.from) return 'From email address is missing!';
-		if (!this.to) return 'To email address is missing!';
-		if (!this.subject) return 'Subject line is missing!';
-		if (!this.text && !this.html) return 'Neither email body HTML nor text is included!';
+		if (!this.from) throw new Error('From-email address is missing!');
+		if (!this.to) throw new Error('To-email address is missing!');
+		if (!this.subject) throw new Error('Subject line is missing!');
+		if (!this.text && !this.html) throw new Error('Neither email body HTML nor text is included!');
 		// text version not tested
 		const text = this.text || htmlToText.fromString(this.html);
 		const mailOptions = {

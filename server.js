@@ -37,13 +37,13 @@ app.post('/api/v1/sendemail', async (req, res) => {
 
 		// custom text sent with HTML markup, incl <BR> newlines
 		const template = nunjucks.render('email-visitor.html', {
-			custommsg: req.body.customText
+			custommsg: req.body.bodyText
 		});
 		new Email(template, req.body).send();
 
 		res.status(200).json({
 			status: 'success',
-			message: 'Email sent to Mailtrap'
+			message: 'Email sent.'
 		});
 	} catch (err) {
 		console.log('post err', err);

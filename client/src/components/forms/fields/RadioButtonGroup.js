@@ -10,6 +10,7 @@ const RadioButtonGroup = ({
 	touched,
 	id,
 	label,
+	description,
 	className,
 	children,
 	required,
@@ -32,11 +33,15 @@ const RadioButtonGroup = ({
 		_reqAsterisk = reqAsterisk;
 	}
 
+	let descText = null;
+	if (description) descText = <div className="mb-2 small  text-muted">{description}</div>
+
 	return (
 		<Form.Group controlId={id} className={classes}>
 			<fieldset>
 				{formLabel}{_reqAsterisk}
-				{children}
+				{descText}
+				<div className="mb-2">{children}</div>
 				{touched && <InputFeedback error={error} />}
 			</fieldset>
 		</Form.Group>

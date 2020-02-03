@@ -2,11 +2,13 @@
  *  Select options in react-select component in format:
  *    [{ label: "Alligators", value: 1 }].
  */
+import * as peopleFields from './peopleFields';
+import * as lawTypeData from './lawTypeData';
 
 // format data from people table into react-select options
 export const getPeopleIntoSelectOptions = (arr) => {
 	return arr.reduce((options, item) => {
-		if (item.firstName || item.lastName) {
+		if (item[peopleFields.FIRST_NAME] || item[peopleFields.LAST_NAME]) {
 			const inqObj = {
 				value: item.id,
 				label: formatName(item),
@@ -18,13 +20,19 @@ export const getPeopleIntoSelectOptions = (arr) => {
 	}, []);
 }
 
-// people table record full name format
+// format type of law state into select options
+export const getLawTypeSelectOptions = (arr) => {
+	return arr.reduce((acc, curr) => {
+		return [...acc, { value: curr.id, label: curr[lawTypeData.NAME] }]
+	}, []);
+}
+
 export const formatName = inquirer => {
-	const firstName = inquirer.firstName;
-	const middleName = inquirer.middleName;
-	const otherNames = inquirer.otherNames;
-	const lastName = inquirer.lastName;
-	return (firstName ? firstName : '') + (middleName ? ' ' + middleName : '') + ' ' + (lastName ? lastName : '') + (otherNames ? ' (' + otherNames + ')' : '')
+	const firstName = inquirer[peopleFields.FIRST_NAME];
+	const middleName = inquirer[peopleFields.MIDDLE_NAME];
+	const otherNames = inquirer[peopleFields.OTHER_NAMES];
+	const lastName = inquirer[peopleFields.LAST_NAME];
+	return (firstName ? firstName : '') + (otherNames ? ' "' + otherNames + '"' : '') + (middleName ? ' ' + middleName : '') + ' ' + (lastName ? lastName : '')
 }
 
 /**
@@ -36,7 +44,7 @@ export const getRecordsFromSelection = (selection, recordsIn) => {
 	let recordsOut = [];
 	let selectArray = [];
 	// if selection is not an array, push into one
-	if(Array.isArray(selection)) {
+	if (Array.isArray(selection)) {
 		selectArray = selection;
 	} else {
 		selectArray.push(selection);
@@ -50,4 +58,22 @@ export const getRecordsFromSelection = (selection, recordsIn) => {
 		});
 	}
 	return recordsOut;
+}
+
+export const recordForUpdate = data => {
+	let fields = objectWithoutProps(data, ['id']);
+	let payload = {};
+	payload.fields = fields;
+	payload.id = data.id;
+	return payload;
+}
+
+const objectWithoutProps = (obj, keys) => {
+	var target = {};
+	for (var i in obj) {
+		if (keys.indexOf(i) >= 0) continue;
+		if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+		target[i] = obj[i];
+	}
+	return target;
 }

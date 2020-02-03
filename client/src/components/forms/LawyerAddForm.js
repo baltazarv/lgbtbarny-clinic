@@ -1,111 +1,137 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { withFormik, Form as FormikForm } from 'formik';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import InputField from './fields/InputField';
+import * as peopleFields from '../../data/peopleFields';
 // import styles from './LawyerAddForm.module.css';
 
-const initialValues = {
+class LawyerAddForm extends Component {
 
-}
+	render() {
 
-const validate = (values) => {
-	const errors = {};
+		const {
+			// modal
+			onHide,
 
-	return errors;
-}
+			// formik props
+			isSubmitting,
+			// values,
+			// touched,
+			// errors,
+			// dirty,
+			// handleChange,
+			// handleBlur,
+			// handleSubmit,
+			// handleReset,
+		} = this.props;
 
-const handleSubmit = (values, { setSubmitting }) => {
-	setTimeout(() => {
-		alert(JSON.stringify(values, null, 2));
-		setSubmitting(false);
-	}, 400);
-}
-
-const LawyerAddForm = props => {
-
-	const {
-		onHide,
-		// handleBlur,
-		// errors,
-		values,
-		// isRepeat,
-	} = props;
-
-	return <>
-		<FormikForm>
-			<Row>
-				<Col className="label form-label mb-2">Name</Col>
-			</Row>
-			<Form.Row>
-				<Col sm={5}>
-					<InputField
-						name="firstName"
-						type="text"
-						placeholder="First Name"
-						required={true}
-						style={{
-							width: "86%",
-							display: "inline",
-						}}
-					/>
-				</Col>
-				<Col sm={2}>
-					<InputField
-						name="middleName"
-						type="text"
-						placeholder="Middle Name"
-						style={{
-							width: "84%",
-							display: "inline",
-						}}
-					/>
-				</Col>
-				<Col sm={5}>
-					<InputField
-						name="lastName"
-						type="text"
-						placeholder="Last Name"
-						required={true}
-						style={{
-							width: "86%",
-							display: "inline",
-						}}
-					/>
-				</Col>
-			</Form.Row>
-			<Form.Row>
-				<Col>
-					<InputField
-						name="email"
-						type="email"
-						label="Email Address"
-						placeholder="email@address.com"
-						required={!values.phone}
-						style={{
-							width: "82%",
-							display: "inline",
-						}}
-					/>
-				</Col>
-			</Form.Row>
-			<hr />
-			<Row >
-				<Col className="d-flex justify-content-end">
-				<Button variant="secondary" className="m-1" onClick={onHide}>
-						Cancel
+		return <>
+			<FormikForm>
+				<Row>
+					<Col className="label form-label mb-2">Name</Col>
+				</Row>
+				<Form.Row>
+					<Col sm={5}>
+						<InputField
+							name={peopleFields.FIRST_NAME}
+							type="text"
+							placeholder={peopleFields.FIRST_NAME}
+							required={true}
+							style={{
+								width: "86%",
+								display: "inline",
+							}}
+						/>
+					</Col>
+					<Col sm={2}>
+						<InputField
+							name={peopleFields.MIDDLE_NAME}
+							type="text"
+							placeholder={peopleFields.MIDDLE_NAME}
+							style={{
+								width: "84%",
+								display: "inline",
+							}}
+						/>
+					</Col>
+					<Col sm={5}>
+						<InputField
+							name={peopleFields.LAST_NAME}
+							type="text"
+							placeholder={peopleFields.LAST_NAME}
+							required={true}
+							style={{
+								width: "86%",
+								display: "inline",
+							}}
+						/>
+					</Col>
+				</Form.Row>
+				<Form.Row>
+					<Col>
+						<InputField
+							name={peopleFields.EMAIL}
+							type="email"
+							label="Email Address" // "Email" on DB
+							placeholder="email@address.com"
+							required={false}
+							style={{
+								width: "82%",
+								display: "inline",
+							}}
+						/>
+					</Col>
+				</Form.Row>
+				<hr />
+				<Row >
+					<Col className="d-flex justify-content-end">
+						<Button variant="secondary" className="m-1" onClick={onHide}>
+							Cancel
 						</Button>
-					<Button variant="primary" type="submit" className="m-1">
-						Add Lawyer
+						<Button variant="primary" type="submit" className="m-1" disabled={isSubmitting}>
+							Add Lawyer
 						</Button>
-				</Col>
-			</Row>
-		</FormikForm>
-	</>
+					</Col>
+				</Row>
+			</FormikForm>
+		</>
+	}
+
 }
 
+// connect()(withFormik()(Component))
 export default withFormik({
-	mapPropsToValues: () => (initialValues),
-	validate,
-	handleSubmit,
+	mapPropsToValues: props => {
+		return {
+			[peopleFields.FIRST_NAME]: '',
+			[peopleFields.MIDDLE_NAME]: '',
+			[peopleFields.LAST_NAME]: '',
+			[peopleFields.EMAIL]: '',
+		}
+	},
+	validate: (values) => {
+		const errors = {};
+
+		if (!values[peopleFields.FIRST_NAME]) {
+			errors[peopleFields.FIRST_NAME] = 'First name is required.';
+		}
+
+		if (!values[peopleFields.LAST_NAME]) {
+			errors[peopleFields.LAST_NAME] = 'Last name is required.';
+		}
+		return errors;
+
+	},
+	handleSubmit: (values, actions) => {
+		const {
+			props,
+			setSubmitting,
+		} = actions;
+		props.submitForm(values);
+
+		// only if serverResponse.status === 'success'
+		setSubmitting(false);
+		props.onHide();
+	},
 	displayName: 'lawyersForm',
 })(LawyerAddForm);

@@ -1,68 +1,136 @@
-import React from 'react';
+/** Separate into EditCustomEmailModal & EditCustomEmail */
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
+// data
+import { formatName } from '../../data/dataTransforms';
+import * as peopleFields from '../../data/peopleFields';
+import { EMAIL_OPTIONS, mergeCustomAndDefaulText } from '../../emails/visitorPostConsultation';
+// styles
 import styles from './EditEmailModal.module.css';
 
 const EditEmailModal = ({
-	inquirerIsSelected,
+	// modal props
+	showModal,
+	handleCloseModal,
+
 	inquirers,
-	emailOptions,
-	emailMessageTemp,
-	emailBodyDefaultModified,
-	emailBodyModifyConfirmed,
-	editEmailBodyDefault,
-	cancelCustomEmailDefault,
-	show,
-	onChange,
-	onHide,
-	cancelEditModal,
-	saveEditModal,
+	handleSavedEdit,
 }) => {
+	// appears on textarea:
+	const [textBuffer, setTextBuffer] = useState('');
+	// custom message saved:
+	const [savedText, setSavedText] = useState('');
+	// switch to textarea containing default text?
+	const [editingDefaultText, setEditingDefaultText] = useState(false);
+	// don't show boilerplate text, has been copied to saved text
+	const [defaultTextSaved, setDefaultTextSaved] = useState(false);
+
+	// controls textBuffer
+	const handleChangeCustomEmail = evt => {
+		setTextBuffer(evt.target.value);
+	}
+
+	/** "Edit Entire Email Body" */
+	const editDefaultText = () => {
+		setEditingDefaultText(true); // hide boilerplate text
+		setTextBuffer(mergeCustomAndDefaulText(textBuffer))
+	}
+
+	/** "Edit Custom Message Only" */
+	const cancelEditDefaultText = () => {
+		setEditingDefaultText(false); // show boilerplate text
+		setDefaultTextSaved(false);
+	}
+
+	const cancelEdit = () => {
+		if (editingDefaultText && !defaultTextSaved) {
+			setEditingDefaultText(false);
+		}
+		setTextBuffer(savedText);
+		handleCloseModal();
+	}
+
+	/** save buffer to savedText,
+	 * clear buffer,
+	 * save to Consultation
+	 */
+	const saveEdit = () => {
+
+		// console.log('editingDefaultText', editingDefaultText)
+		let _defaultTextSaved = false;
+		if (editingDefaultText) {
+			_defaultTextSaved = true;
+		}
+		/** if editing boilerplate & save,
+		 * boilerplate now in saved text,
+		 * no longer showing boilerplate as boilerpate
+		 * */
+		setDefaultTextSaved(_defaultTextSaved);
+
+		/** Consultation saves text for submission
+		 * and resets when loading a new inquirer selected
+		 */
+		handleSavedEdit(textBuffer, _defaultTextSaved, onReset);
+
+		setSavedText(textBuffer);
+		handleCloseModal();
+	}
+
+	const onReset = () => {
+		// on a new inquierer selected clear fields
+		setTextBuffer('');
+		setSavedText('');
+		setEditingDefaultText(false);
+		setDefaultTextSaved(false);
+	}
+
 	let emailEditModalTitle = null;
 	let emailEditModalHead = null;
 	let emailEditModalBody = null;
-	if (inquirerIsSelected) {
+	if (inquirers.length > 0) {
 		const firstCurrInquirer = inquirers[0];
-		const firstCurrInqName = `${firstCurrInquirer.firstName} ${firstCurrInquirer.lastName}`;
-		if (firstCurrInquirer.email) {
+		const firstCurrInqName = formatName(firstCurrInquirer);
+		if (firstCurrInquirer[peopleFields.EMAIL]) {
 			emailEditModalTitle = `Edit Email for ${firstCurrInqName}`;
 
 			emailEditModalHead = <div className="text-muted small">
-				<span className="font-weight-bold">from:</span> {emailOptions.from}<br />
-				<span className="font-weight-bold">to:</span> {firstCurrInquirer.email}<br />
-				<span className="font-weight-bold">subject:</span> {emailOptions.subject}<br /><br />
-				<span className="font-weight-bold">body:</span> {emailOptions.message}
+				<span className="font-weight-bold">from:</span> {EMAIL_OPTIONS.from}<br />
+				<span className="font-weight-bold">to:</span> {firstCurrInquirer[peopleFields.EMAIL]}<br />
+				<span className="font-weight-bold">subject:</span> {EMAIL_OPTIONS.subject}<br /><br />
+				<span className="font-weight-bold">body:</span> {EMAIL_OPTIONS.message}
 			</div>
 
-			// custom email message
-			const customEmailTxtArea = (rows = 4) => <Form.Group controlId="emailMessageTemp">
+			// TEXTAREA
+			const customEmailTxtArea = (rows = 4) => <Form.Group controlId="textBuffer">
 				<Form.Control
 					style={{ fontSize: '0.8em' }}
 					as="textarea"
 					rows={rows}
-					value={emailMessageTemp}
-					name="emailMessageTemp"
-					onChange={onChange}
+					value={textBuffer}
+					name="textBuffer"
+					onChange={handleChangeCustomEmail}
 				/>
 			</Form.Group>
-			if (!emailBodyDefaultModified) {
+
+			if (!editingDefaultText) {
 				emailEditModalBody = <div>
 					<div className={styles.emailBody}>
-						<div className="text-muted small mb-3">{emailOptions.bodyPre}</div>
-						{customEmailTxtArea(4)}
-						<div className="text-muted small mt-3">{emailOptions.bodyPost}</div>
+						<div className="text-muted small mb-3">{EMAIL_OPTIONS.bodyPre}</div>
+						{customEmailTxtArea(6)}
+						<div className="text-muted small mt-3">{EMAIL_OPTIONS.bodyPost}</div>
 					</div>
 					<Button
-						onClick={() => editEmailBodyDefault()} size="sm" className="btn btn-sm btn-warning mt-3">
+						onClick={() => editDefaultText()} size="sm" className="btn btn-sm btn-warning mt-3">
 						Edit Entire Email Body
 					</Button>
 				</div>
 			} else {
 				let editMsgBtn = null;
-				if (!emailBodyModifyConfirmed) {
+				if (!defaultTextSaved) {
 					editMsgBtn = <Button
-						onClick={cancelCustomEmailDefault} size="sm" className="btn btn-sm  mt-3">
+						onClick={cancelEditDefaultText} size="sm" className="btn btn-sm  mt-3">
 						Edit Custom Message Only
 					</Button>
 				}
@@ -78,8 +146,9 @@ const EditEmailModal = ({
 
 	return (
 		<Modal
-			show={show}
-			onHide={onHide}
+			show={showModal}
+			onHide={cancelEdit}
+			// onShow={showEditor}
 			size="md"
 			aria-labelledby="contained-modal-title-vcenter"
 			centered
@@ -94,8 +163,8 @@ const EditEmailModal = ({
 				{emailEditModalBody}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button onClick={cancelEditModal}>Cancel</Button>
-				<Button onClick={saveEditModal}>Save</Button>
+				<Button onClick={cancelEdit}>Cancel</Button>
+				<Button onClick={saveEdit}>Save</Button>
 			</Modal.Footer>
 		</Modal>
 	)

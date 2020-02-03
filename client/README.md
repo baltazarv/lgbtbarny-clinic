@@ -9,10 +9,10 @@ Forms use React Select pull-down component:
 * https://github.com/JedWatson/react-select
 
 
-For React Select to work with Formik:
+For `React Select` to work with Formik:
 * https://gist.github.com/hubgit/e394e9be07d95cd5e774989178139ae8
-* [Formik Select Example](https://codesandbox.io/s/vxv6Q4z5)
 * [Formik 1.2 x React Select Example](https://codesandbox.io/s/jRzE53pqR)
+* [Formik Select Example](https://codesandbox.io/s/vxv6Q4z5): Integration with a simple HTML select component, not a `React Select` component example.
 
 ## Formik
 

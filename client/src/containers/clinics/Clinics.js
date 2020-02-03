@@ -1,20 +1,24 @@
+/**
+ * Clinics >
+ * * Intake >
+ *   * Select
+ *   * VisitorAddForm (create & update)
+ * * Consultation > ConsultationForm >
+ *   * FormModal > VisitorAddForm
+ *   * FormModal > LawyerAddForm
+ */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+// components
 import { Route, Switch, Link, withRouter, Redirect } from 'react-router-dom';
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
-import Container from 'react-bootstrap/Container';
-import Card from 'react-bootstrap/Card';
-import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
-import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-
-import styles from './Clinics.module.css';
-import ConsultationForm from './forms/ConsultationForm';
+import { Navbar, Nav, Container, Card, ButtonToolbar, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import Consultation from './forms/Consultation';
 import Intake from './forms/Intake';
 import Referrals from './forms/Referrals';
-
-import * as actions from '../../store/actions'
+// data
+import * as actions from '../../store/actions';
+// css & images
+import styles from './Clinics.module.css';
 import logo from '../../assets/images/logo.png';
 import bgImageIntake from '../../assets/images/bg-intake.png';
 import bgImageConsult from '../../assets/images/bg-consultation.png';
@@ -23,20 +27,27 @@ import bgImageReferrals from '../../assets/images/bg-referrals.png';
 class Clinics extends Component {
 	state = {
 		bgImageStyle: null,
+
+		// data in pulldown option formats
+		// lawyerSelectOptions: [],
+		// populates inquirer select dropdown for all
+		// inqSelectOptions: [],
+		// populates law type select pulldown
+		// lawTypeOptions: [],
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
 		this.setBgImageStyle();
-		this.props.getLawyers();
-		this.props.getInquirers();
-		this.props.getLawTypes();
+		this.props.getLawTypes(); // return Promise that updates state?
+		this.props.getLawyers(); // return Promise that updates state
+		this.props.getInquirers(); // return Promise that updates state
 		this.props.getClinicSettings();
 	}
 
-  componentDidUpdate(prevProps) {
-    if (this.props.location !== prevProps.location) {
-      this.setBgImageStyle();
-    }
+	componentDidUpdate(prevProps) {
+		if (this.props.location !== prevProps.location) {
+			this.setBgImageStyle();
+		}
 	}
 
 	onClinicToggle = val => {
@@ -63,6 +74,7 @@ class Clinics extends Component {
 	render() {
 		let clinicTitle = '';
 		if (this.props.clinicSettings && this.props.clinicSettings[this.props.currentClinic]) {
+
 			clinicTitle = this.props.clinicSettings[this.props.currentClinic].title;
 		}
 
@@ -73,7 +85,19 @@ class Clinics extends Component {
 		let consultRoute = null;
 		if (this.props.currentClinic !== 'nj') {
 			consultNavLink = <Nav.Link as={Link} to="/consultation" eventKey="/consultation" >Consultation</Nav.Link>
-			consultRoute = <Route path="/consultation" render={() => <ConsultationForm clinicTitle={clinicTitle} />} />
+			consultRoute = <Route path="/consultation" render={() => {
+
+				/*** Consultatin **/
+
+				return <Consultation
+					clinicTitle={clinicTitle}
+					lawyers={this.props.lawyers}
+					inquirers={this.props.inquirers}
+					lawTypes={this.props.lawTypes}
+					refreshInquirers={this.props.getInquirers}
+				/>
+			}}
+			/>
 		}
 
 		// youth clinics do intake & consultation at same time
@@ -85,7 +109,13 @@ class Clinics extends Component {
 		let intakeRoute = null;
 		if (this.props.currentClinic !== 'youth') {
 			intakeNavLink = <Nav.Link as={Link} to="/intake" eventKey="/intake" defaultChecked>Intake</Nav.Link>
-			intakeRoute = <Route path="/intake" render={() => <Intake clinicTitle={clinicTitle} />} />
+
+			/*** Intake **/
+
+			intakeRoute = <Route path="/intake" render={() => <Intake
+				clinicTitle={clinicTitle}
+				inquirers={this.props.inquirers}
+			/>} />
 		}
 
 		let clinicToggleBtns = null;
@@ -118,8 +148,6 @@ class Clinics extends Component {
 					<Navbar.Collapse className="justify-content-end">
 						<Nav
 							activeKey={this.props.location.pathname}
-						// defaultActiveKey="intake"
-						// onSelect={selectKey => console.log(selectKey)}
 						>
 							{intakeNavLink}
 							{consultNavLink}
@@ -155,6 +183,12 @@ class Clinics extends Component {
 
 const mapStateToProps = state => {
 	return {
+		inquirers: state.people.inquirers,
+		lawyers: state.people.lawyers,
+		lawTypes: state.lawTypes.lawTypes,
+
+		// lawyerSelectOptions: state.people.lawyerSelectOptions,
+
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
 	}

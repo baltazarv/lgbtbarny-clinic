@@ -1,7 +1,11 @@
 export {
-	getInquirers,
-	setCurrentInquirers,
 	getLawyers,
+	createLawyer,
+	getInquirers,
+	createInquirer,
+	updateInquirer,
+	// REMOVE?
+	setCurrentInquirers, // used when select repeat visitor // could save in Clinic state vs. redux store
 } from './people';
 
 export {
@@ -9,9 +13,7 @@ export {
 } from './lawtypes';
 
 export {
-	getCurrInqPastConsults,
 	createConsultation,
-	consultationInProgress,
 } from './consultations';
 
 export {

@@ -10,36 +10,54 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
+// components
 import Select from '../../../components/forms/fields/Select';
 import VisitorAddForm from '../../../components/forms/VisitorAddForm';
-import { getPeopleIntoSelectOptions, getRecordsFromSelection } from '../../../data/dataTransforms';
+// data
+import { getRecordsFromSelection, formatName, getPeopleIntoSelectOptions } from '../../../data/dataTransforms';
 import * as actions from '../../../store/actions/index';
 
 const Intake = props => {
 	const { clinicTitle } = props;
+	// shows or hides repeatVisitorSelect
 	const [isRepeat, setIsRepeat] = useState(false);
-	const [isEditing, setIsEditing] = useState(false);
-	const [selectVisitorOptions, setSelectVisitorOptions] = useState([]);
+	// select pulldown format
+	const [repeatVisitorSelected, setRepeatVisitorSelected] = useState(null);
+	// set to true to show success message when visitor is submitted
+	const [visitorWasUpdated, setVisitorWasUpdated] = useState(false);
+	// prop sent to VisitorAddForm & arg sent to visitorUpdatedMessage
+	const [serverResponse, setServerResponse] = useState({});
 
 	const handleRepeatSwitch = () => {
+		setVisitorWasUpdated(false);
 		setIsRepeat(!isRepeat);
-		// populate select pulldown
-		if (props.inquirers && props.inquirers.length > 0) {
-			setSelectVisitorOptions(getPeopleIntoSelectOptions(props.inquirers));
-		}
 	}
 
 	const handleVisitorSelect = selection => {
-		// get full airtable record
-		const inqRecSelected = getRecordsFromSelection(selection, props.inquirers);
-		props.setCurrentInquirers(inqRecSelected);
-		// props.getCurrInqPastConsults(inqRecSelected);
-		if (selection && selection.value) {
-			setIsEditing(true);
-		} else {
-			setIsEditing(false);
+		setRepeatVisitorSelected(selection);
+	}
+
+	// console.log('repeatVisitorSelected', repeatVisitorSelected);
+
+	const submitCreateInquirer = async (values, resetForm) => {
+		const serverResponse = await props.createInquirer(values);
+		setServerResponse(serverResponse);
+		if (serverResponse.status === 'success' && serverResponse.type === 'createInquirer') {
+			resetForm();
 		}
 	}
+
+	const submitUpdateInquirer = async (values) => {
+		const serverResponse = await props.updateInquirer(values);
+		setServerResponse(serverResponse);
+		if (serverResponse.status === 'success') {
+			// unload VisitorAddForm and reload switch Select
+			setVisitorWasUpdated(true);
+			setRepeatVisitorSelected(null)
+		}
+	}
+
+	// components
 
 	const repeatInstructions = () => {
 		const style = "mb-3 small";
@@ -48,6 +66,38 @@ const Intake = props => {
 		}
 		return <Col className={style}>&nbsp;<strong>No &mdash; </strong> Enter new visitor:</Col>
 	};
+
+	const repeatVisitorSelect = () => {
+		return (
+			<div className="mb-3">
+				<Card className={cardStyle}>
+					<Card.Body>
+						<Select
+							name="visitor"
+							options={getPeopleIntoSelectOptions(props.inquirers)}
+							defaultValue={null}
+							value={repeatVisitorSelected}
+							onChange={handleVisitorSelect}
+							label="Repeat Visitor"
+							isDisabled={repeatVisitorSelected}
+							required={true}
+						/>
+					</Card.Body>
+				</Card>
+			</div>
+		)
+	}
+
+	const visitorUpdatedMessage = serverResponse => {
+		const visitor = serverResponse.payload[0].fields;
+		return (
+			<Row>
+				<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">The record for <span className="font-weight-bold">{formatName(visitor)}</span> was&nbsp;updated!</Col>
+			</Row>
+		)
+	}
+
+	// styles
 
 	// TO-DO: add to global style sheet
 	const cardStyle = {
@@ -62,7 +112,8 @@ const Intake = props => {
 			<h1 className="h2"><em>{clinicTitle}</em> Intake</h1>
 			<p className="text-danger small">*Required</p>
 
-			{/* is repeat visitor switch */}
+			{/* is repeat visitor Form.Check switch */}
+
 			<Row>
 				<Col>
 					<Form.Group className="mb-2">
@@ -83,47 +134,45 @@ const Intake = props => {
 			<Row>
 				{repeatInstructions()}
 			</Row>
+
+			{/* new visitor */}
 			{!isRepeat &&
-				<VisitorAddForm />
+				<VisitorAddForm
+					submitForm={submitCreateInquirer}
+					serverResponse={serverResponse}
+				/>
 			}
+
+			{/* repeat visitor */}
 			{isRepeat &&
-				<div className="mb-3">
-					<Card className={cardStyle}>
-						<Card.Body>
-							<Select
-								name="visitor"
-								options={selectVisitorOptions}
-								defaultValue=""
-								onChange={handleVisitorSelect}
-								label="Repeat Visitor"
-								isDisabled={isEditing}
-								required={true}
-							/>
-						</Card.Body>
-					</Card>
-				</div>
-			}{isRepeat && isEditing &&
-				( // pump in visitor info
+				repeatVisitorSelect()
+			}
+
+			{/* repeat visitor selected for editing */}
+			{isRepeat && repeatVisitorSelected &&
+				(
 					<VisitorAddForm
-						editData={props.currentInquirers}
+						// start with given select obj, return array with full airtable record
+						repeatVisitor={getRecordsFromSelection(repeatVisitorSelected, props.inquirers)[0]}
+						submitForm={submitUpdateInquirer}
+						serverResponse={serverResponse}
 					/>
 				)
+			}
+
+			{/* repeat visitor edits submitted: success message */}
+			{isRepeat && visitorWasUpdated &&
+				visitorUpdatedMessage(serverResponse)
 			}
 		</>
 	);
 };
 
-const mapStateToProps = state => {
-	return {
-		inquirers: state.people.inquirers,
-		currentInquirers: state.people.currentInquirers,
-	}
-}
-
 const mapDispatchToProps = dispatch => {
 	return {
-		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)),
-		getCurrInqPastConsults: inqs => dispatch(actions.getCurrInqPastConsults(inqs)),
+		// call from parent Clinics?
+		createInquirer: inq => dispatch(actions.createInquirer(inq)),
+		updateInquirer: inqValues => dispatch(actions.updateInquirer(inqValues))
 	}
 }
-export default connect(mapStateToProps, mapDispatchToProps)(Intake);
+export default connect(null, mapDispatchToProps)(Intake);

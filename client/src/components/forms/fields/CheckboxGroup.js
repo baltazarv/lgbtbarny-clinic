@@ -97,15 +97,17 @@ class CheckboxGroup extends Component {
         <fieldset>
 					{formLabel}{_reqAsterisk}
 					{descText}
-          {React.Children.map(children, child => {
-            return React.cloneElement(child, {
-              field: {
-                value: this.getValue(child.props.id),
-                onChange: this.handleChange,
-                onBlur: this.handleBlur
-							},
-            });
-          })}
+          <div className="mb-2">
+          	{React.Children.map(children, child => {
+	            return React.cloneElement(child, {
+	              field: {
+	                value: this.getValue(child.props.id),
+	                onChange: this.handleChange,
+	                onBlur: this.handleBlur
+								},
+	            });
+	          })}
+          </div>
           {touched && <InputFeedback error={error} />}
         </fieldset>
       </Form.Group>
