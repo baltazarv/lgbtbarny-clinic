@@ -38,20 +38,6 @@ const INITIAL_VALUES = {
 	[peopleFields.OTHER_NAMES]: '',
 	[peopleFields.MIDDLE_NAME]: '',
 	// id
-
-	// [peopleFields.FIRST_NAME]: '',
-	// [peopleFields.MIDDLE_NAME]: '',
-	// [peopleFields.LAST_NAME]: '',
-	// [peopleFields.OTHER_NAMES]: '',
-	// [peopleFields.EMAIL]: '',
-	// [peopleFields.PHONE]: '',
-	// [peopleFields.ADDRESS]: '',
-	// [peopleFields.GENDER]: '',
-	// [peopleFields.PRONOUNS]: [], // multi-checkbox array
-	// [peopleFields.INCOME]: '',
-	// [peopleFields.INTAKE_NOTES]: '',
-	// [peopleFields.TERMS]: '', // single-checkbox string
-	// [peopleFields.SIGNATURE]: '',
 }
 
 let initialValues = { ...INITIAL_VALUES };
@@ -118,7 +104,6 @@ const VisitorAddForm = props => {
 		setFieldTouched,
 		isSubmitting,
 		dirty,
-		editData, //current inquirers
 	} = props;
 
 	// add to global style sheet
@@ -139,7 +124,7 @@ const VisitorAddForm = props => {
 	let btnLabel = 'Enter Visitor';
 	let serverRespMessage = null;
 	if (props.serverResponse && props.serverResponse.payload && props.serverResponse.status === 'success' && props.serverResponse.type === 'createInquirer') {
-		const visitor = props.serverResponse.payload[0].fields;
+		const visitor = props.serverResponse.payload.fields;
 		let message = '';
 		let name = <span className="font-weight-bold">{formatName(visitor)}</span>;
 		if (props.serverResponse.type === 'createInquirer') {
@@ -150,7 +135,7 @@ const VisitorAddForm = props => {
 			<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">{message}</Col>
 		</Row>
 	}
-	if (editData) btnLabel = 'Update Info';
+	if (props.repeatVisitor) btnLabel = 'Update Info';
 	// if update form vs create form
 	buttons = <>
 		<Button
@@ -177,7 +162,6 @@ const VisitorAddForm = props => {
 					Reset
 				</button> */}
 	</>
-
 
 	return <Card style={cardStyle}>
 		<Card.Body>
@@ -475,7 +459,6 @@ export default withFormik({
 		} else {
 			// initialValues = {...INITIAL_VALUES};
 		}
-		// console.log('VisitorAddForm editData', editData)
 		return initialValues;
 	},
 	validate,

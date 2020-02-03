@@ -9,7 +9,6 @@ import * as consultFields from '../data/consultionFields';
 import { formatName } from '../data/dataTransforms';
 
 const ConsultationList = ({ consultations, lawyers, showConsultModal }) => {
-	console.log('ConsultationList', consultations);
 	return (
 		<>
 			{consultations && consultations.length > 0 &&
@@ -88,7 +87,7 @@ const InquirerInfo = ({
 	if (_inquirers.length > 0) {
 		inquirerInfo = (
 			_inquirers.map(inq => {
-				// console.log('ConsultationList BUG! inq has fullConsultation prop?', inq)
+				console.log('ConsultationList BUG! inq has fullConsultation prop?', inq)
 				return (
 					<div key={inq.id}>
 						{/* inquirer name */}

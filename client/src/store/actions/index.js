@@ -4,8 +4,6 @@ export {
 	getInquirers,
 	createInquirer,
 	updateInquirer,
-	// REMOVE?
-	setCurrentInquirers, // used when select repeat visitor // could save in Clinic state vs. redux store
 } from './people';
 
 export {

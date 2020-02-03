@@ -128,6 +128,7 @@ export const createInquirer = inquirer => {
 						error,
 					});
 				}
+				// payload is one inquirer object with `id` and `fields` props
 				dispatch(addInquirer(inquirer));
 				return resolve({
 					status: 'success',
@@ -205,12 +206,10 @@ export const updateInquirers = inquirer => {
 	}
 }
 
-// REMOVE
-
 // select an inquirer to send between screens
-export const setCurrentInquirers = currentInquirers => {
-	return {
-		type: actionTypes.SET_CURRENT_INQUIRERS,
-		currentInquirers
-	}
-}
+// export const setCurrentInquirers = currentInquirers => {
+// 	return {
+// 		type: actionTypes.SET_CURRENT_INQUIRERS,
+// 		currentInquirers
+// 	}
+// }

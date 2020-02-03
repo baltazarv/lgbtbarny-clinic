@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 // components
 import { Row, Col, Button } from 'react-bootstrap';
-import ConsultationForm from './ConsultationForm';
+import ConsultationForm from '../../../components/forms/ConsultationForm';
 import EditEmailModal from '../../../components/modals/EditEmailModal';
 import TimerCounter from '../../../components/TimerCountdown/index';
 // data
@@ -100,8 +100,8 @@ class Consultation extends Component {
 			if (serverResponse.status === 'success' && serverResponse.type === 'createConsultation') {
 
 				// ConsultationForm
-				setFieldValue(consultFields.LAWYERS, selectedLawyers);
 				resetForm();
+				setFieldValue(consultFields.LAWYERS, selectedLawyers);
 
 				this.sendEmail(); // should return promise?
 				if (this.state.resetEmailEditor) this.state.resetEmailEditor();

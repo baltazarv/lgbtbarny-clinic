@@ -27,13 +27,6 @@ import bgImageReferrals from '../../assets/images/bg-referrals.png';
 class Clinics extends Component {
 	state = {
 		bgImageStyle: null,
-
-		// data in pulldown option formats
-		// lawyerSelectOptions: [],
-		// populates inquirer select dropdown for all
-		// inqSelectOptions: [],
-		// populates law type select pulldown
-		// lawTypeOptions: [],
 	}
 
 	async componentDidMount() {
@@ -186,9 +179,6 @@ const mapStateToProps = state => {
 		inquirers: state.people.inquirers,
 		lawyers: state.people.lawyers,
 		lawTypes: state.lawTypes.lawTypes,
-
-		// lawyerSelectOptions: state.people.lawyerSelectOptions,
-
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
 	}

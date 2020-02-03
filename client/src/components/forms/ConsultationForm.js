@@ -5,19 +5,18 @@ import { withFormik, Form as FormikForm, Field } from 'formik';
 import { Row, Col, Form, Button, Collapse } from 'react-bootstrap';
 import ReactSelect from 'react-select';
 import { Button as AntButton } from 'antd'; // { Select }
-import RadioButtonGroup from '../../../components/forms/fields/RadioButtonGroup';
-import RadioButton from '../../../components/forms/fields/RadioButton';
-import TextArea from '../../../components/forms/fields/TextArea';
-import { InputFeedback } from '../../../components/forms/formElements';
-import InquirerInfo from '../../../components/InquirerInfo';
-import FormModal from '../../../components/modals/FormModal';
-import VisitorAddForm from '../../../components/forms/VisitorAddForm';
-import LawyerAddForm from '../../../components/forms/LawyerAddForm';
+import RadioButtonGroup from './fields/RadioButtonGroup';
+import RadioButton from './fields/RadioButton';
+import TextArea from './fields/TextArea';
+import { InputFeedback } from './formElements';
+import InquirerInfo from '../InquirerInfo';
+import FormModal from '../modals/FormModal';
+import VisitorAddForm from './VisitorAddForm';
+import LawyerAddForm from './LawyerAddForm';
 // import ReactSelectWithValidation from '../../../components/forms/fields/ReactSelectWithValidation';
 // data
-import * as actions from '../../../store/actions/index';
-import * as consultFields from '../../../data/consultionFields';
-import { getPeopleIntoSelectOptions, getLawTypeSelectOptions } from '../../../data/dataTransforms';
+import * as consultFields from '../../data/consultionFields';
+import { getPeopleIntoSelectOptions, getLawTypeSelectOptions } from '../../data/dataTransforms';
 // import styles from './ConsultationForm.module.css';
 
 // determines if referral fields show and validate
@@ -240,7 +239,6 @@ class ConsultationForm extends Component {
 										name={consultFields.LAWYERS}
 										id={[consultFields.LAWYERS]}
 										options={getPeopleIntoSelectOptions(this.props.lawyers)}
-										// options={this.props.lawyerSelectOptions}
 										isClearable
 										isMulti={true}
 										onChange={values => setFieldValue(consultFields.LAWYERS, values)}
@@ -275,7 +273,6 @@ class ConsultationForm extends Component {
 									<ReactSelect
 										name={consultFields.INQUIRERS}
 										options={getPeopleIntoSelectOptions(this.props.inquirers)}
-										// options={inqSelectOptions}
 										isClearable
 										isMulti={true}
 										onChange={values => this.handleInquirerSelectChange(values)}
@@ -466,21 +463,19 @@ const mapStateToProps = state => {
 		lawTypes: state.lawTypes.lawTypes,
 
 		// REMOVE?
-		currentInquirers: state.people.currentInquirers,
+		// currentInquirers: state.people.currentInquirers,
 		currInqsPastConsults: state.consultations.currInqsPastConsults,
 		personCreateStatus: state.people.personCreateStatus,
-		// lawyerSelectOptions: state.people.lawyerSelectOptions,
 	}
 }
 
-// REMOVE
-const mapDispatchToProps = dispatch => {
-	return {
-		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)),
-	}
-}
+// const mapDispatchToProps = dispatch => {
+// 	return {
+// 		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)),
+// 	}
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withFormik({
+export default connect(mapStateToProps)(withFormik({
 	mapPropsToValues: props => {
 		return {
 			[consultFields.LAWYERS]: [],
