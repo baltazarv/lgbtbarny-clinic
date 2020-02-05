@@ -111,19 +111,18 @@ class Clinics extends Component {
 			/>} />
 		}
 
-		let clinicToggleBtns = null;
+		let clinicToggleBtns = [];
 		if (this.props.clinicSettings) {
-			clinicToggleBtns = Object.entries(this.props.clinicSettings).map((clinic, index) => {
-				let key = clinic[0], value = clinic[1];
+			const settings = this.props.clinicSettings;
+			for (var item in settings) {
+				let key = item, value = settings[item];
 				let style = {}
-				if (index !== 2) {
-					style = {
-						borderRight: "1px solid rgb(255, 255, 255, .5)",
-						borderLeft: "1px solid rgb(255, 255, 255, .5)",
-					}
+				style = {
+					borderRight: "1px solid rgb(255, 255, 255, .5)",
+					borderLeft: "1px solid rgb(255, 255, 255, .5)",
 				}
-				return <ToggleButton key={index} value={key} className="btn-sm" style={style}>{value.buttonLabel}</ToggleButton>
-			})
+				clinicToggleBtns.push(<ToggleButton key={key} value={key} className="btn-sm" style={style}>{value.buttonLabel}</ToggleButton>)
+			}
 		}
 
 		return (
