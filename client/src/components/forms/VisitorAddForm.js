@@ -8,6 +8,7 @@ import React from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Form, Row, Col, Button, Card } from 'react-bootstrap';
+import Select from './fields/Select';
 import RadioButtonGroup from './fields/RadioButtonGroup'
 import CheckboxGroup from './fields/CheckboxGroup';
 import Checkbox from './fields/Checkbox';
@@ -16,6 +17,7 @@ import TextArea from './fields/TextArea';
 import InputField from './fields/InputField'
 // data
 import * as peopleFields from '../../data/peopleFields';
+import { getLawTypeOptions } from '../../data/lawTypeData';
 import { formatName } from '../../data/dataTransforms';
 // styles
 import classNames from "classnames";
@@ -29,6 +31,7 @@ const INITIAL_VALUES = {
 	[peopleFields.ADDRESS]: '',
 	[peopleFields.INTAKE_NOTES]: '',
 	[peopleFields.FIRST_NAME]: '',
+	[peopleFields.LAW_TYPES]: [],
 	// consultation
 	[peopleFields.PRONOUNS]: [], // multi-checkbox array
 	[peopleFields.INCOME]: '', // radio buttons
@@ -52,6 +55,10 @@ const validate = (values, props) => {
 	if (!values[peopleFields.LAST_NAME]) {
 		errors[peopleFields.LAST_NAME] = 'Last name is required.';
 	}
+
+	// if (values[peopleFields.LAW_TYPES].length < 1) {
+	// 	errors[peopleFields.LAW_TYPES] = 'Please enter the type of law.';
+	// }
 
 	if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values[peopleFields.EMAIL]) && values[peopleFields.EMAIL]) {
 		errors[peopleFields.EMAIL] = 'Invalid email address.';
@@ -96,6 +103,7 @@ const handleSubmit = (values, actions) => {
 
 const VisitorAddForm = props => {
 	const {
+		// formik
 		handleSubmit,
 		values,
 		errors,
@@ -104,6 +112,9 @@ const VisitorAddForm = props => {
 		setFieldTouched,
 		isSubmitting,
 		dirty,
+
+		// parent <Intake />
+		lawTypes,
 	} = props;
 
 	// add to global style sheet
@@ -216,6 +227,22 @@ const VisitorAddForm = props => {
 						display: "inline",
 					}}
 				/>
+				<Card style={cardStyle} className="mb-3">
+					<Card.Body style={{backgroundColor: '#39c1fa1a'}}>
+						<Select
+							name={peopleFields.LAW_TYPES}
+							options={lawTypes}
+							optFunc={getLawTypeOptions}
+							label={peopleFields.LAW_TYPES}
+							required={false}
+							value={values[peopleFields.LAW_TYPES]}
+							onChange={values => setFieldValue(peopleFields.LAW_TYPES, values)}
+							onBlur={() => setFieldTouched(peopleFields.LAW_TYPES, true)}
+							touched={touched[peopleFields.LAW_TYPES]}
+							error={errors[peopleFields.LAW_TYPES]}
+						/>
+					</Card.Body>
+				</Card>
 				<Card style={cardStyle} className="mb-3">
 					<Card.Body className="pb-0">
 						<Card.Title className="small text-muted">
@@ -380,8 +407,8 @@ const VisitorAddForm = props => {
 						component={TextArea}
 						name={peopleFields.INTAKE_NOTES}
 						id={peopleFields.INTAKE_NOTES}
-						label={peopleFields.INTAKE_NOTES}
-						placeholder="Type of law related to visit? Anything the attorneys should know?"
+						label="Optional/additional Notes"
+						placeholder="Anything else the attorney should know."
 						rows={2}
 					/>
 				</div>

@@ -61,53 +61,6 @@ const handleSubmit = (values, actions) => {
 	setSubmitting(false);
 }
 
-/** Ant Design Select implementation for lawyer select
- * TO DO: replace react-select with this component
- */
-
-// const { Option } = Select;
-// const getPeopleOptions = people => {
-// 	console.log('getPeopleOptions', people);
-// 	if (people && people.length > 0) {
-// 		const options = people.reduce((_options, item) => {
-// 			if (item[peopleFields.FIRST_NAME] || item[peopleFields.LAST_NAME]) {
-// 				const inqObj = <Option key={item.id} value={item.id}>{formatName(item)}</Option>
-// 				return [..._options, inqObj];
-// 			}
-// 			else {
-// 				return _options;
-// 			}
-// 		}, []);
-// 		// console.log('getPeopleOptions options', options)
-// 		return options;
-// 	}
-// }
-
-// const handleLawyerSelectChange = (value, option) => {
-// 	console.log(`selected value: ${value}, option`, option);
-// }
-
-// const LawyerSelect = ({ lawyers, show }) => {
-// 	let lawyersSelect = null
-// 	lawyersSelect = <Select
-// 		key={new Date()}
-// 		mode="multiple"
-// 		style={{ width: '100%' }}
-// 		placeholder="Select..."
-// 		// defaultValue=""
-// 		onChange={handleLawyerSelectChange}
-// 		optionFilterProp="children"
-// 		allowClear={true}
-// 		autoFocus={true}
-// 	>
-// 		{getPeopleOptions(lawyers)}
-// 		{/* {options} */}
-// 	</Select>
-// 	return (
-// 		<>{lawyersSelect}</>
-// 	)
-// }
-
 class ConsultationForm extends Component {
 
 	// lifecycle methods
@@ -231,10 +184,6 @@ class ConsultationForm extends Component {
 							</Form.Text>
 							<Row>
 								<Col xs={10}>
-									{/* <LawyerSelect
-										lawyers={this.props.lawyers}
-										show={!this.props.lawyerAddModalShown}
-									/> */}
 									<ReactSelect
 										name={consultFields.LAWYERS}
 										id={[consultFields.LAWYERS]}
@@ -444,6 +393,7 @@ class ConsultationForm extends Component {
 					header="Add a New Visitor"
 					body={<VisitorAddForm
 						onHide={this.hideVisitorAddModal}
+						lawTypes={this.props.lawTypes}
 						submitForm={this.submitAddInquirer}
 					/>}
 					size="lg"
@@ -455,25 +405,13 @@ class ConsultationForm extends Component {
 
 const mapStateToProps = state => {
 	return {
+		// pass these from parent?
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
-
-		// pass these from parent?
 		lawyers: state.people.lawyers,
 		lawTypes: state.lawTypes.lawTypes,
-
-		// REMOVE?
-		// currentInquirers: state.people.currentInquirers,
-		currInqsPastConsults: state.consultations.currInqsPastConsults,
-		personCreateStatus: state.people.personCreateStatus,
 	}
 }
-
-// const mapDispatchToProps = dispatch => {
-// 	return {
-// 		setCurrentInquirers: inqs => dispatch(actions.setCurrentInquirers(inqs)),
-// 	}
-// }
 
 export default connect(mapStateToProps)(withFormik({
 	mapPropsToValues: props => {

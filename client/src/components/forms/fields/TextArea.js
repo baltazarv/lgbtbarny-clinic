@@ -1,8 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
-import { InputFeedback } from '../formElements';
-import { reqAsterisk } from '../formElements';
+import { reqAsterisk, InputFeedback } from '../formElements';
 
 const TextArea = ({
 	field: { name, value, onChange, onBlur },

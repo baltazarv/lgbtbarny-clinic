@@ -1,5 +1,13 @@
 # Project Notes
 
+## Installation
+* `npm install` at root at in `/client`.
+
+#### Get files not checked into Git
+* `/config/dev.js`
+* `/client/.env.development`
+* `/client/.env.production`
+
 ## Code
 
 Forms use React Select pull-down component:
@@ -19,11 +27,13 @@ Or
 * yarn install && yarn install --prefix client
 
 ### Environment variable files
-* File `/config/dev.js`: same as `/config/prod.js` file, minus   `mailtrapHost` and `mailtrapPort` variables.
+* File `/config/dev.js`: same as `/config/prod.js` file, minus `mailtrapHost` and `mailtrapPort` variables.
 * Files `/client/.env.development` and `/client/.env.production`, each with the following variables:
 	* REACT_APP_AIRTABLE_API_KEY
 	* REACT_APP_AIRTABLE_BASE
 	* REACT_APP_SENDGRID
+	* SENDGRID_USERNAME?
+	* SENDGRID_PASSWORD?
 
 # Create React App
 
@@ -95,4 +105,3 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
-

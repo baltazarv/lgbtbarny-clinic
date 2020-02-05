@@ -1,61 +1,36 @@
-/** TO-DO: rename `VisitorSelect` after commit as is */
-
 /**
- * Props for react-select:
- * * option: { value: 'xxx', label: 'Baltazar Villegas' }
- * * isMulti
- *
- * For react-select async option loading, import AsyncSelect from react-select/lib/Async or the AsyncCreatable -- can then use loadOptions, defaultOptions, cacheOptions props.
- *
- * Props for fornik:
- *  * name: fornik name
- *
- * Props for component functionality:
- *  * onChange: func to call when handle change
- *  * disabled: to add required asterisk
- *  * label: to add field label
- *  *
+ * Used with Formik
  */
-import React, { useState } from 'react';
-import ReactSelect from 'react-select';
+import React from 'react';
+import { Select as AntSelect } from 'antd';
 import { Form, Row, Col } from 'react-bootstrap';
-import { reqAsterisk } from '../formElements';
 import classNames from 'classnames';
+import { reqAsterisk, InputFeedback } from '../formElements';
 
 const Select = ({
+	// data array
 	options,
-	defaultValue,
-	value,
-	label,
-	info,
-	onChange,
-	onBlur,
-	required,
-	isMulti,
-	isDisabled,
+	// function to transform data array into select options, eg, etPeopleOptions, getLawTypeOptions
+	optFunc,
+
+	// name for formik touched and errors
 	name,
-	resetValue,
+	touched,
+	error,
+	// formik values
+	value,
+	// calls formik setFieldValue
+	onChange,
+	// calls formik setFieldTouched
+	onBlur,
+
+	// optional
+	label,
+	// for asterisk
+	required,
+	isDisabled,
+	info,
 }) => {
-	// let [value, setValue] = useState(null);
-	let [touched, setTouched] = useState(false);
-	let [error, setError] = useState(null);
-
-	const handleChange = selection => {
-		setError(validate());
-		if (onChange) onChange(selection);
-	}
-
-	const handleBlur = evt => {
-		setError(validate());
-		setTouched(true);
-		if (onBlur) onBlur(value);
-	}
-
-	const validate = () => {
-		let _error = '';
-		if (!value) _error = 'Select a repeat visitor to proceed. If not on pulldown, do not enter as repeat visitor';
-		return _error;
-	}
 
 	let _reqAsterisk = <span className="hidden-sm-up">&nbsp;</span>;
 	if (required) {
@@ -69,33 +44,14 @@ const Select = ({
 	let formLabel = null;
 	let inputCols = 12;
 	if (label) {
-		formLabel = (<Form.Label column sm={4} className="text-md-right">
+		formLabel = (<Form.Label column sm={3} className="text-md-right">
 			{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
 		</Form.Label>);
-		inputCols = 8;
+		inputCols = 9;
 	}
 
 	let infoTxt = null;
 	if (info) infoTxt = <Form.Text className="text-muted mt-0 mb-1">{info}</Form.Text>
-
-	const customStyles = {
-		control: (provided, state) => {
-			let borderColor = 'hsl(0,0%,80%)';
-			if (error && touched) borderColor = 'red';
-			return { ...provided, borderColor };
-		},
-		placeholder: (provided, state) => {
-			let color = '#212529';
-			if (error && touched) {
-				color = 'red';
-			}
-			return { ...provided, color };
-		},
-		option: (provided, state) => ({
-			...provided,
-			color: state.isSelected ? 'white' : 'black',
-		}),
-	}
 
 	return (
 		<>
@@ -103,30 +59,24 @@ const Select = ({
 				{formLabel}
 				<Col sm={inputCols}>
 					{infoTxt}
-					<ReactSelect
-						// key={}
-						options={options}
-						defaultValue={defaultValue}
-						onChange={handleChange}
-						onBlur={handleBlur}
-						isClearable
-						isMulti={isMulti}
-						// isDisabled={disabled}
-						styles={customStyles}
-						// isLoading={true} // Is the select in a state of loading (async)
-						// ref={selectField}
-						value={value} // setting this clears the value when unmounting
-					/>
+					<AntSelect
+						// key={new Date()}
+						mode="multiple"
+						style={{ width: '100%' }}
+						placeholder="Select..."
+						// defaultValue=""
+						value={value}
+						onChange={onChange}
+						onBlur={onBlur}
+						optionFilterProp="children"
+						allowClear={true}
+					// autoFocus={true}
+					>
+						{optFunc(options)}
+					</AntSelect>
 				</Col>
 			</Form.Group>
-			<Row>
-				<Col>
-					{error &&
-						touched && (
-							<div className="text-danger small">{error}</div>
-						)}
-				</Col>
-			</Row>
+			{touched && <InputFeedback error={error} />}
 		</>
 	)
 }

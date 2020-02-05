@@ -79,6 +79,7 @@ export const getInquirers = () => {
 				peopleFields.MIDDLE_NAME,
 				peopleFields.LAST_NAME,
 				peopleFields.OTHER_NAMES,
+				peopleFields.LAW_TYPES,
 				peopleFields.EMAIL,
 				peopleFields.PHONE,
 				peopleFields.ADDRESS,

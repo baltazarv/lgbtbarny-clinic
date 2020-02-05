@@ -106,6 +106,7 @@ class Clinics extends Component {
 			/*** Intake **/
 
 			intakeRoute = <Route path="/intake" render={() => <Intake
+				lawTypes={this.props.lawTypes} // for <VisitorAddForm />
 				clinicTitle={clinicTitle}
 				inquirers={this.props.inquirers}
 			/>} />

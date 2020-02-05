@@ -8,6 +8,7 @@ export const FIRST_NAME = 'First Name';
 export const MIDDLE_NAME = 'Middle Name';
 export const LAST_NAME = 'Last Name';
 export const OTHER_NAMES = 'Other Names';
+export const LAW_TYPES = 'Type Of Law';
 export const EMAIL = 'Email';
 export const PHONE = 'Phone Number';
 export const ADDRESS = 'Home Address';

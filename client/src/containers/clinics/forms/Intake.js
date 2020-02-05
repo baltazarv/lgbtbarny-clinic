@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
 // components
-import Select from '../../../components/forms/fields/Select';
+import VisitorSelect from '../../../components/forms/fields/VisitorSelect';
 import VisitorAddForm from '../../../components/forms/VisitorAddForm';
 // data
 import { getRecordsFromSelection, formatName, getPeopleIntoSelectOptions } from '../../../data/dataTransforms';
@@ -72,7 +72,7 @@ const Intake = props => {
 			<div className="mb-3">
 				<Card className={cardStyle}>
 					<Card.Body>
-						<Select
+						<VisitorSelect
 							name="visitor"
 							options={getPeopleIntoSelectOptions(props.inquirers)}
 							defaultValue={null}
@@ -138,6 +138,7 @@ const Intake = props => {
 			{/* new visitor */}
 			{!isRepeat &&
 				<VisitorAddForm
+					lawTypes={props.lawTypes}
 					submitForm={submitCreateInquirer}
 					serverResponse={serverResponse}
 				/>
@@ -154,6 +155,7 @@ const Intake = props => {
 					<VisitorAddForm
 						// start with given select obj, return array with full airtable record
 						repeatVisitor={getRecordsFromSelection(repeatVisitorSelected, props.inquirers)[0]}
+						lawTypes={props.lawTypes}
 						submitForm={submitUpdateInquirer}
 						serverResponse={serverResponse}
 					/>
