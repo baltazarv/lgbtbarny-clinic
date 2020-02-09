@@ -32,7 +32,7 @@ export const formatName = inquirer => {
 	const middleName = inquirer[peopleFields.MIDDLE_NAME];
 	const otherNames = inquirer[peopleFields.OTHER_NAMES];
 	const lastName = inquirer[peopleFields.LAST_NAME];
-	return (firstName ? firstName : '') + (otherNames ? ' "' + otherNames + '"' : '') + (middleName ? ' ' + middleName : '') + ' ' + (lastName ? lastName : '')
+	return (firstName ? firstName : '') + (middleName ? ' ' + middleName[0] : '') + ' ' + (lastName ? lastName : '') + (otherNames ? ' "' + otherNames + '"' : '');
 }
 
 /**

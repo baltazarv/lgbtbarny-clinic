@@ -37,8 +37,6 @@ const Intake = props => {
 		setRepeatVisitorSelected(selection);
 	}
 
-	// console.log('repeatVisitorSelected', repeatVisitorSelected);
-
 	const submitCreateInquirer = async (values, resetForm) => {
 		const serverResponse = await props.createInquirer(values);
 		setServerResponse(serverResponse);

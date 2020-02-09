@@ -27,7 +27,7 @@ export const readConsultationsByIds = consultIds => {
 		filterByFormula += ')';
 
 		// get consultations from airtable & match to inquirer objects
-		const consultations = [];
+		let consultations = [];
 		airtableBase(TABLE).select({
 			filterByFormula: filterByFormula,
 			fields: [
@@ -75,3 +75,30 @@ export const getInquirerConsultations = async (inqs) => {
 		return [];
 	}
 }
+
+export const getReferralConsultations = () => {
+	return new Promise((resolve, reject) => {
+		let consultations = [];
+		airtableBase(TABLE).select({
+			view: "_Referrals"
+		}).eachPage(function page(records, fetchNextPage) {
+			records.forEach(function (record) {
+				consultations.push(record);
+			});
+			fetchNextPage();
+		}, function done(error) {
+			if (error) {
+				console.log('Airtable Error:', error);
+				return reject({
+					status: 'failed',
+					error,
+				});
+			}
+			return resolve({
+				status: 'success',
+				type: 'getReferralConsultations',
+				payload: consultations,
+			})
+		});
+	})
+};

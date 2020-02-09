@@ -1,4 +1,5 @@
 // AirTable field names
+export const CREATED_ON = 'Created On';
 export const NAME = 'Name'; // calc field
 export const DATE = 'Date';
 export const TYPE = 'Type';
