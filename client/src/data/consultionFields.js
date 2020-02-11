@@ -3,10 +3,17 @@ export const CREATED_ON = 'Created On';
 export const NAME = 'Name'; // calc field
 export const DATE = 'Date';
 export const TYPE = 'Type';
-export const STATUS = 'Status';
 export const LAWYERS = 'Lawyer'; // array
 export const INQUIRERS = 'Inquirer'; // array
 export const SITUATION = 'Inquirer\'s Situation';
+
+// status
+export const STATUS = 'Status';
+export const STATUS_ASSIGNED = 'Lawyer Assigned';
+export const STATUS_REFER = 'Referral Needed';
+export const STATUS_REFERRED = 'Referral Made';
+export const STATUS_IMPACT = 'Impact Litigation';
+// "Consulted-No Referral",
 
 // dispositions
 export const DISPOSITIONS = 'Disposition'; // array
