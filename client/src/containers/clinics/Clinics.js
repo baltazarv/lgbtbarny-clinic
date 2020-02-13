@@ -31,9 +31,11 @@ class Clinics extends Component {
 
 	async componentDidMount() {
 		this.setBgImageStyle();
+		// return Promise that updates state
+		this.props.getLawyers();
+		this.props.getInquirers();
 		this.props.getLawTypes(); // return Promise that updates state?
-		this.props.getLawyers(); // return Promise that updates state
-		this.props.getInquirers(); // return Promise that updates state
+		this.props.getConsultations();
 		this.props.getClinicSettings();
 	}
 
@@ -162,7 +164,11 @@ class Clinics extends Component {
 								{consultRoute}
 								<Route
 									path="/referrals"
-									render={() => <Referrals clinicTitle={clinicTitle} />}
+									render={() => <Referrals
+										clinicTitle={clinicTitle}
+										inquirers={this.props.inquirers}
+										consultations={this.props.consultations}
+									/>}
 								/>
 								{redirectRoute}
 							</Switch>
@@ -179,6 +185,7 @@ const mapStateToProps = state => {
 		inquirers: state.people.inquirers,
 		lawyers: state.people.lawyers,
 		lawTypes: state.lawTypes.lawTypes,
+		consultations: state.consultations.consultations,
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
 	}
@@ -188,6 +195,7 @@ const mapDispatchToProps = dispatch => {
 	return {
 		getLawyers: () => dispatch(actions.getLawyers()),
 		getInquirers: () => dispatch(actions.getInquirers()),
+		getConsultations: () => dispatch(actions.getConsultations()),
 		getLawTypes: () => dispatch(actions.getLawTypes()),
 		getClinicSettings: () => dispatch(actions.getClinicSettings()),
 		setCurrentClinic: clinic => dispatch(actions.setCurrentClinic(clinic))

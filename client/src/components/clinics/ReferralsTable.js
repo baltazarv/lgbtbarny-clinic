@@ -1,19 +1,14 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { Table, Tag, Icon, List, Typography } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
+import { Tag, Icon, List, Typography } from 'antd';
+// components
+import EditableReferralsTable from './EditableReferralsTable';
 // data
 import * as consultFields from '../../data/consultionFields';
+import { filterEligibleConsultations } from '../../data/consultationData';
 import * as lawTypeData from '../../data/lawTypeData';
 import { formatName } from '../../data/dataTransforms';
-
-import { Menu } from 'antd';
-
-const menu = (
-	<Menu>
-		<Menu.Item>Action 1</Menu.Item>
-		<Menu.Item>Action 2</Menu.Item>
-	</Menu>
-);
+// utils
+import { objectIsEmpty } from '../../utils';
 
 const dispoShortNames = {
 	[consultFields.DISPOSITIONS_FEE_BASED]: "Fee-based",
@@ -21,17 +16,12 @@ const dispoShortNames = {
 	[consultFields.DISPOSITIONS_COMPELLING]: "Highly Compelling",
 }
 
-const getDispoFilters = () => {
-	let filters = [];
-	for (var dispo in dispoShortNames) {
-		let value = dispoShortNames[dispo];
-		filters.push({
-			text: value,
-			value: value,
-		})
-	}
-	return filters;
-}
+const statuses = [
+	consultFields.STATUS_ASSIGNED,
+	consultFields.STATUS_REFER,
+	consultFields.STATUS_REFERRED,
+	// consultFields.STATUS_IMPACT,
+];
 
 const statusFilters = [
 	{ text: consultFields.STATUS_REFER, value: consultFields.STATUS_REFER },
@@ -41,11 +31,17 @@ const statusFilters = [
 
 const iconStyle = { fontSize: '18px', color: '#1890ff' };
 
-const tableColumns = [
+const columns = [
 	{
 		title: 'Date',
 		dataIndex: consultFields.CREATED_ON,
-		key: consultFields.CREATED_ON,
+		key: 'date',
+		defaultSortOrder: 'descend',
+		sorter: (a, b) => {
+			const dateA = new Date(a[consultFields.CREATED_ON]);
+			const dateB = new Date(b[consultFields.CREATED_ON]);
+			return dateA - dateB;
+		},
 	},
 	{
 		title: 'Visitor(s)',
@@ -55,7 +51,11 @@ const tableColumns = [
 			<span>
 				{visitor} <a><Icon style={iconStyle} type="user" /></a>
 			</span>
-		)
+		),
+		// doesn't work!?
+		// sorter: (a, b) => {
+		// 	return a[consultFields.INQUIRERS][0] - b[consultFields.INQUIRERS][0];
+		// },
 	},
 	{
 		title: 'Dispositions(s)',
@@ -63,7 +63,7 @@ const tableColumns = [
 		key: 'dispos',
 		render: dispos => (
 			<span>
-				{dispos.map(dispo => {
+				{dispos.map((dispo, index) => {
 					let color = 'cyan';
 					if (dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]) {
 						color = 'blue';
@@ -71,18 +71,25 @@ const tableColumns = [
 						color = 'magenta';
 					}
 					return (
-						<Tag color={color} key={dispo}>
+						<Tag color={color} key={index}>
 							{dispo}
 						</Tag>
 					);
 				})}
 			</span>
 		),
+		// doesn't work!?
+		// sorter: (a, b) => {
+		// 	return a[consultFields.DISPOSITIONS][0] - b[consultFields.DISPOSITIONS][0];
+		// },
 	},
 	{
 		title: consultFields.STATUS,
 		dataIndex: consultFields.STATUS,
 		key: consultFields.STATUS,
+		// edit column
+		editable: true,
+		// filters
 		filters: statusFilters,
 		defaultFilteredValue: [consultFields.STATUS_REFER, consultFields.STATUS_IMPACT],
 		onFilter: (value, record) => {
@@ -101,16 +108,16 @@ const tableColumns = [
 			}
 		},
 	},
-	{
-		title: 'Actions',
-		dataIndex: 'action',
-		key: 'action',
-		render: () => {
-			return <span>
-				<a style={iconStyle}><Icon type="form" /></a>
-			</span>
-		}
-	},
+	// {
+	// 	title: 'Actions',
+	// 	dataIndex: 'action',
+	// 	key: 'action',
+	// 	render: () => {
+	// 		return <span>
+	// 			<a style={iconStyle}><Icon type="form" /></a>
+	// 		</span>
+	// 	}
+	// },
 ];
 
 const formatDate = isoDate => {
@@ -119,30 +126,26 @@ const formatDate = isoDate => {
 }
 
 const getVisitorNames = (ids, inquirers) => {
-	return inquirers.reduce((acc, cur) => {
-		const found = ids.find(id => id === cur.id);
-		if (found) {
-			acc.push(formatName(cur));
-		}
-		return acc;
-	}, []);
-}
-
-const getLawyerNames = (ids, lawyers) => {
-	if (ids && ids.length > 0 && lawyers && lawyers.length > 0) {
-		let _lawyers = lawyers.reduce((acc, cur) => {
-			const found = ids.find(id => id === cur.id);
-			if (found) {
-				acc.push(formatName(cur));
-			}
-			return acc;
-		}, []);
-		return _lawyers.length > 0 ? _lawyers.join(', ') : 'Lawyers not specified.';
+	if (ids && ids.length > 0) {
+		return ids.map(id => {
+			return formatName(inquirers[id]);
+		});
 	} else {
-		return '';
+		return [];
 	}
 }
 
+const getLawyerNames = (ids, lawyers) => {
+	if (ids && ids.length > 0) {
+		return ids.map(id => {
+			return formatName(lawyers[id]);
+		}).join(', ');
+	} else {
+		return 'Lawyers not specified.';
+	}
+}
+
+// TO DO: lawyers object instead
 const getLawTypes = (ids, lawTypes) => {
 	if (ids && ids.length > 0 && lawTypes && lawTypes.length > 0) {
 		let _lawTypes = lawTypes.reduce((acc, cur) => {
@@ -163,30 +166,73 @@ const getDispoShortNames = dispos => {
 	return [];
 }
 
-const tableData = (consultations, inquirers, lawyers, lawTypes) => {
-	return consultations.map(item => {
-		return ({
-			key: item.id,
-			// convert from iso to other date format
-			[consultFields.CREATED_ON]: formatDate(item.fields[consultFields.CREATED_ON]),
-			// get visitors' full names
-			[consultFields.INQUIRERS]: getVisitorNames(item.fields[consultFields.INQUIRERS], inquirers),
-			// convert to short name
-			[consultFields.DISPOSITIONS]: getDispoShortNames(item.fields[consultFields.DISPOSITIONS]),
-			[consultFields.STATUS]: item.fields[consultFields.STATUS],
-			[consultFields.LAWYERS]: getLawyerNames(item.fields[consultFields.LAWYERS], lawyers),
-			[consultFields.LAW_TYPES]: getLawTypes(item.fields[consultFields.LAW_TYPES], lawTypes),
-			[consultFields.SITUATION]: item.fields[consultFields.SITUATION],
-			[consultFields.REF_SUMMARY]: item.fields[consultFields.REF_SUMMARY],
-		})
-	});
+const fillInEmptyStatuses = object => {
+	const statusField = object[consultFields.STATUS];
+	const dispoField = dispoShortNames[object[consultFields.DISPOSITIONS]];
+	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED] || dispoField === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO])) {
+		return consultFields.STATUS_REFER;
+	}
+	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING])) {
+		return consultFields.STATUS_IMPACT;
+	}
+	return object[consultFields.STATUS];
 }
 
 const ReferralsTable = props => {
 
+	const [isLoading, setIsLoading] = useState(true);
+	const [dataSource, setDataSource] = useState([]);
+
+	useEffect(() => {
+		// TO DO: lawyers and lawtypes objects
+		if (isLoading && !objectIsEmpty(props.consultations) && !objectIsEmpty(props.inquirers) > 0 && !objectIsEmpty(props.lawyers) && props.lawTypes.length > 0) {
+			const data = tableData();
+			setDataSource(data);
+			setIsLoading(false);
+		}
+	})
+
+	const tableData = () => {
+		const { consultations, inquirers, lawyers, lawTypes } = props;
+		const eligible = filterEligibleConsultations(consultations);
+		let data = [];
+		for (var key in eligible) { // props.consultations
+			let fields = eligible[key]; // consultations[key]
+			const object = {
+				key,
+				// convert from iso to other date format
+				[consultFields.CREATED_ON]: formatDate(fields[consultFields.CREATED_ON]),
+				// get visitors' full names
+				[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
+				// convert to short name
+				[consultFields.DISPOSITIONS]: getDispoShortNames(fields[consultFields.DISPOSITIONS]),
+				[consultFields.STATUS]: fillInEmptyStatuses(fields),
+				[consultFields.LAWYERS]: getLawyerNames(fields[consultFields.LAWYERS], lawyers),
+				[consultFields.LAW_TYPES]: getLawTypes(fields[consultFields.LAW_TYPES], lawTypes),
+				[consultFields.SITUATION]: fields[consultFields.SITUATION],
+				[consultFields.REF_SUMMARY]: fields[consultFields.REF_SUMMARY],
+			}
+			data.push(object)
+		}
+		return data;
+	}
+
 	const handleTableChange = (pagination, filters, sorter) => {
 		console.log('handleTableChange pagination', pagination, 'filters', filters, 'sorter', sorter)
 	};
+
+	const saveDispoUpdate = row => {
+		console.log('saveDispoUpdate', row)
+		// const newData = [...this.state.dataSource];
+		// const index = newData.findIndex(item => row.key === item.key);
+		// const item = newData[index];
+		// newData.splice(index, 1, {
+		// 	...item,
+		// 	...row,
+		// });
+		// console.log('saved', newData)
+		// this.setState({ dataSource: newData });
+	}
 
 	const referralsExpandList = (record, index, indent, expanded) => {
 		console.log('referralsExpandList record', record, 'index', index, 'indent', indent, 'expanded', expanded)
@@ -235,26 +281,17 @@ const ReferralsTable = props => {
 
 	return (
 		<>
-			<Table
-				columns={tableColumns}
-				rowKey={record => record.key}
-				dataSource={tableData(props.consultations, props.inquirers, props.lawyers, props.lawTypes)}
-				pagination={false}
+			<EditableReferralsTable
+				loading={isLoading}
+				dataSource={dataSource}
+				columns={columns}
+				statuses={statuses} // edit field pulldown menu items
 				onChange={handleTableChange}
-				loading={props.isLoading}
-				size="middle"
+				handleSave={saveDispoUpdate}
 				expandedRowRender={referralsExpandList}
 			/>
 		</>
 	)
 };
 
-const mapStateToProps = state => {
-	return {
-		inquirers: state.people.inquirers,
-		lawyers: state.people.lawyers,
-		lawTypes: state.lawTypes.lawTypes,
-	}
-}
-
-export default connect(mapStateToProps)(ReferralsTable)
+export default ReferralsTable;

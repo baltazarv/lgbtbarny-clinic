@@ -1,43 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // components
-import ConsultTable from '../../../components/clinics/ReferralsTable';
+import ReferralsTable from '../../../components/clinics/ReferralsTable';
 // data
-import { getReferralConsultations } from '../../../data/consultationData';
+// TO DO: remove ajax funtction
+// import { getReferralConsultations } from '../../../data/consultationData';
 
 class Referrals extends Component {
-	constructor() {
-		super();
-		this.state = {
-			consultations: [],
-			tableIsLoading: true,
-		}
-		this.getAllConsultations = this.getAllConsultations.bind(this);
-	}
-
-	componentDidUpdate(prevProps) {
-		if (this.props.inquirers.length > 0 && this.props.inquirers.length !== prevProps.inquirers.length) {
-			this.getAllConsultations();
-			this.setState({
-				tableIsLoading: false,
-			})
-		}
-	}
-
-	async getAllConsultations() {
-		const results = await getReferralConsultations();
-		this.setState({
-			consultations: results.payload,
-		})
-	}
 
 	render() {
 		return (
 			<>
-				<h1 className="h2">Referrals</h1>
-				<ConsultTable
-					consultations={this.state.consultations}
-					isLoading={this.state.tableIsLoading}
+				<h1 className="h2" > Referrals </h1> <ReferralsTable
+					inquirers={this.props.inquirers}
+					lawyers={this.props.lawyers}
+					lawTypes={this.props.lawTypes}
+					consultations={this.props.consultations} // object
+					// isLoading={this.state.tableIsLoading}
 				/>
 			</>
 		)
@@ -46,7 +25,9 @@ class Referrals extends Component {
 
 const mapStateToProps = state => {
 	return {
-		inquirers: state.people.inquirers,
+		inquirers: state.people.inquirersObject,
+		lawyers: state.people.lawyersObject,
+		lawTypes: state.lawTypes.lawTypes,
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
 	}

@@ -11,6 +11,7 @@ export {
 } from './lawtypes';
 
 export {
+	getConsultations,
 	createConsultation,
 } from './consultations';
 

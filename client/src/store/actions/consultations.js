@@ -8,6 +8,43 @@ export { readConsultationsByIds } from '../../data/consultationData';
 
 // async action creators
 
+export const getConsultations = () => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			// let consultations = [];
+			let consultations = {}
+			airtableBase(TABLE).select({
+				view: "_Consultations"
+			}).eachPage(function page(records, fetchNextPage) {
+				records.forEach(function (record) {
+					// option 1
+					// const _record = record.fields;
+					// _record.id = record.id;
+					// consultations.push(_record);
+
+					// option 2
+					// consultations.push(records);
+
+					// option 3
+					consultations[record.id] = record.fields;
+				});
+				fetchNextPage();
+			}, function done(err) {
+				if (err) {
+					console.error('Airtable Error: ', err);
+					return reject('Airtable erroror: ', err);
+				}
+			});
+			dispatch(initConsultations(consultations));
+			return resolve({
+				status: 'success',
+				type: 'getConsultations',
+				payload: consultations,
+			});
+		})
+	}
+}
+
 export const createConsultation = submitFields => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {

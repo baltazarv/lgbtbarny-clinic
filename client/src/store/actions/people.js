@@ -9,7 +9,9 @@ import { recordForUpdate } from '../../data/dataTransforms';
 export const getLawyers = () => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
-			let lawyers = [];
+			// TO DO: remove array
+			let lawyersArray = [];
+			let lawyersObject = [];
 			airtableBase(PEOPLE_TABLE).select({
 				fields: [
 					peopleFields.FIRST_NAME,
@@ -17,20 +19,24 @@ export const getLawyers = () => {
 					peopleFields.LAST_NAME,
 					peopleFields.OTHER_NAMES,
 				],
-				view: LAWYERS_VIEW
-				// filterByFormula: 'Type = "Lawyer"'
+				view: LAWYERS_VIEW,
+				// filterByFormula: 'Type = ...', // array
 			}).eachPage(function page(records, fetchNextPage) {
 				records.forEach(record => {
+					// array
 					const _record = record.fields;
 					_record.id = record.id;
-					lawyers.push(_record);
+					lawyersArray.push(_record);
+					// object
+					lawyersObject[record.id] = record.fields;
 				});
 				fetchNextPage(); // next 100
-			}, function done(err, records) {
+			}, function done(err) {
 				if (err) {
 					console.error('Airtable Error: ', err);
 					return reject('Airtable Error: ', err);
 				}
+				const lawyers = [lawyersArray, lawyersObject];
 				dispatch(initLawyers(lawyers));
 				return resolve(lawyers);
 			});
@@ -70,7 +76,8 @@ export const createLawyer = lawyer => {
 
 export const getInquirers = () => {
 	return dispatch => {
-		let inquirers = [];
+		let inquirersArray = [];
+		let inquirersObject = {};
 		airtableBase(PEOPLE_TABLE).select({
 			view: INQUIRERS_VIEW,
 			fields: [
@@ -95,9 +102,12 @@ export const getInquirers = () => {
 			// filterByFormula: 'Type = "Inquirer"'
 		}).eachPage(function page(records, fetchNextPage) {
 			records.forEach(function (record) {
+				// array
 				const _record = record.fields;
 				_record.id = record.id;
-				inquirers.push(_record);
+				inquirersArray.push(_record);
+				// object
+				inquirersObject[record.id] = record.fields;
 			});
 			fetchNextPage(); // next 100
 		}, function done(err, records) {
@@ -106,6 +116,7 @@ export const getInquirers = () => {
 				// dispatch(fetchInquirersFailed())
 				return;
 			}
+			const inquirers = [inquirersArray, inquirersObject]
 			dispatch(initInquirers(inquirers));
 		});
 	}
@@ -174,6 +185,7 @@ export const updateInquirer = info => {
 export const initLawyers = lawyers => {
 	return {
 		type: actionTypes.INIT_LAWYERS,
+		// array with array & object
 		lawyers
 	}
 }
@@ -185,10 +197,11 @@ export const addLawyer = lawyer => {
 	}
 }
 
-export const initInquirers = inquirers => {
+// TO DO: inquirers object only
+export const initInquirers = (inquirers) => {
 	return {
 		type: actionTypes.INIT_INQUIRERS,
-		inquirers
+		inquirers,
 	}
 }
 
