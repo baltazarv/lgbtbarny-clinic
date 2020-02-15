@@ -17,8 +17,8 @@ import TextArea from './fields/TextArea';
 import InputField from './fields/InputField'
 // data
 import * as peopleFields from '../../data/peopleFields';
+import { formatName } from '../../data/peopleData';
 import { getLawTypeOptions } from '../../data/lawTypeData';
-import { formatName } from '../../data/dataTransforms';
 // styles
 import classNames from "classnames";
 import { reqAsterisk } from './formElements';

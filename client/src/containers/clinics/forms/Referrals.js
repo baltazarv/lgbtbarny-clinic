@@ -27,7 +27,7 @@ const mapStateToProps = state => {
 	return {
 		inquirers: state.people.inquirersObject,
 		lawyers: state.people.lawyersObject,
-		lawTypes: state.lawTypes.lawTypes,
+		lawTypes: state.lawTypes.lawTypesObject,
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
 	}

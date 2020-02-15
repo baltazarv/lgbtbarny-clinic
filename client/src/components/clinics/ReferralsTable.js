@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tag, Icon, List, Typography } from 'antd';
 // components
 import EditableReferralsTable from './EditableReferralsTable';
 // data
 import * as consultFields from '../../data/consultionFields';
+import { getLawTypes } from '../../data/lawTypeData';
 import { filterEligibleConsultations } from '../../data/consultationData';
-import * as lawTypeData from '../../data/lawTypeData';
-import { formatName } from '../../data/dataTransforms';
+import { formatName } from '../../data/peopleData';
 // utils
-import { objectIsEmpty } from '../../utils';
+import { objectIsEmpty, isoToStandardDate } from '../../utils';
 
 const dispoShortNames = {
 	[consultFields.DISPOSITIONS_FEE_BASED]: "Fee-based",
@@ -64,12 +64,10 @@ const columns = [
 		render: dispos => (
 			<span>
 				{dispos.map((dispo, index) => {
-					let color = 'cyan';
-					if (dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]) {
-						color = 'blue';
-					} else if (dispo === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING]) {
-						color = 'magenta';
-					}
+					let color = '#8c8c8c';
+					if (dispo === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED]) color = 'cyan';
+					if (dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]) color = 'blue';
+					if (dispo === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING]) color = 'magenta';
 					return (
 						<Tag color={color} key={index}>
 							{dispo}
@@ -120,11 +118,6 @@ const columns = [
 	// },
 ];
 
-const formatDate = isoDate => {
-	let date = new Date(isoDate);
-	return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
-}
-
 const getVisitorNames = (ids, inquirers) => {
 	if (ids && ids.length > 0) {
 		return ids.map(id => {
@@ -142,22 +135,6 @@ const getLawyerNames = (ids, lawyers) => {
 		}).join(', ');
 	} else {
 		return 'Lawyers not specified.';
-	}
-}
-
-// TO DO: lawyers object instead
-const getLawTypes = (ids, lawTypes) => {
-	if (ids && ids.length > 0 && lawTypes && lawTypes.length > 0) {
-		let _lawTypes = lawTypes.reduce((acc, cur) => {
-			const found = ids.find(id => id === cur.id);
-			if (found) {
-				acc.push(cur[lawTypeData.NAME]);
-			}
-			return acc;
-		}, []);
-		return _lawTypes.length > 0 ? _lawTypes.join(', ') : 'Law type not specified.';
-	} else {
-		return '';
 	}
 }
 
@@ -184,8 +161,7 @@ const ReferralsTable = props => {
 	const [dataSource, setDataSource] = useState([]);
 
 	useEffect(() => {
-		// TO DO: lawyers and lawtypes objects
-		if (isLoading && !objectIsEmpty(props.consultations) && !objectIsEmpty(props.inquirers) > 0 && !objectIsEmpty(props.lawyers) && props.lawTypes.length > 0) {
+		if (isLoading && !objectIsEmpty(props.consultations) && !objectIsEmpty(props.inquirers) > 0 && !objectIsEmpty(props.lawyers) && !objectIsEmpty(props.lawTypes)) {
 			const data = tableData();
 			setDataSource(data);
 			setIsLoading(false);
@@ -201,7 +177,7 @@ const ReferralsTable = props => {
 			const object = {
 				key,
 				// convert from iso to other date format
-				[consultFields.CREATED_ON]: formatDate(fields[consultFields.CREATED_ON]),
+				[consultFields.CREATED_ON]: isoToStandardDate(fields[consultFields.CREATED_ON]),
 				// get visitors' full names
 				[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
 				// convert to short name
@@ -248,7 +224,7 @@ const ReferralsTable = props => {
 			},
 			{
 				title: "Consultation Notes",
-				value: record[consultFields.SITUATION] ? record[consultFields.SITUATION] : "No intake notes."
+				value: record[consultFields.SITUATION] ? record[consultFields.SITUATION] : "No notes taken."
 			},
 		];
 

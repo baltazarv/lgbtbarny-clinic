@@ -4,19 +4,20 @@ import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Row, Col, Form, Button, Collapse } from 'react-bootstrap';
 import ReactSelect from 'react-select';
-import { Button as AntButton } from 'antd'; // { Select }
+import { Button as AntButton, Tooltip } from 'antd'; // { Select }
 import RadioButtonGroup from './fields/RadioButtonGroup';
 import RadioButton from './fields/RadioButton';
 import TextArea from './fields/TextArea';
 import { InputFeedback } from './formElements';
-import InquirerInfo from '../InquirerInfo';
+import InquirerDetails from '../InquirerDetails';
 import FormModal from '../modals/FormModal';
 import VisitorAddForm from './VisitorAddForm';
 import LawyerAddForm from './LawyerAddForm';
 // import ReactSelectWithValidation from '../../../components/forms/fields/ReactSelectWithValidation';
 // data
 import * as consultFields from '../../data/consultionFields';
-import { getPeopleIntoSelectOptions, getLawTypeSelectOptions } from '../../data/dataTransforms';
+import { getPeopleIntoSelectOptions } from '../../data/peopleData';
+import { getLawTypeSelectOptions } from '../../data/dataTransforms';
 // import styles from './ConsultationForm.module.css';
 
 // determines if referral fields show and validate
@@ -139,7 +140,6 @@ class ConsultationForm extends Component {
 		// passed by Consultaton parent container
 		const {
 			inquirersSelected,
-			inqSelectedConsultations,
 			clinicTitle,
 		} = this.props;
 
@@ -198,13 +198,15 @@ class ConsultationForm extends Component {
 									/>
 								</Col>
 								<Col xs={2} className="justify-content-left">
-									<Button onClick={() => this.showLawyerAddModal()} size="sm">+</Button>
+									<Tooltip title="add new lawyer">
+										<Button onClick={() => this.showLawyerAddModal()} size="sm">+</Button>
+									</Tooltip>
 								</Col>
 							</Row>
 							{touched[consultFields.LAWYERS] && <InputFeedback error={errors[consultFields.LAWYERS]} />}
-							<div className="text-right text-muted">
+							{/* <div className="text-right text-muted">
 								<small>If lawyer not on pulldown, click</small> <strong>+</strong> <small>above to add.</small>
-							</div>
+							</div> */}
 						</Col>
 					</Form.Group>
 
@@ -232,32 +234,37 @@ class ConsultationForm extends Component {
 									/>
 								</Col>
 								<Col xs={3} sm={4} md={3} className="justify-content-left">
-									<AntButton
-										type="primary"
-										shape="circle"
-										onClick={() => this.props.refreshInquirers()}
-										className="mr-3 pb-1"
-										icon="reload" />
-									<Button onClick={() => this.showVisitorAddModal()} size="sm">+</Button>
+									<Tooltip title="refresh selections">
+										<AntButton
+											type="primary"
+											shape="circle"
+											onClick={() => this.props.refreshInquirers()}
+											className="mr-3 pb-1"
+											icon="reload" />
+									</Tooltip>
+									<Tooltip title="add new visitor">
+										<Button onClick={() => this.showVisitorAddModal()} size="sm">+</Button>
+									</Tooltip>
 								</Col>
 							</Row>
 							{touched[consultFields.INQUIRERS] && <InputFeedback error={errors[consultFields.INQUIRERS]} />}
-							<div className="text-right text-muted">
+							{/* <div className="text-right text-muted">
 								<small>If visitor not in the system, click</small> <strong>+</strong> <small>above to add.</small>
-							</div>
+							</div> */}
 						</Col>
 					</Form.Group>
 
 					{/* selected inquirer info list */}
 					<Collapse in={this.props.inquirers && this.props.inquirers.length > 0} className="mb-4">
 						<div id="visitor-info" className="small">
-							<InquirerInfo
+							<InquirerDetails
 								// inquirers determines if list shows up:
-								inquirers={inquirersSelected}
-								consultations={inqSelectedConsultations}
+								inquirersSelected={inquirersSelected}
+								inquirers={this.props.inquirersObject}
+								consultations={this.props.consultations}
 								// needed for lawyer names:
-								lawyers={this.props.lawyers}
-								lawTypes={this.props.lawTypes}
+								lawyers={this.props.lawyersObject}
+								lawTypes={this.props.lawTypesObject}
 							/>
 						</div>
 					</Collapse>
@@ -274,6 +281,9 @@ class ConsultationForm extends Component {
 							rows={5}
 						/>
 					</div>
+
+					{/* customize email */}
+					{this.props.editCustomEmailButton()}
 
 					{/* disposition */}
 					<RadioButtonGroup
@@ -355,9 +365,6 @@ class ConsultationForm extends Component {
 						</div>
 					</Collapse>
 
-					{/* {linkToEmailEditModal} */}
-					{this.props.linkToEditCustomEmail()}
-
 					{/* submit */}
 					<Row className="justify-content-start">
 						<Col>
@@ -405,11 +412,19 @@ class ConsultationForm extends Component {
 
 const mapStateToProps = state => {
 	return {
-		// pass these from parent?
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
 		lawyers: state.people.lawyers,
+		consultations: state.consultations.consultations,
 		lawTypes: state.lawTypes.lawTypes,
+		lawTypesObject: state.lawTypes.lawTypesObject,
+
+		// passed by parent
+		// clinicTitle={this.props.clinicTitle}
+		// inquirers={this.props.inquirers}
+		// lawyersObject: state.people.lawyersObject,
+		// lawyers={this.props.lawyers}
+		// lawTypes={this.props.lawTypes}
 	}
 }
 

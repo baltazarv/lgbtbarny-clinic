@@ -3,9 +3,6 @@ import airtableBase from '../../airtableBase';
 // db item names
 import { TABLE } from '../../data/consultationData';
 
-// fetch function that does not save to redux state
-export { readConsultationsByIds } from '../../data/consultationData';
-
 // async action creators
 
 export const getConsultations = () => {

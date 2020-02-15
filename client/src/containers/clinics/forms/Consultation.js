@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 // components
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
+import { Button } from 'antd';
 import ConsultationForm from '../../../components/forms/ConsultationForm';
 import EditEmailModal from '../../../components/modals/EditEmailModal';
 import TimerCounter from '../../../components/TimerCountdown/index';
@@ -10,9 +11,11 @@ import TimerCounter from '../../../components/TimerCountdown/index';
 import * as actions from '../../../store/actions/index';
 import * as consultFields from '../../../data/consultionFields';
 import * as peopleFields from '../../../data/peopleFields';
-import { getRecordsFromSelection, getPeopleIntoSelectOptions, formatName } from '../../../data/dataTransforms';
-import { getInquirerConsultations } from '../../../data/consultationData';
+import { getPeopleIntoSelectOptions } from '../../../data/peopleData';
+import { formatName } from '../../../data/peopleData';
+// import { getInquirerConsultations } from '../../../data/consultationData';
 import { EMAIL_OPTIONS, mergeCustomAndDefaultHtml } from '../../../emails/visitorPostConsultation';
+import { objectIsEmpty } from '../../../utils';
 // utils
 
 const TYPE_CLINIC = 'Clinic';
@@ -33,10 +36,10 @@ class Consultation extends Component {
 		super(props);
 		this.state = {
 			// populates inquirer info list for current:
-			inquirersSelected: [],
+			inquirersSelected: {},
 			// all consultations for selected inquirers
 			// fetched from this class and pushed to <ConsultationsList />
-			inqSelectedConsultations: [],
+			// inqSelectedConsultations: [],
 
 			// prop sent to ConsultationForm (arg sent to a custom message?)
 			serverResponse: null,
@@ -56,17 +59,15 @@ class Consultation extends Component {
 		this.submitAddInquirer = this.submitAddInquirer.bind(this);
 	}
 
-	async handleInquirerSelectChange(options) {
-		if (this.props.inquirers) {
-			let inquirersSelected = getRecordsFromSelection(options, this.props.inquirers);
-			let inqSelectedConsultations = await getInquirerConsultations(inquirersSelected);
-			this.setState({
-				inquirersSelected,
-				inqSelectedConsultations,
-			})
-		} else {
-			console.log('haven\'t pulled inquirers from db yet');
-		}
+	handleInquirerSelectChange(options) {
+		// array to object
+		const inquirersSelected = {};
+		options.forEach(option => {
+			inquirersSelected[option.value] = this.props.inquirersObject[option.value];
+		});
+		this.setState({
+			inquirersSelected,
+		})
 	}
 
 	async submitConsultation(values, setFieldValue, resetForm) {
@@ -108,8 +109,7 @@ class Consultation extends Component {
 
 				this.setState({
 					serverResponse,
-					inquirersSelected: [], // hide <InquirerInfo />
-					inqSelectedConsultations: [],
+					inquirersSelected: {}, // hide <InquirerInfo />
 				})
 			}
 
@@ -127,9 +127,10 @@ class Consultation extends Component {
 			bodyText = this.state.customEmailText.replace(/(\r\n|\n|\r)/g, '<br />');
 		}
 
+		const firstCurrInquirer = this.state.inquirersSelected[[Object.keys(this.state.inquirersSelected)[0]]];
 		const payload = {
 			from: EMAIL_OPTIONS.from,
-			to: this.state.inquirersSelected[0][peopleFields.EMAIL],
+			to: firstCurrInquirer[peopleFields.EMAIL],
 			subject: EMAIL_OPTIONS.subject,
 			bodyText,
 		};
@@ -157,7 +158,6 @@ class Consultation extends Component {
 	async submitAddInquirer(values, setFieldValue) {
 		try {
 			const serverResponse = await this.props.createInquirer(values);
-			// console.log('submitAddInquirer', serverResponse);
 			if (serverResponse.status === 'success' && serverResponse.type === 'createInquirer') {
 				this.setState({
 					serverResponse
@@ -177,23 +177,26 @@ class Consultation extends Component {
 	// email
 
 	// link to open modal window to edit email
-	linkToEditCustomEmail = () => {
+	editCustomEmailButton = () => {
 		let linkToEmailEditModal = null;
-		if (this.state.inquirersSelected.length > 0) {
-			const firstCurrInquirer = this.state.inquirersSelected[0];
+		if (!objectIsEmpty(this.state.inquirersSelected)) {
+			const firstCurrInquirer = this.state.inquirersSelected[[Object.keys(this.state.inquirersSelected)[0]]];
 			const firstCurrInqName = formatName(firstCurrInquirer);
 			if (firstCurrInquirer[peopleFields.EMAIL]) {
-				let customEmailBtnLabel = <>Add custom message to email for <strong>{firstCurrInqName}</strong>.</>
+				let customEmailBtnLabel = <>Customize email to <strong>{firstCurrInqName}</strong></>
 				if (this.state.emailMessage) {
 					customEmailBtnLabel = `Custom Message to Email ${firstCurrInqName} Added`;
 				}
 				linkToEmailEditModal = <Row>
 					<Col>
 						<Button
+							icon="mail"
 							onClick={() => this.showEmailEditModal()}
-							variant="link" size="md" className="mb-3">
-							{customEmailBtnLabel}
+							type="primary"
+						>
+							&nbsp;{customEmailBtnLabel}
 						</Button>
+						<div className="mb-3"><small>Emails sent on submission.</small></div>
 					</Col>
 				</Row>;
 			} else {
@@ -248,7 +251,7 @@ class Consultation extends Component {
 		}
 
 		let timerCounter = null;
-		if (this.state.inquirersSelected.length > 0) {
+		if (!objectIsEmpty(this.state.inquirersSelected)) {
 			timerCounter = <TimerCounter getTimeSpent={this.getTimeSpent} />
 		}
 
@@ -257,7 +260,9 @@ class Consultation extends Component {
 				<ConsultationForm
 					clinicTitle={this.props.clinicTitle}
 					inquirers={this.props.inquirers}
+					inquirersObject={this.props.inquirersObject}
 					lawyers={this.props.lawyers}
+					lawyersObject={this.props.lawyersObject}
 					lawTypes={this.props.lawTypes}
 					// container will handle state
 					handleInquirerSelectChange={this.handleInquirerSelectChange}
@@ -271,9 +276,8 @@ class Consultation extends Component {
 					refreshInquirers={this.props.refreshInquirers}
 					// needed for (1) visitor info table & (2) for link to custom email editing modal
 					inquirersSelected={this.state.inquirersSelected}
-					inqSelectedConsultations={this.state.inqSelectedConsultations}
 
-					linkToEditCustomEmail={this.linkToEditCustomEmail}
+					editCustomEmailButton={this.editCustomEmailButton}
 				/>
 
 				{/* edit custom email modal */}
@@ -298,6 +302,8 @@ class Consultation extends Component {
 
 const mapStateToProps = state => {
 	return {
+		inquirersObject: state.people.inquirersObject,
+		lawyersObject: state.people.lawyersObject,
 		currentLawyers: state.people.currentLawyers, // REMOVE?
 	}
 }

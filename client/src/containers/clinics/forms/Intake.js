@@ -14,7 +14,8 @@ import { Form, Row, Col, Card } from 'react-bootstrap';
 import VisitorSelect from '../../../components/forms/fields/VisitorSelect';
 import VisitorAddForm from '../../../components/forms/VisitorAddForm';
 // data
-import { getRecordsFromSelection, formatName, getPeopleIntoSelectOptions } from '../../../data/dataTransforms';
+import { formatName, getPeopleIntoSelectOptions } from '../../../data/peopleData';
+import { getRecordsFromSelection } from '../../../data/dataTransforms';
 import * as actions from '../../../store/actions/index';
 
 const Intake = props => {

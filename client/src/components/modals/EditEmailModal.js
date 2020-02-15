@@ -4,11 +4,13 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 // data
-import { formatName } from '../../data/dataTransforms';
+import { formatName } from '../../data/peopleData';
 import * as peopleFields from '../../data/peopleFields';
 import { EMAIL_OPTIONS, mergeCustomAndDefaulText } from '../../emails/visitorPostConsultation';
 // styles
 import styles from './EditEmailModal.module.css';
+// utils
+import { objectIsEmpty } from '../../utils';
 
 const EditEmailModal = ({
 	// modal props
@@ -89,8 +91,8 @@ const EditEmailModal = ({
 	let emailEditModalTitle = null;
 	let emailEditModalHead = null;
 	let emailEditModalBody = null;
-	if (inquirers.length > 0) {
-		const firstCurrInquirer = inquirers[0];
+	if (!objectIsEmpty(inquirers)) {
+		const firstCurrInquirer = inquirers[[Object.keys(inquirers)[0]]];
 		const firstCurrInqName = formatName(firstCurrInquirer);
 		if (firstCurrInquirer[peopleFields.EMAIL]) {
 			emailEditModalTitle = `Edit Email for ${firstCurrInqName}`;

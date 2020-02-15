@@ -5,3 +5,8 @@ export const objectIsEmpty = (obj) => {
 	}
 	return true;
 }
+
+export const isoToStandardDate = isoDate => {
+	let date = new Date(isoDate);
+	return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+}

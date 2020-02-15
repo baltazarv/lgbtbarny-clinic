@@ -36,22 +36,3 @@ export const TERMS = 'Acknowledgment';
 export const TERMS_AGREE = 'I understand and agree to the terms and conditions of the clinic.';
 export const SIGNATURE = 'Digital Signature';
 export const CONSULTATIONS = 'Consultations';
-
-// TEMP - delete soon
-export const local = {
-	REPEAT_VISIT: 'repeat',
-	FIRST_NAME: 'firstName',
-	MIDDLE_NAME: 'middleName',
-	LAST_NAME: 'lastName',
-	OTHER_NAMES: 'otherNames',
-	EMAIL: 'email',
-	PHONE: 'phone',
-	ADDRESS: 'address',
-	GENDER: 'gender',
-	PRONOUNS: 'pronouns',
-	INCOME: 'income',
-	INTAKE_NOTES: 'notes',
-	TERMS: 'terms',
-	SIGNATURE: 'signature',
-	CONSULTATIONS: 'consultations',
-}
