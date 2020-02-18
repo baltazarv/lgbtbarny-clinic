@@ -289,7 +289,6 @@ class ConsultationForm extends Component {
 					<RadioButtonGroup
 						id={consultFields.DISPOSITIONS}
 						label="Disposition"
-						description="Please describe the factual situation as well as the legal assessment."
 						value={values[consultFields.DISPOSITIONS]}
 						error={errors[consultFields.DISPOSITIONS]}
 						touched={touched[consultFields.DISPOSITIONS]}

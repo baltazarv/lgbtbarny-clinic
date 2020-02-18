@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import jsxToPlainText from '../utils/jsxToPlainText';
 
 export const EMAIL_OPTIONS = {
-	from: 'LeGaL <no-reply@le-gal.org>',
+	from: 'LeGaL <no-reply@lgbtbarny.org>',
 	// to: 'baltazarv@gmail.com',
 	subject: 'Thank you for visiting the Tuesday Night Clinic of the LGBT Bar Association of Greater New York',
 	bodyPre: 'Thank you for visiting tonight\'s Clinic. If the volunteer lawyer with whom you had a consultation indicated that specific information would be provided, please find that information below.',
