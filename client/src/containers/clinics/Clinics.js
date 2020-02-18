@@ -166,8 +166,6 @@ class Clinics extends Component {
 									path="/referrals"
 									render={() => <Referrals
 										clinicTitle={clinicTitle}
-										inquirers={this.props.inquirers}
-										consultations={this.props.consultations}
 									/>}
 								/>
 								{redirectRoute}

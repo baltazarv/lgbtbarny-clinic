@@ -30,6 +30,7 @@ const mapStateToProps = state => {
 		lawTypes: state.lawTypes.lawTypesObject,
 		clinicSettings: state.clinics.clinicSettings,
 		currentClinic: state.clinics.currentClinic,
+		consultations: state.consultations.consultations,
 	}
 }
 

@@ -1,5 +1,4 @@
 import * as consultFields from './consultionFields';
-import airtableBase from '../airtableBase';
 
 // database item names
 

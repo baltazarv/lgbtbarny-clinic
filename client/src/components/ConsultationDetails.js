@@ -1,11 +1,9 @@
 import React from 'react';
 import { List, Typography, Tag } from 'antd';
-// import { Button, Modal } from 'react-bootstrap';
 // data
 import * as consultFields from '../data/consultionFields';
 import { getPeopleByIds } from '../data/peopleData';
 import { getLawTypes } from '../data/lawTypeData';
-import { formatName } from '../data/peopleData'
 
 const ConsultationDetails = props => {
 	// props from InquirerDetails parent

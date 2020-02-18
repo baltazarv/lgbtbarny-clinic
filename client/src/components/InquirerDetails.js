@@ -147,7 +147,7 @@ const InquirerDetails = ({
 					footer={[
 						<Button key="back" onClick={hideConsultModal}>
 							Close
-					</Button>,
+						</Button>,
 					]}
 				>
 					<ConsultationDetails
