@@ -13,6 +13,7 @@ export {
 export {
 	getConsultations,
 	createConsultation,
+	updateConsultation,
 } from './consultations';
 
 export {

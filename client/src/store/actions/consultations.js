@@ -69,12 +69,45 @@ export const createConsultation = submitFields => {
 	}
 }
 
+// takes an oject: { key, fields }
+export const updateConsultation = updateObject => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			let newConsultation = {};
+			airtableBase(TABLE).update(updateObject.id,
+				updateObject.fields,
+				function (error, record) {
+					if (error) {
+						console.log('Airtable Error:', error);
+						return reject({
+							status: 'failed',
+							error,
+						});
+					}
+					newConsultation[record.id] = record.fields;
+					dispatch(consultationUpdated(newConsultation));
+					return resolve({
+						status: 'success',
+						type: 'updateConsultation',
+						payload: newConsultation,
+					})
+				})
+		});
+	}
+}
+
 // sync action creators
 
-// maybe use for later // is there a need to get all consultations?
 export const initConsultations = consultations => {
 	return {
 		type: actionTypes.INIT_CONSULTATIONS,
 		consultations
+	}
+}
+
+export const consultationUpdated = consultation => {
+	return {
+		type: actionTypes.CONSULTATION_UPDATED,
+		consultation
 	}
 }

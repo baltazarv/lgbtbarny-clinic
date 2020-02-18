@@ -51,11 +51,11 @@ class EditableCell extends React.Component {
 		return editing ? (
 			<Form.Item style={{ margin: 0 }}>
 				{form.getFieldDecorator(dataIndex, {
+					// no rules since pulldown menu
 					initialValue: record[dataIndex],
 				})(<Select
 					ref={node => (this.input = node)}
 					onPressEnter={this.save}
-					// onBlur={this.save}
 					onSelect={this.save}
 				>
 					{getOptions(statuses)}
@@ -100,12 +100,13 @@ class EditableTable extends React.Component {
 	render() {
 		// parent ReferralsTable props
 		const {
-			loading,
-			dataSource,
 			columns,
+			dataSource,
+			handleSave,
+			loading,
 			onChange,
 			statuses,
-			expandedRowRender
+			expandedRowRender,
 		} = this.props;
 
 		const components = {
@@ -123,9 +124,9 @@ class EditableTable extends React.Component {
 				onCell: record => ({
 					record,
 					editable: col.editable,
-					title: col.title,
 					dataIndex: col.dataIndex,
-					handleSave: this.props.handleSave,
+					title: col.title,
+					handleSave,
 					statuses: statuses,
 				}),
 			};
@@ -134,11 +135,11 @@ class EditableTable extends React.Component {
 			<div>
 				<Table
 					components={components}
-					loading={loading}
-					columns={_columns}
-					dataSource={dataSource}
-					statuses={statuses}
 					rowClassName={() => 'editable-row'}
+					loading={loading}
+					dataSource={dataSource}
+					columns={_columns}
+					statuses={statuses}
 					pagination={false}
 					size="small"
 					onChange={onChange}

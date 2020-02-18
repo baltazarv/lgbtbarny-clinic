@@ -146,9 +146,11 @@ const getDispoShortNames = dispos => {
 const fillInEmptyStatuses = object => {
 	const statusField = object[consultFields.STATUS];
 	const dispoField = dispoShortNames[object[consultFields.DISPOSITIONS]];
+	// fee-base or pro-bono => reference needed
 	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED] || dispoField === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO])) {
 		return consultFields.STATUS_REFER;
 	}
+	// compelling => high impact
 	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING])) {
 		return consultFields.STATUS_IMPACT;
 	}
@@ -160,20 +162,24 @@ const ReferralsTable = props => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
 
+	// props from parent Referrals
+	const {
+		updateConsultation, // redux function
+	} = props;
+
 	useEffect(() => {
-		if (isLoading && !objectIsEmpty(props.consultations) && !objectIsEmpty(props.inquirers) > 0 && !objectIsEmpty(props.lawyers) && !objectIsEmpty(props.lawTypes)) {
-			const data = tableData();
-			setDataSource(data);
+		if (isLoading && !objectIsEmpty(props.consultations) && !objectIsEmpty(props.inquirers) && !objectIsEmpty(props.lawyers) && !objectIsEmpty(props.lawTypes)) {
+			setDataSource(setTableData());
 			setIsLoading(false);
 		}
 	})
 
-	const tableData = () => {
+	const setTableData = () => {
 		const { consultations, inquirers, lawyers, lawTypes } = props;
 		const eligible = filterEligibleConsultations(consultations);
 		let data = [];
-		for (var key in eligible) { // props.consultations
-			let fields = eligible[key]; // consultations[key]
+		for (var key in eligible) {
+			let fields = eligible[key];
 			const object = {
 				key,
 				// convert from iso to other date format
@@ -197,22 +203,28 @@ const ReferralsTable = props => {
 		console.log('handleTableChange pagination', pagination, 'filters', filters, 'sorter', sorter)
 	};
 
-	const saveDispoUpdate = row => {
-		console.log('saveDispoUpdate', row)
-		// const newData = [...this.state.dataSource];
-		// const index = newData.findIndex(item => row.key === item.key);
-		// const item = newData[index];
-		// newData.splice(index, 1, {
-		// 	...item,
-		// 	...row,
-		// });
-		// console.log('saved', newData)
-		// this.setState({ dataSource: newData });
+	const updateDispoStatus = tableRow => {
+		// (1) update table
+    const newData = [...dataSource];
+    const index = newData.findIndex(item => tableRow.key === item.key);
+		const item = newData[index];
+    newData.splice(index, 1, {
+      ...item,
+      ...tableRow,
+		});
+		setDataSource(newData);
+
+		// (2) update db >> (3) update redux state
+		const updateObject = {
+			id: tableRow.key,
+			fields: {
+				[consultFields.STATUS]: tableRow[consultFields.STATUS],
+			}
+		};
+		updateConsultation(updateObject);
 	}
 
 	const referralsExpandList = (record, index, indent, expanded) => {
-		console.log('referralsExpandList record', record, 'index', index, 'indent', indent, 'expanded', expanded)
-
 		const expandListData = [
 			{
 				title: "Lawyer(s) Consulted",
@@ -263,7 +275,7 @@ const ReferralsTable = props => {
 				columns={columns}
 				statuses={statuses} // edit field pulldown menu items
 				onChange={handleTableChange}
-				handleSave={saveDispoUpdate}
+				handleSave={updateDispoStatus}
 				expandedRowRender={referralsExpandList}
 			/>
 		</>
