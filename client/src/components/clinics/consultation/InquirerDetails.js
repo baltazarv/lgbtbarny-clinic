@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { List, Typography, Button, Modal, Tooltip } from 'antd';
 import ConsultationDetails from './ConsultationDetails';
 // data
-import * as peopleFields from '../data/peopleFields';
-import { formatName, getPeopleByIds } from '../data/peopleData';
-import * as consultFields from '../data/consultionFields';
-import { getLawTypes } from '../data/lawTypeData';
+import * as peopleFields from '../../../data/peopleFields';
+import { formatName, getPeopleByIds } from '../../../data/peopleData';
+import * as consultFields from '../../../data/consultionFields';
+import { getLawTypes } from '../../../data/lawTypeData';
 // utils
-import { objectIsEmpty, isoToStandardDate } from '../utils';
+import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 
 const InquirerDetails = ({
 	// props from parent ConsultationForm

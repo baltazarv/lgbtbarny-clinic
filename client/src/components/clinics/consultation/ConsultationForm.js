@@ -5,20 +5,19 @@ import { withFormik, Form as FormikForm, Field } from 'formik';
 import { Row, Col, Form, Button, Collapse } from 'react-bootstrap';
 import ReactSelect from 'react-select';
 import { Button as AntButton, Tooltip } from 'antd'; // { Select }
-import RadioButtonGroup from './fields/RadioButtonGroup';
-import RadioButton from './fields/RadioButton';
-import TextArea from './fields/TextArea';
-import { InputFeedback } from './formElements';
-import InquirerDetails from '../InquirerDetails';
-import FormModal from '../modals/FormModal';
-import VisitorAddForm from './VisitorAddForm';
+import RadioButtonGroup from '../../forms/fields/RadioButtonGroup';
+import RadioButton from '../../forms/fields/RadioButton';
+import TextArea from '../../forms/fields/TextArea';
+import { InputFeedback } from '../../forms/formElements';
+import InquirerDetails from './InquirerDetails';
+import FormModal from '../../modals/FormModal';
+import VisitorAddForm from '../VisitorAddForm';
 import LawyerAddForm from './LawyerAddForm';
 // import ReactSelectWithValidation from '../../../components/forms/fields/ReactSelectWithValidation';
 // data
-import * as consultFields from '../../data/consultionFields';
-import { getPeopleIntoSelectOptions } from '../../data/peopleData';
-import { getLawTypeSelectOptions } from '../../data/dataTransforms';
-// import styles from './ConsultationForm.module.css';
+import * as consultFields from '../../../data/consultionFields';
+import { getPeopleIntoSelectOptions } from '../../../data/peopleData';
+import { getLawTypeSelectOptions } from '../../../data/dataTransforms';
 
 // determines if referral fields show and validate
 // b/c validate function needs to be outside class, this flag cannot be in the local class state
@@ -194,7 +193,6 @@ class ConsultationForm extends Component {
 										onBlur={() => setFieldTouched(consultFields.LAWYERS, true)}
 										value={values[consultFields.LAWYERS]}
 										defaultValue=""
-									// styles={customStyles} // styles on VisitorSelect
 									/>
 								</Col>
 								<Col xs={2} className="justify-content-left">
@@ -230,7 +228,6 @@ class ConsultationForm extends Component {
 										onBlur={() => setFieldTouched(consultFields.INQUIRERS, true)}
 										value={values[consultFields.INQUIRERS]}
 										defaultValue=""
-									// styles={customStyles} // styles on VisitorSelect
 									/>
 								</Col>
 								<Col xs={3} sm={4} md={3} className="justify-content-left">

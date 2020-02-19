@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Tag, Icon, List, Typography, Modal, Button } from 'antd';
 // components
 import EditableReferralsTable from './EditableReferralsTable';
-import InquirerDetails from '../InquirerDetails';
+import InquirerDetails from '../consultation/InquirerDetails';
 // data
-import * as consultFields from '../../data/consultionFields';
-import { getLawTypes } from '../../data/lawTypeData';
-import { filterEligibleConsultations } from '../../data/consultationData';
-import { formatName } from '../../data/peopleData';
+import * as consultFields from '../../../data/consultionFields';
+import { getLawTypes } from '../../../data/lawTypeData';
+import { filterEligibleConsultations } from '../../../data/consultationData';
+import { formatName } from '../../../data/peopleData';
 // utils
-import { objectIsEmpty, isoToStandardDate } from '../../utils';
+import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 
 const dispoShortNames = {
 	[consultFields.DISPOSITIONS_FEE_BASED]: "Fee-based",
@@ -298,7 +298,6 @@ const ReferralsTable = props => {
 						Close
 					</Button>,
 				]}>
-				<p>Some contents...</p>
 				<InquirerDetails
 					inquirers={inquirers}
 					lawyers={lawyers}

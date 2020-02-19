@@ -1,9 +1,9 @@
 import React from 'react';
 import { List, Typography, Tag } from 'antd';
 // data
-import * as consultFields from '../data/consultionFields';
-import { getPeopleByIds } from '../data/peopleData';
-import { getLawTypes } from '../data/lawTypeData';
+import * as consultFields from '../../../data/consultionFields';
+import { getPeopleByIds } from '../../../data/peopleData';
+import { getLawTypes } from '../../../data/lawTypeData';
 
 const ConsultationDetails = props => {
 	// props from InquirerDetails parent

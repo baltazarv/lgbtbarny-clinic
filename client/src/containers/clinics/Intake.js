@@ -11,12 +11,12 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
 // components
-import VisitorSelect from '../../../components/forms/fields/VisitorSelect';
-import VisitorAddForm from '../../../components/forms/VisitorAddForm';
+import VisitorSelect from '../../components/clinics/intake/VisitorSelect';
+import VisitorAddForm from '../../components/clinics/VisitorAddForm';
 // data
-import { formatName, getPeopleIntoSelectOptions } from '../../../data/peopleData';
-import { getRecordsFromSelection } from '../../../data/dataTransforms';
-import * as actions from '../../../store/actions/index';
+import { formatName, getPeopleIntoSelectOptions } from '../../data/peopleData';
+import { getRecordsFromSelection } from '../../data/dataTransforms';
+import * as actions from '../../store/actions/index';
 
 const Intake = props => {
 	const { clinicTitle } = props;

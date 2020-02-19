@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import ReactSelect from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
-import { reqAsterisk } from '../formElements';
+import { reqAsterisk } from '../../forms/formElements';
 import classNames from 'classnames';
 
 const VisitorSelect = ({

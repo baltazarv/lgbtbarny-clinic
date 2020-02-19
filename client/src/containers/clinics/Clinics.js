@@ -12,9 +12,9 @@ import { connect } from 'react-redux';
 // components
 import { Route, Switch, Link, withRouter, Redirect } from 'react-router-dom';
 import { Navbar, Nav, Container, Card, ButtonToolbar, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
-import Consultation from './forms/Consultation';
-import Intake from './forms/Intake';
-import Referrals from './forms/Referrals';
+import Consultation from './Consultation';
+import Intake from './Intake';
+import Referrals from './Referrals';
 // data
 import * as actions from '../../store/actions';
 // css & images

@@ -8,20 +8,20 @@ import React from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Form, Row, Col, Button, Card } from 'react-bootstrap';
-import Select from './fields/Select';
-import RadioButtonGroup from './fields/RadioButtonGroup'
-import CheckboxGroup from './fields/CheckboxGroup';
-import Checkbox from './fields/Checkbox';
-import RadioButton from './fields/RadioButton';
-import TextArea from './fields/TextArea';
-import InputField from './fields/InputField'
+import Select from '../forms/fields/Select';
+import RadioButtonGroup from '../forms/fields/RadioButtonGroup'
+import CheckboxGroup from '../forms/fields/CheckboxGroup';
+import Checkbox from '../forms/fields/Checkbox';
+import RadioButton from '../forms/fields/RadioButton';
+import TextArea from '../forms/fields/TextArea';
+import InputField from '../forms/fields/InputField'
 // data
 import * as peopleFields from '../../data/peopleFields';
 import { formatName } from '../../data/peopleData';
 import { getLawTypeOptions } from '../../data/lawTypeData';
 // styles
 import classNames from "classnames";
-import { reqAsterisk } from './formElements';
+import { reqAsterisk } from '../forms/formElements';
 
 const INITIAL_VALUES = {
 	[peopleFields.LAST_NAME]: '',

@@ -4,13 +4,13 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 // data
-import { formatName } from '../../data/peopleData';
-import * as peopleFields from '../../data/peopleFields';
-import { EMAIL_OPTIONS, mergeCustomAndDefaulText } from '../../emails/visitorPostConsultation';
+import { formatName } from '../../../data/peopleData';
+import * as peopleFields from '../../../data/peopleFields';
+import { EMAIL_OPTIONS, mergeCustomAndDefaulText } from '../../../emails/visitorPostConsultation';
 // styles
 import styles from './EditEmailModal.module.css';
 // utils
-import { objectIsEmpty } from '../../utils';
+import { objectIsEmpty } from '../../../utils';
 
 const EditEmailModal = ({
 	// modal props

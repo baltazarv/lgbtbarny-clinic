@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // components
-import ReferralsTable from '../../../components/clinics/ReferralsTable';
+import ReferralsTable from '../../components/clinics/referrals/ReferralsTable';
 // data
-import * as actions from '../../../store/actions';
+import * as actions from '../../store/actions';
 
 class Referrals extends Component {
 

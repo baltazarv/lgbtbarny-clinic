@@ -95,7 +95,7 @@ class EditableCell extends React.Component {
 	}
 }
 
-class EditableTable extends React.Component {
+class EditableReferralsTable extends React.Component {
 
 	render() {
 		// parent ReferralsTable props
@@ -150,4 +150,4 @@ class EditableTable extends React.Component {
 	}
 }
 
-export default EditableTable;
+export default EditableReferralsTable;

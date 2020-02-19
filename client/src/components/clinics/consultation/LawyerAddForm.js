@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { withFormik, Form as FormikForm } from 'formik';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import InputField from './fields/InputField';
-import * as peopleFields from '../../data/peopleFields';
-// import styles from './LawyerAddForm.module.css';
+import InputField from '../../forms/fields/InputField';
+import * as peopleFields from '../../../data/peopleFields';
 
 class LawyerAddForm extends Component {
 

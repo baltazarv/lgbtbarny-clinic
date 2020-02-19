@@ -4,18 +4,18 @@ import axios from 'axios';
 // components
 import { Row, Col } from 'react-bootstrap';
 import { Button } from 'antd';
-import ConsultationForm from '../../../components/forms/ConsultationForm';
-import EditEmailModal from '../../../components/modals/EditEmailModal';
-import TimerCounter from '../../../components/TimerCountdown/index';
+import ConsultationForm from '../../components/clinics/consultation/ConsultationForm';
+import EditEmailModal from '../../components/clinics/consultation/EditEmailModal';
+import TimerCounter from '../../components/TimerCountdown/index';
 // data
-import * as actions from '../../../store/actions/index';
-import * as consultFields from '../../../data/consultionFields';
-import * as peopleFields from '../../../data/peopleFields';
-import { getPeopleIntoSelectOptions } from '../../../data/peopleData';
-import { formatName } from '../../../data/peopleData';
+import * as actions from '../../store/actions/index';
+import * as consultFields from '../../data/consultionFields';
+import * as peopleFields from '../../data/peopleFields';
+import { getPeopleIntoSelectOptions } from '../../data/peopleData';
+import { formatName } from '../../data/peopleData';
 // import { getInquirerConsultations } from '../../../data/consultationData';
-import { EMAIL_OPTIONS, mergeCustomAndDefaultHtml } from '../../../emails/visitorPostConsultation';
-import { objectIsEmpty } from '../../../utils';
+import { EMAIL_OPTIONS, mergeCustomAndDefaultHtml } from '../../emails/visitorPostConsultation';
+import { objectIsEmpty } from '../../utils';
 // utils
 
 const TYPE_CLINIC = 'Clinic';
