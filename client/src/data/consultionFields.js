@@ -22,7 +22,7 @@ export const STATUS = 'Status';
 export const STATUS_ASSIGNED = 'Lawyer Assigned';
 export const STATUS_REFER = 'Referral Needed';
 export const STATUS_REFERRED = 'Referral Made';
-export const STATUS_IMPACT = 'Impact Litigation';
-// "Consulted-No Referral",
+export const STATUS_POSSIBLE_IMPACT = 'Possible Impact';
+export const STATUS_IMPACT_CONSIDERED = 'Impact Considered';
 
 export const EMAIL_TEXT_SENT = 'Custom Message Emailed';

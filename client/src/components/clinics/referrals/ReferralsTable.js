@@ -17,17 +17,20 @@ const dispoShortNames = {
 	[consultFields.DISPOSITIONS_COMPELLING]: "Highly Compelling",
 }
 
+// values to edit into
 const statuses = [
-	consultFields.STATUS_ASSIGNED,
+	// consultFields.STATUS_ASSIGNED,
 	consultFields.STATUS_REFER,
 	consultFields.STATUS_REFERRED,
-	// consultFields.STATUS_IMPACT,
+	consultFields.STATUS_POSSIBLE_IMPACT,
+	consultFields.STATUS_IMPACT_CONSIDERED,
 ];
 
 const statusFilters = [
 	{ text: consultFields.STATUS_REFER, value: consultFields.STATUS_REFER },
-	{ text: consultFields.STATUS_IMPACT, value: consultFields.STATUS_IMPACT },
 	{ text: consultFields.STATUS_REFERRED, value: consultFields.STATUS_REFERRED },
+	{ text: consultFields.STATUS_POSSIBLE_IMPACT, value: consultFields.STATUS_POSSIBLE_IMPACT },
+	{ text: consultFields.STATUS_IMPACT_CONSIDERED, value: consultFields.STATUS_IMPACT_CONSIDERED },
 ];
 
 const getVisitorNames = (ids, inquirers) => {
@@ -64,7 +67,7 @@ const fillInEmptyStatuses = object => {
 	}
 	// compelling => high impact
 	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING])) {
-		return consultFields.STATUS_IMPACT;
+		return consultFields.STATUS_POSSIBLE_IMPACT;
 	}
 	return object[consultFields.STATUS];
 }
@@ -147,7 +150,7 @@ const ReferralsTable = props => {
 			editable: true,
 			// filters
 			filters: statusFilters,
-			defaultFilteredValue: [consultFields.STATUS_REFER, consultFields.STATUS_IMPACT],
+			defaultFilteredValue: [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT],
 			onFilter: (value, record) => {
 				// dispoIsRef: disposition either fee based or pro-bono
 				const dispoIsRef = record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED]) || record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]);
@@ -156,7 +159,7 @@ const ReferralsTable = props => {
 				if (!record[consultFields.STATUS] && value === consultFields.STATUS_REFER && dispoIsRef) {
 					// status is blank, 'Referral Needed' selected, & dispoIsRef
 					return true;
-				} else if (!record[consultFields.STATUS] && value === consultFields.STATUS_IMPACT && dispoIsCompelling) {
+				} else if (!record[consultFields.STATUS] && value === consultFields.STATUS_POSSIBLE_IMPACT && dispoIsCompelling) {
 					// status is blank, 'Impact Litigation' selected, & dispoIsCompelling
 					return true;
 				} else {
@@ -239,10 +242,6 @@ const ReferralsTable = props => {
 				value: record[consultFields.LAWYERS],
 			},
 			{
-				title: "Type(s) of Law",
-				value: record[consultFields.LAW_TYPES],
-			},
-			{
 				title: "Consultation Notes",
 				value: record[consultFields.SITUATION] ? record[consultFields.SITUATION] : "No notes taken."
 			},
@@ -251,9 +250,13 @@ const ReferralsTable = props => {
 		// if disp compelling, no ref summary
 		if (!record[consultFields.DISPOSITIONS].every(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING])) {
 			expandListData.push({
+				title: "Type(s) of Law",
+				value: record[consultFields.LAW_TYPES],
+			});
+			expandListData.push({
 				title: [consultFields.REF_SUMMARY],
 				value: record[consultFields.REF_SUMMARY] ? record[consultFields.REF_SUMMARY] : "No summary for referral entered."
-			})
+			});
 		}
 
 		return (
