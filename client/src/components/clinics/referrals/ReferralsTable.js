@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tag, Icon, List, Typography, Modal, Button } from 'antd';
 // components
 import EditableReferralsTable from './EditableReferralsTable';
-import InquirerDetails from '../consultation/InquirerDetails';
+import InquirerDetails from './InquirerDetails';
 // data
 import * as consultFields from '../../../data/consultionFields';
 import { getLawTypes } from '../../../data/lawTypeData';
@@ -75,6 +75,7 @@ const ReferralsTable = props => {
 	const [dataSource, setDataSource] = useState([]);
 	const [visitorModalShown, setVisitorModalShown] = useState(false);
 	const [inquirersSelected, setInquirersSelected] = useState({});
+	const [visitorModalTitle, setVisitorModalTitle] = useState('');
 
 	// props from parent Referrals
 	const {
@@ -277,6 +278,7 @@ const ReferralsTable = props => {
 	const showVisitorModal = row => {
 		const firstInquirerId = consultations[row.key][consultFields.INQUIRERS][0];
 		const inquirerFields = inquirers[firstInquirerId];
+		setVisitorModalTitle(formatName(inquirerFields))
 		setInquirersSelected({ [firstInquirerId]: inquirerFields });
 		setVisitorModalShown(true);
 	}
@@ -289,7 +291,7 @@ const ReferralsTable = props => {
 	return (
 		<>
 			<Modal
-				title="Basic Modal"
+				title={visitorModalTitle}
 				visible={visitorModalShown}
 				onOk={hideVisitorModal}
 				onCancel={hideVisitorModal}

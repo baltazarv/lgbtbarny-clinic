@@ -1,9 +1,10 @@
+// referrals inquirer's list
 import React, { useState } from 'react';
 import { List, Typography, Button, Modal, Tooltip } from 'antd';
-import ConsultationDetails from './ConsultationDetails';
+import ConsultationDetails from '../consultation/ConsultationDetails';
 // data
 import * as peopleFields from '../../../data/peopleFields';
-import { formatName, getPeopleByIds } from '../../../data/peopleData';
+import { getPeopleByIds } from '../../../data/peopleData';
 import * as consultFields from '../../../data/consultionFields';
 import { getLawTypes } from '../../../data/lawTypeData';
 // utils
@@ -52,42 +53,56 @@ const InquirerDetails = ({
 	}
 
 	const renderListItemForVisitor = (id, fields) => {
-		let dataSource = [
-			{
-				title: peopleFields.GENDER,
-				value: fields[peopleFields.GENDER],
-			},
-			{
-				title: "Type(s) of Law",
+
+		let dataSource = [];
+
+		if (fields[peopleFields.OTHER_NAMES]) {
+			dataSource.push({
+				title: "Preferred Name",
+				value: fields[peopleFields.OTHER_NAMES],
+			});
+		}
+
+		// { title: peopleFields.GENDER, value: fields[peopleFields.GENDER] },
+
+		if (fields[peopleFields.LAW_TYPES]) {
+			dataSource.push({
+				title: "Law Type(s) – determined at intake",
 				value: getLawTypes(fields[peopleFields.LAW_TYPES], lawTypes),
-			},
-			{
-				title: peopleFields.INCOME,
-				value: fields[peopleFields.INCOME],
-			},
-			{
-				title: 'Optional/additional Notes',
-				value: fields[peopleFields.INTAKE_NOTES] ? fields[peopleFields.INTAKE_NOTES] : 'NONE',
-			},
-			{
-				title: peopleFields.ADDRESS,
-				value: fields[peopleFields.ADDRESS] ? fields[peopleFields.ADDRESS] : 'No address provided.',
-			},
-			{
-				title: peopleFields.EMAIL,
-				value: fields[peopleFields.EMAIL] ? fields[peopleFields.EMAIL] : 'No email provided.',
-			},
-			{
-				title: 'Previous Consultations',
-				key: peopleFields.CONSULTATIONS,
-				value: fields[peopleFields.CONSULTATIONS],
-			},
-		];
+			});
+		}
+
+		// { title: peopleFields.INCOME, value: fields[peopleFields.INCOME], },
+
+		dataSource.push({
+			title: 'Intake Notes',
+			value: fields[peopleFields.INTAKE_NOTES] ? fields[peopleFields.INTAKE_NOTES] : 'NONE',
+		});
+
+		// { title: peopleFields.ADDRESS, value: fields[peopleFields.ADDRESS] ? fields[peopleFields.ADDRESS] : 'No address provided.' },
+
+		dataSource.push({
+			title: peopleFields.PHONE,
+			value: fields[peopleFields.PHONE] ? fields[peopleFields.PHONE] : 'No phone number provided.',
+		});
+
+
+		dataSource.push({
+			title: peopleFields.EMAIL,
+			value: fields[peopleFields.EMAIL] ? fields[peopleFields.EMAIL] : 'No email provided.',
+		});
+
+		dataSource.push({
+			title: 'Consultations',
+			key: peopleFields.CONSULTATIONS,
+			value: fields[peopleFields.CONSULTATIONS],
+		});
+
 		return <div className="mb-3" key={id}>
 			<List
 				bordered
 				itemLayout="horizontal"
-				header={<strong>{formatName(fields)}</strong>}
+				// header={<strong>{formatName(fields)}</strong>}
 				dataSource={dataSource}
 				size="small"
 				renderItem={item => {
