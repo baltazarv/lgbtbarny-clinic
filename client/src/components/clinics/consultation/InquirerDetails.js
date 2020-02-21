@@ -5,6 +5,7 @@ import ConsultationDetails from './ConsultationDetails';
 import * as peopleFields from '../../../data/peopleFields';
 import { formatName, getPeopleByIds } from '../../../data/peopleData';
 import * as consultFields from '../../../data/consultionFields';
+import { getDispoTags } from '../../../data/consultationData';
 import { getLawTypes } from '../../../data/lawTypeData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../../utils';
@@ -38,7 +39,7 @@ const InquirerDetails = ({
 	const getConsultationListLink = consultation => {
 		if (consultation) {
 			const renderLawyers = consultation[consultFields.LAWYERS] ? ' with ' + getPeopleByIds(consultation[consultFields.LAWYERS], lawyers) : ' (Lawyer not specified.)';
-			return <span>Consultation on {isoToStandardDate(consultation[consultFields.CREATED_ON])} {renderLawyers}</span>
+			return <span>Met on {isoToStandardDate(consultation[consultFields.CREATED_ON])} {renderLawyers} – {getDispoTags(consultation[consultFields.DISPOSITIONS], true)}</span>
 		}
 		return null;
 	}
@@ -108,7 +109,7 @@ const InquirerDetails = ({
 									</List.Item>
 								)
 							});
-							content = <ul>{listItems}</ul>;
+							content = <ul className="pl-0">{listItems}</ul>;
 						} else {
 							content = 'No previous consultations.';
 						}
@@ -116,7 +117,7 @@ const InquirerDetails = ({
 
 					return (
 						<>
-							<List.Item key={id}>
+							<List.Item key={id} style={{paddingLeft: 0}}>
 								<Typography.Text code>{item.title}</Typography.Text> {content}
 							</List.Item>
 						</>

@@ -315,6 +315,12 @@ class ConsultationForm extends Component {
 							id={consultFields.DISPOSITIONS_COMPELLING}
 							label={consultFields.DISPOSITIONS_COMPELLING}
 						/>
+						<Field
+							component={RadioButton}
+							name={consultFields.DISPOSITIONS}
+							id={consultFields.DISPOSITIONS_IMMIGRATION}
+							label={consultFields.DISPOSITIONS_IMMIGRATION}
+						/>
 					</RadioButtonGroup>
 
 					<Collapse in={isReferralDispositionChecked}>

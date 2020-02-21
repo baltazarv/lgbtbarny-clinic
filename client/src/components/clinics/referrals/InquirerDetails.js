@@ -6,6 +6,7 @@ import ConsultationDetails from '../consultation/ConsultationDetails';
 import * as peopleFields from '../../../data/peopleFields';
 import { getPeopleByIds } from '../../../data/peopleData';
 import * as consultFields from '../../../data/consultionFields';
+import { getDispoTags } from '../../../data/consultationData';
 import { getLawTypes } from '../../../data/lawTypeData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../../utils';
@@ -39,7 +40,7 @@ const InquirerDetails = ({
 	const getConsultationListLink = consultation => {
 		if (consultation) {
 			const renderLawyers = consultation[consultFields.LAWYERS] ? ' with ' + getPeopleByIds(consultation[consultFields.LAWYERS], lawyers) : ' (Lawyer not specified.)';
-			return <span>Consultation on {isoToStandardDate(consultation[consultFields.CREATED_ON])} {renderLawyers}</span>
+			return <span>Met on {isoToStandardDate(consultation[consultFields.CREATED_ON])} {renderLawyers} – {getDispoTags(consultation[consultFields.DISPOSITIONS], true)}</span>
 		}
 		return null;
 	}

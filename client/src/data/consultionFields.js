@@ -13,6 +13,7 @@ export const DISPOSITIONS_NO_FURTHER = 'No further action required or available.
 export const DISPOSITIONS_FEE_BASED = 'Fee-based - Lawyer Referral Network (LRN) - limited availability';
 export const DISPOSITIONS_PRO_BONO = 'Pro Bono Panel (PBP) - VERY limited availability!';
 export const DISPOSITIONS_COMPELLING = 'Highly compelling/impact litigation';
+export const DISPOSITIONS_IMMIGRATION = 'Immigration advisory panel';
 
 export const LAW_TYPES = 'Type Of Law'; // array
 export const REF_SUMMARY = 'Referral Summary';

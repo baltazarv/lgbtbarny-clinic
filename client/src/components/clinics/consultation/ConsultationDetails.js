@@ -1,7 +1,8 @@
 import React from 'react';
-import { List, Typography, Tag } from 'antd';
+import { List, Typography } from 'antd';
 // data
 import * as consultFields from '../../../data/consultionFields';
+import { getDispoTags } from '../../../data/consultationData';
 import { getPeopleByIds } from '../../../data/peopleData';
 import { getLawTypes } from '../../../data/lawTypeData';
 
@@ -75,20 +76,6 @@ const ConsultationDetails = props => {
 		})
 	}
 
-	const renderDispoTags = values => {
-		return values.map((value, index) => {
-			let color = '#8c8c8c';
-			if (value === consultFields.DISPOSITIONS_FEE_BASED) color = 'cyan';
-			if (value === consultFields.DISPOSITIONS_PRO_BONO) color = 'blue';
-			if (value === consultFields.DISPOSITIONS_COMPELLING) color = 'magenta';
-			return <li key={index}>
-				<Tag color={color} key={index}>
-					{value}
-				</Tag>
-			</li>;
-		});
-	}
-
 	return (
 		<>
 			<List
@@ -104,7 +91,7 @@ const ConsultationDetails = props => {
 									listStyleType: 'none',
 									paddingInlineStart: 'unset'
 								}}>
-									{renderDispoTags(item.value)}
+									{getDispoTags(item.value)}
 								</ul>
 							</List.Item>
 						)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Icon, List, Typography, Modal, Button } from 'antd';
+import { Icon, List, Typography, Modal, Button } from 'antd';
 // components
 import EditableReferralsTable from './EditableReferralsTable';
 import InquirerDetails from './InquirerDetails';
@@ -8,18 +8,12 @@ import * as consultFields from '../../../data/consultionFields';
 import { getLawTypes } from '../../../data/lawTypeData';
 import { filterEligibleConsultations } from '../../../data/consultationData';
 import { formatName } from '../../../data/peopleData';
+import { dispoShortNames, getDispoShortNames, getDispoTagsFromShortNames, getStatusForEmptyShortName } from '../../../data/consultationData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 
-const dispoShortNames = {
-	[consultFields.DISPOSITIONS_FEE_BASED]: "Fee-based",
-	[consultFields.DISPOSITIONS_PRO_BONO]: "Pro Bono",
-	[consultFields.DISPOSITIONS_COMPELLING]: "Highly Compelling",
-}
-
 // values to edit into
 const statuses = [
-	// consultFields.STATUS_ASSIGNED,
 	consultFields.STATUS_REFER,
 	consultFields.STATUS_REFERRED,
 	consultFields.STATUS_POSSIBLE_IMPACT,
@@ -51,25 +45,6 @@ const getLawyerNames = (ids, lawyers) => {
 	} else {
 		return 'Lawyers not specified.';
 	}
-}
-
-const getDispoShortNames = dispos => {
-	if (dispos && dispos.length > 0) return dispos.map(dispo => dispoShortNames[dispo]);
-	return [];
-}
-
-const fillInEmptyStatuses = object => {
-	const statusField = object[consultFields.STATUS];
-	const dispoField = dispoShortNames[object[consultFields.DISPOSITIONS]];
-	// fee-base or pro-bono => reference needed
-	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED] || dispoField === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO])) {
-		return consultFields.STATUS_REFER;
-	}
-	// compelling => high impact
-	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING])) {
-		return consultFields.STATUS_POSSIBLE_IMPACT;
-	}
-	return object[consultFields.STATUS];
 }
 
 const ReferralsTable = props => {
@@ -122,21 +97,7 @@ const ReferralsTable = props => {
 			title: 'Dispositions(s)',
 			dataIndex: [consultFields.DISPOSITIONS],
 			key: 'dispos',
-			render: dispos => (
-				<span>
-					{dispos.map((dispo, index) => {
-						let color = '#8c8c8c';
-						if (dispo === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED]) color = 'cyan';
-						if (dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]) color = 'blue';
-						if (dispo === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING]) color = 'magenta';
-						return (
-							<Tag color={color} key={index}>
-								{dispo}
-							</Tag>
-						);
-					})}
-				</span>
-			),
+			render: dispos => getDispoTagsFromShortNames(dispos),
 			// doesn't work!?
 			// sorter: (a, b) => {
 			// 	return a[consultFields.DISPOSITIONS][0] - b[consultFields.DISPOSITIONS][0];
@@ -187,13 +148,10 @@ const ReferralsTable = props => {
 				let fields = eligible[key];
 				const object = {
 					key,
-					// convert from iso to other date format
 					[consultFields.CREATED_ON]: isoToStandardDate(fields[consultFields.CREATED_ON]),
-					// get visitors' full names
 					[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
-					// convert to short name
 					[consultFields.DISPOSITIONS]: getDispoShortNames(fields[consultFields.DISPOSITIONS]),
-					[consultFields.STATUS]: fillInEmptyStatuses(fields),
+					[consultFields.STATUS]: getStatusForEmptyShortName(fields),
 					[consultFields.LAWYERS]: getLawyerNames(fields[consultFields.LAWYERS], lawyers),
 					[consultFields.LAW_TYPES]: getLawTypes(fields[consultFields.LAW_TYPES], lawTypes),
 					[consultFields.SITUATION]: fields[consultFields.SITUATION],
