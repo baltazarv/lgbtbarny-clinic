@@ -9,11 +9,19 @@ const DISPO_PRO_BONO_COLOR = 'blue';
 const DISPO_COMPELLING_COLOR = 'magenta';
 const DISPO_IMMIGRATION_COLOR = 'volcano';
 
+// export const statuses = [
+// 	consultFields.STATUS_REFER,
+// 	consultFields.STATUS_REFERRED,
+// 	consultFields.STATUS_POSSIBLE_IMPACT,
+// 	consultFields.STATUS_IMPACT_CONSIDERED,
+// ];
+
 export const statuses = [
-	consultFields.STATUS_REFER,
-	consultFields.STATUS_REFERRED,
-	consultFields.STATUS_POSSIBLE_IMPACT,
-	consultFields.STATUS_IMPACT_CONSIDERED,
+	{ group: 'Referrals', value: consultFields.STATUS_REFER },
+	{ group: 'Referrals', value: consultFields.STATUS_REFERRED },
+	{ group: 'Referrals', value: consultFields.STATUS_REFERRAL_PICKED_UP },
+	{ group: 'Impact', value: consultFields.STATUS_POSSIBLE_IMPACT },
+	{ group: 'Impact', value: consultFields.STATUS_IMPACT_CONSIDERED },
 ];
 
 // given consultations as an object, return object with only referral-eligible consultations
@@ -44,7 +52,7 @@ export const filterEligibleConsultations = consultations => {
 export const dispoShortNames = {
 	[consultFields.DISPOSITIONS_FEE_BASED]: "Fee-based",
 	[consultFields.DISPOSITIONS_PRO_BONO]: "Pro bono",
-	[consultFields.DISPOSITIONS_COMPELLING]: "Highly compelling",
+	[consultFields.DISPOSITIONS_COMPELLING]: "Impact",
 	[consultFields.DISPOSITIONS_IMMIGRATION]: "Immigration",
 	[consultFields.DISPOSITIONS_NO_FURTHER]: "Info given",
 }

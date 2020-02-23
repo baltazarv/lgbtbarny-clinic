@@ -8,5 +8,5 @@ export const objectIsEmpty = (obj) => {
 
 export const isoToStandardDate = isoDate => {
 	let date = new Date(isoDate);
-	return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+	return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear().toString().substr(-2);
 }
