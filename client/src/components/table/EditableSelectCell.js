@@ -1,15 +1,9 @@
 import React from 'react';
-import { Table, Form, Select } from 'antd';
+import { Form, Select } from 'antd';
+import { EditableContext } from './EditableTable'
 
 const { Option } = Select;
 
-const EditableContext = React.createContext();
-
-const EditableRow = ({ form, index, ...props }) => (
-	<EditableContext.Provider value={form}>
-		<tr {...props} />
-	</EditableContext.Provider>
-);
 
 const getOptions = arr => {
 	return arr.map(item => {
@@ -17,9 +11,7 @@ const getOptions = arr => {
 	})
 }
 
-const EditableFormRow = Form.create()(EditableRow);
-
-class EditableCell extends React.Component {
+class EditableSelectCell extends React.Component {
 	state = {
 		editing: false,
 	};
@@ -46,7 +38,7 @@ class EditableCell extends React.Component {
 
 	renderCell = form => {
 		this.form = form;
-		const { children, dataIndex, record, statuses } = this.props;
+		const { children, dataIndex, record, options } = this.props;
 		const { editing } = this.state;
 		return editing ? (
 			<Form.Item style={{ margin: 0 }}>
@@ -58,7 +50,7 @@ class EditableCell extends React.Component {
 					onPressEnter={this.save}
 					onSelect={this.save}
 				>
-					{getOptions(statuses)}
+					{getOptions(options)}
 				</Select>)}
 			</Form.Item>
 		) : (
@@ -95,59 +87,4 @@ class EditableCell extends React.Component {
 	}
 }
 
-class EditableReferralsTable extends React.Component {
-
-	render() {
-		// parent ReferralsTable props
-		const {
-			columns,
-			dataSource,
-			handleSave,
-			loading,
-			onChange,
-			statuses,
-			expandedRowRender,
-		} = this.props;
-
-		const components = {
-			body: {
-				row: EditableFormRow,
-				cell: EditableCell,
-			},
-		};
-		const _columns = columns.map(col => {
-			if (!col.editable) {
-				return col;
-			}
-			return {
-				...col,
-				onCell: record => ({
-					record,
-					editable: col.editable,
-					dataIndex: col.dataIndex,
-					title: col.title,
-					handleSave,
-					statuses: statuses,
-				}),
-			};
-		});
-		return (
-			<div>
-				<Table
-					components={components}
-					rowClassName={() => 'editable-row'}
-					loading={loading}
-					dataSource={dataSource}
-					columns={_columns}
-					statuses={statuses}
-					pagination={false}
-					size="small"
-					onChange={onChange}
-					expandedRowRender={expandedRowRender}
-				/>
-			</div>
-		);
-	}
-}
-
-export default EditableReferralsTable;
+export default EditableSelectCell;

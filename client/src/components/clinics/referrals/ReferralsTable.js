@@ -1,24 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Icon, List, Typography, Modal, Button } from 'antd';
+import { Icon, Modal, Button } from 'antd';
 // components
-import EditableReferralsTable from './EditableReferralsTable';
+import EditableTable from '../../table/EditableTable';
 import InquirerDetails from './InquirerDetails';
+import ConsultExpandList from '../ConsultExpandList';
 // data
 import * as consultFields from '../../../data/consultionFields';
+import { statuses, dispoShortNames, getDispoShortNames, getDispoTagsFromShortNames, getStatusForEmptyShortName, filterEligibleConsultations } from '../../../data/consultationData';
+import { formatName, getLawyerNames } from '../../../data/peopleData';
 import { getLawTypes } from '../../../data/lawTypeData';
-import { filterEligibleConsultations } from '../../../data/consultationData';
-import { formatName } from '../../../data/peopleData';
-import { dispoShortNames, getDispoShortNames, getDispoTagsFromShortNames, getStatusForEmptyShortName } from '../../../data/consultationData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../../utils';
-
-// values to edit into
-const statuses = [
-	consultFields.STATUS_REFER,
-	consultFields.STATUS_REFERRED,
-	consultFields.STATUS_POSSIBLE_IMPACT,
-	consultFields.STATUS_IMPACT_CONSIDERED,
-];
 
 const statusFilters = [
 	{ text: consultFields.STATUS_REFER, value: consultFields.STATUS_REFER },
@@ -34,16 +26,6 @@ const getVisitorNames = (ids, inquirers) => {
 		});
 	} else {
 		return [];
-	}
-}
-
-const getLawyerNames = (ids, lawyers) => {
-	if (ids && ids.length > 0) {
-		return ids.map(id => {
-			return formatName(lawyers[id]);
-		}).join(', ');
-	} else {
-		return 'Lawyers not specified.';
 	}
 }
 
@@ -193,49 +175,6 @@ const ReferralsTable = props => {
 		updateConsultation(updateObject);
 	}
 
-	const referralsExpandList = (record, index, indent, expanded) => {
-		const expandListData = [
-			{
-				title: "Lawyer(s) Consulted",
-				value: record[consultFields.LAWYERS],
-			},
-			{
-				title: "Consultation Notes",
-				value: record[consultFields.SITUATION] ? record[consultFields.SITUATION] : "No notes taken."
-			},
-		];
-
-		// if disp compelling, no ref summary
-		if (!record[consultFields.DISPOSITIONS].every(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING])) {
-			expandListData.push({
-				title: "Type(s) of Law",
-				value: record[consultFields.LAW_TYPES],
-			});
-			expandListData.push({
-				title: [consultFields.REF_SUMMARY],
-				value: record[consultFields.REF_SUMMARY] ? record[consultFields.REF_SUMMARY] : "No summary for referral entered."
-			});
-		}
-
-		return (
-			<>
-				<List
-					bordered
-					itemLayout="horizontal"
-					dataSource={expandListData}
-					size="small"
-					renderItem={item => {
-						return (
-							<List.Item>
-								<Typography.Text code>{item.title}</Typography.Text> {item.value}
-							</List.Item>
-						)
-					}}
-				/>
-			</>
-		)
-	}
-
 	const showVisitorModal = row => {
 		const firstInquirerId = consultations[row.key][consultFields.INQUIRERS][0];
 		const inquirerFields = inquirers[firstInquirerId];
@@ -270,14 +209,14 @@ const ReferralsTable = props => {
 				/>
 			</Modal>
 
-			<EditableReferralsTable
+			<EditableTable
 				loading={isLoading}
 				dataSource={dataSource}
 				columns={columns}
-				statuses={statuses} // edit field pulldown menu items
+				options={statuses} // edit field pulldown menu items
 				onChange={handleTableChange}
 				handleSave={updateDispoStatus}
-				expandedRowRender={referralsExpandList}
+				expandedRowRender={ConsultExpandList}
 			/>
 		</>
 	)

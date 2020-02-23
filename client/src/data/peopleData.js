@@ -58,3 +58,13 @@ export const getPeopleOptions = people => {
 		return options;
 	}
 }
+
+export const getLawyerNames = (ids, lawyers) => {
+	if (ids && ids.length > 0) {
+		return ids.map(id => {
+			return formatName(lawyers[id]);
+		}).join(', ');
+	} else {
+		return 'Lawyers not specified.';
+	}
+}

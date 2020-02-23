@@ -108,9 +108,7 @@ class Clinics extends Component {
 			/*** Intake **/
 
 			intakeRoute = <Route path="/intake" render={() => <Intake
-				lawTypes={this.props.lawTypes} // for <VisitorAddForm />
 				clinicTitle={clinicTitle}
-				inquirers={this.props.inquirers}
 			/>} />
 		}
 
@@ -151,7 +149,7 @@ class Clinics extends Component {
 					</Navbar.Collapse>
 				</Navbar>
 				<Container>
-					<Card className={styles.cardContainer}>
+					<Card className={styles.cardContainer} style={{border: 0}}>
 						{/* Card.Header with top border */}
 						<ButtonToolbar className={styles.clinicToolbar}>
 							<ToggleButtonGroup type="radio" name="options" defaultValue="tuesday" onChange={this.onClinicToggle}>

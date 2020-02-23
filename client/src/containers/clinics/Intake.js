@@ -13,6 +13,7 @@ import { Form, Row, Col, Card } from 'react-bootstrap';
 // components
 import VisitorSelect from '../../components/clinics/intake/VisitorSelect';
 import VisitorAddForm from '../../components/clinics/VisitorAddForm';
+import PreviousConsultations from '../../components/clinics/intake/PreviousConsultations';
 // data
 import { formatName, getPeopleIntoSelectOptions } from '../../data/peopleData';
 import { getRecordsFromSelection } from '../../data/dataTransforms';
@@ -69,7 +70,7 @@ const Intake = props => {
 	const repeatVisitorSelect = () => {
 		return (
 			<div className="mb-3">
-				<Card className={cardStyle}>
+				<Card>
 					<Card.Body>
 						<VisitorSelect
 							name="visitor"
@@ -94,16 +95,6 @@ const Intake = props => {
 				<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">The record for <span className="font-weight-bold">{formatName(visitor)}</span> was&nbsp;updated!</Col>
 			</Row>
 		)
-	}
-
-	// styles
-
-	// TO-DO: add to global style sheet
-	const cardStyle = {
-		backgroundClip: "border-box",
-		border: "1px solid rgba(0, 0, 0, 0.125)",
-		borderRadius: "0.25rem",
-		// marginBottom: "1rem", // not working
 	}
 
 	return (
@@ -151,13 +142,27 @@ const Intake = props => {
 			{/* repeat visitor selected for editing */}
 			{isRepeat && repeatVisitorSelected &&
 				(
-					<VisitorAddForm
-						// start with given select obj, return array with full airtable record
-						repeatVisitor={getRecordsFromSelection(repeatVisitorSelected, props.inquirers)[0]}
-						lawTypes={props.lawTypes}
-						submitForm={submitUpdateInquirer}
-						serverResponse={serverResponse}
-					/>
+					<>
+						<div className="mb-3">
+							<div className="form-label">Previous Consultations</div>
+							<p className="mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p>
+							<PreviousConsultations
+								visitorSelected={repeatVisitorSelected}
+								inquirers={props.inquirersObject}
+								consultations={props.consultations}
+								updateConsultation={props.updateConsultation}
+								lawyers={props.lawyersObject}
+								lawTypes={props.lawTypesObject}
+							/>
+						</div>
+						<VisitorAddForm
+							// start with given select obj, return array with full airtable record
+							repeatVisitor={getRecordsFromSelection(repeatVisitorSelected, props.inquirers)[0]}
+							lawTypes={props.lawTypes}
+							submitForm={submitUpdateInquirer}
+							serverResponse={serverResponse}
+						/>
+					</>
 				)
 			}
 
@@ -169,11 +174,22 @@ const Intake = props => {
 	);
 };
 
+const mapStateToProps = state => {
+	return {
+		inquirers: state.people.inquirers,
+		consultations: state.consultations.consultations,
+		inquirersObject: state.people.inquirersObject,
+		lawyersObject: state.people.lawyersObject,
+		lawTypes: state.lawTypes.lawTypes, // for <VisitorAddForm />
+		lawTypesObject: state.lawTypes.lawTypesObject,
+	}
+}
 const mapDispatchToProps = dispatch => {
 	return {
 		// call from parent Clinics?
 		createInquirer: inq => dispatch(actions.createInquirer(inq)),
-		updateInquirer: inqValues => dispatch(actions.updateInquirer(inqValues))
+		updateInquirer: inqValues => dispatch(actions.updateInquirer(inqValues)),
+		updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
 	}
 }
-export default connect(null, mapDispatchToProps)(Intake);
+export default connect(mapStateToProps, mapDispatchToProps)(Intake);

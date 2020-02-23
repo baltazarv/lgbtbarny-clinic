@@ -117,13 +117,6 @@ const VisitorAddForm = props => {
 		lawTypes,
 	} = props;
 
-	// add to global style sheet
-	const cardStyle = {
-		backgroundClip: "border-box",
-		border: "1px solid rgba(0, 0, 0, 0.125)",
-		borderRadius: "0.25rem",
-	}
-
 	const termsAcceptClasses = {
 		label: classNames({
 			'font-weight-bold': !errors[peopleFields.TERMS] || !touched[peopleFields.TERMS],
@@ -174,7 +167,7 @@ const VisitorAddForm = props => {
 				</button> */}
 	</>
 
-	return <Card style={cardStyle}>
+	return <Card>
 		<Card.Body>
 			<FormikForm onSubmit={handleSubmit}>
 				<Row>
@@ -227,7 +220,7 @@ const VisitorAddForm = props => {
 						display: "inline",
 					}}
 				/>
-				<Card style={cardStyle} className="mb-3">
+				<Card className="mb-3">
 					<Card.Body style={{backgroundColor: '#39c1fa1a'}}>
 						<Select
 							name={peopleFields.LAW_TYPES}
@@ -243,7 +236,7 @@ const VisitorAddForm = props => {
 						/>
 					</Card.Body>
 				</Card>
-				<Card style={cardStyle} className="mb-3">
+				<Card className="mb-3">
 					<Card.Body className="pb-0">
 						<Card.Title className="small text-muted">
 							{reqAsterisk} If no email is provided, a phone number is necessary.

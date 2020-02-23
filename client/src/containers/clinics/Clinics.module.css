@@ -2,7 +2,7 @@
 	max-width: 640px;
 	-webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
 	box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
-	border: 0;
+	border: 0; /* .card class overrides this */
 	margin: 75px auto 0 auto;
 }
 
