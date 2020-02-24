@@ -128,7 +128,7 @@ class Clinics extends Component {
 
 		return (
 			<div style={this.state.bgImageStyle}>
-				<Navbar bg="primary" variant="dark" className={styles.navBar}>
+				<Navbar collapseOnSelect expand="sm" bg="primary" variant="dark" className={styles.navBar}>
 					<Navbar.Brand href="/">
 						<img
 							alt="LGBT Bar NY"
@@ -138,7 +138,8 @@ class Clinics extends Component {
 							className="d-inline-block align-top"
 						/>&nbsp;&nbsp;&nbsp;{clinicTitle}
 					</Navbar.Brand>
-					<Navbar.Collapse className="justify-content-end">
+					<Navbar.Toggle aria-controls="clinic-navbar-nav" />
+					<Navbar.Collapse id="clinic-navbar-nav" className="justify-content-end">
 						<Nav
 							activeKey={this.props.location.pathname}
 						>
