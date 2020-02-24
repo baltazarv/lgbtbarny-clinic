@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { List, Typography, Button, Modal, Tooltip } from 'antd';
-import ConsultationDetails from './ConsultationDetails';
+import PrevConsultDetails from './PrevConsultDetails';
 // data
 import * as peopleFields from '../../../data/peopleFields';
 import { formatName, getPeopleByIds } from '../../../data/peopleData';
 import * as consultFields from '../../../data/consultionFields';
-import { getDispoTags } from '../../../data/consultationData';
+import { getDispoTags, getStatusForEmptyShortName } from '../../../data/consultationData';
 import { getLawTypes } from '../../../data/lawTypeData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../../utils';
@@ -38,8 +38,8 @@ const InquirerDetails = ({
 
 	const getConsultationListLink = consultation => {
 		if (consultation) {
-			const renderLawyers = consultation[consultFields.LAWYERS] ? ' with ' + getPeopleByIds(consultation[consultFields.LAWYERS], lawyers) : ' (Lawyer not specified.)';
-			return <span>Met on {isoToStandardDate(consultation[consultFields.CREATED_ON])} {renderLawyers} – {getDispoTags(consultation[consultFields.DISPOSITIONS], true)}</span>
+			// const renderLawyers = consultation[consultFields.LAWYERS] ? ' with ' + getPeopleByIds(consultation[consultFields.LAWYERS], lawyers) : ' (Lawyer not specified.)';
+			return <span>{isoToStandardDate(consultation[consultFields.CREATED_ON])} – {getDispoTags(consultation[consultFields.DISPOSITIONS], true)} – {getStatusForEmptyShortName(consultation)}</span>
 		}
 		return null;
 	}
@@ -151,7 +151,7 @@ const InquirerDetails = ({
 						</Button>,
 					]}
 				>
-					<ConsultationDetails
+					<PrevConsultDetails
 						consultSelected={consultSelected}
 						lawyers={lawyers}
 						lawTypes={lawTypes}

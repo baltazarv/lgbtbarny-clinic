@@ -13,12 +13,12 @@ const { Option, OptGroup } = Select;
 const getOptions = arr => {
 	const groupsObject = arr.reduce((acc, cur) => {
 		if (!acc[cur.group]) acc[cur.group] = [];
-		acc[cur.group].push(<Option value={cur.value} key={cur.value}>{cur.value}</Option>);
+		acc[cur.group].push(<Option value={cur.value} key={cur.value}>{cur.text}</Option>);
 		return acc;
 	}, {});
 	let _options = [];
 	for (var key in groupsObject) {
-		_options.push(<OptGroup label={key}>{groupsObject[key].map(option => option)}</OptGroup>)
+		_options.push(<OptGroup label={key} key={key}>{groupsObject[key].map(option => option)}</OptGroup>)
 	}
 	return _options;
 }

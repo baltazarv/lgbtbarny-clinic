@@ -23,8 +23,9 @@ export const STATUS = 'Status';
 export const STATUS_ASSIGNED = 'Lawyer Assigned';
 export const STATUS_REFER = 'Referral Needed';
 export const STATUS_REFERRED = 'Referral Made';
+export const STATUS_REFERRAL_PICKED_UP = 'Referral Picked Up';
+export const STATUS_REFERRAL_NOT_PICKED_UP = 'Referral Not Picked Up';
 export const STATUS_POSSIBLE_IMPACT = 'Possible Impact';
 export const STATUS_IMPACT_CONSIDERED = 'Impact Considered';
-export const STATUS_REFERRAL_PICKED_UP = 'Referral Picked Up';
 
 export const EMAIL_TEXT_SENT = 'Custom Message Emailed';

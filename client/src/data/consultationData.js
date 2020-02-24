@@ -17,11 +17,12 @@ const DISPO_IMMIGRATION_COLOR = 'volcano';
 // ];
 
 export const statuses = [
-	{ group: 'Referrals', value: consultFields.STATUS_REFER },
-	{ group: 'Referrals', value: consultFields.STATUS_REFERRED },
-	{ group: 'Referrals', value: consultFields.STATUS_REFERRAL_PICKED_UP },
-	{ group: 'Impact', value: consultFields.STATUS_POSSIBLE_IMPACT },
-	{ group: 'Impact', value: consultFields.STATUS_IMPACT_CONSIDERED },
+	{ group: 'Referral', value: consultFields.STATUS_REFER, text: 'Needed' },
+	{ group: 'Referral', value: consultFields.STATUS_REFERRED, text: 'Made' },
+	{ group: 'Referral', value: consultFields.STATUS_REFERRAL_NOT_PICKED_UP, text: 'Not Picked Up' },
+	{ group: 'Referral', value: consultFields.STATUS_REFERRAL_PICKED_UP, text: 'Picked Up' },
+	{ group: 'Impact', value: consultFields.STATUS_POSSIBLE_IMPACT, text: 'Possible' },
+	{ group: 'Impact', value: consultFields.STATUS_IMPACT_CONSIDERED, text: 'Considered' },
 ];
 
 // given consultations as an object, return object with only referral-eligible consultations
@@ -64,8 +65,8 @@ export const getDispoShortNames = dispos => {
 }
 
 // given a fields object with a long-name Disposition
-// and the Status to fill in any empty Dispositons for eligible cases
-// return non-empty status
+// and given a, sometimes empty, Status
+// return non-empty Status
 export const getStatusForEmptyShortName = object => {
 	const statusField = object[consultFields.STATUS];
 	const dispoField = dispoShortNames[object[consultFields.DISPOSITIONS]];

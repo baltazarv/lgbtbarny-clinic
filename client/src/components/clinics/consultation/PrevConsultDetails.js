@@ -2,11 +2,11 @@ import React from 'react';
 import { List, Typography } from 'antd';
 // data
 import * as consultFields from '../../../data/consultionFields';
-import { getDispoTags } from '../../../data/consultationData';
+import { getDispoTags, getStatusForEmptyShortName } from '../../../data/consultationData';
 import { getPeopleByIds } from '../../../data/peopleData';
 import { getLawTypes } from '../../../data/lawTypeData';
 
-const ConsultationDetails = props => {
+const PrevConsultDetails = props => {
 	// props from InquirerDetails parent
 	const {
 		consultSelected,
@@ -69,12 +69,10 @@ const ConsultationDetails = props => {
 		})
 	}
 
-	if (consultSelected.fields[consultFields.STATUS]) {
-		dataSource.push({
-			title: "\"Case\" Status",
-			value: consultSelected.fields[consultFields.STATUS],
-		})
-	}
+	dataSource.push({
+		title: "Referral Status",
+		value: getStatusForEmptyShortName(consultSelected.fields),
+	});
 
 	return (
 		<>
@@ -107,4 +105,4 @@ const ConsultationDetails = props => {
 	)
 }
 
-export default ConsultationDetails;
+export default PrevConsultDetails;

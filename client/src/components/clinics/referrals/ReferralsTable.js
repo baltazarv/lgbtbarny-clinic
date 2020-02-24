@@ -15,6 +15,8 @@ import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 const statusFilters = [
 	{ text: consultFields.STATUS_REFER, value: consultFields.STATUS_REFER },
 	{ text: consultFields.STATUS_REFERRED, value: consultFields.STATUS_REFERRED },
+	{ text: consultFields.STATUS_REFERRAL_NOT_PICKED_UP, value: consultFields.STATUS_REFERRAL_NOT_PICKED_UP },
+	{ text: consultFields.STATUS_REFERRAL_PICKED_UP, value: consultFields.STATUS_REFERRAL_PICKED_UP },
 	{ text: consultFields.STATUS_POSSIBLE_IMPACT, value: consultFields.STATUS_POSSIBLE_IMPACT },
 	{ text: consultFields.STATUS_IMPACT_CONSIDERED, value: consultFields.STATUS_IMPACT_CONSIDERED },
 ];
@@ -86,7 +88,7 @@ const ReferralsTable = props => {
 			// },
 		},
 		{
-			title: consultFields.STATUS,
+			title: 'Referral Status',
 			dataIndex: consultFields.STATUS,
 			key: consultFields.STATUS,
 			// edit column
