@@ -272,8 +272,8 @@ class ConsultationForm extends Component {
 							component={TextArea}
 							name={consultFields.SITUATION}
 							id={consultFields.SITUATION}
-							label="Notes"
-							description="Please describe the factual situation as well as the legal assessment."
+							label="Consultation Notes"
+							description="Please describe the factual situation as well as the legal assessment. This section is necessary for referrals."
 							// placeholder=""
 							rows={5}
 						/>
@@ -291,42 +291,52 @@ class ConsultationForm extends Component {
 						touched={touched[consultFields.DISPOSITIONS]}
 						required={true}
 					>
-						<Field
-							component={RadioButton}
-							name={consultFields.DISPOSITIONS}
-							id={consultFields.DISPOSITIONS_NO_FURTHER}
-							label={consultFields.DISPOSITIONS_NO_FURTHER}
-						/>
-						<Field
-							component={RadioButton}
-							name={consultFields.DISPOSITIONS}
-							id={consultFields.DISPOSITIONS_FEE_BASED}
-							label={consultFields.DISPOSITIONS_FEE_BASED}
-						/>
-						<Field
-							component={RadioButton}
-							name={consultFields.DISPOSITIONS}
-							id={consultFields.DISPOSITIONS_PRO_BONO}
-							label={consultFields.DISPOSITIONS_PRO_BONO}
-						/>
-						<Field
-							component={RadioButton}
-							name={consultFields.DISPOSITIONS}
-							id={consultFields.DISPOSITIONS_COMPELLING}
-							label={consultFields.DISPOSITIONS_COMPELLING}
-						/>
-						<Field
-							component={RadioButton}
-							name={consultFields.DISPOSITIONS}
-							id={consultFields.DISPOSITIONS_IMMIGRATION}
-							label={consultFields.DISPOSITIONS_IMMIGRATION}
-						/>
+						<p style={{ marginBottom: '0.5rem' }}>
+							<Field
+								component={RadioButton}
+								name={consultFields.DISPOSITIONS}
+								id={consultFields.DISPOSITIONS_NO_FURTHER}
+								label={consultFields.DISPOSITIONS_NO_FURTHER}
+							/>
+						</p>
+						<p style={{ marginBottom: '0.5rem' }}>
+							<Field
+								component={RadioButton}
+								name={consultFields.DISPOSITIONS}
+								id={consultFields.DISPOSITIONS_FEE_BASED}
+								label={consultFields.DISPOSITIONS_FEE_BASED}
+							/>
+							<div className="text-muted" style={{ lineHeight: 1.25 }}><small>WE CANNOT GUARANTEE that a lawyer will accept the case for consultation or representation.</small></div>
+						</p>
+						<p style={{ marginBottom: '0.5rem' }}>
+							<Field
+								component={RadioButton}
+								name={consultFields.DISPOSITIONS}
+								id={consultFields.DISPOSITIONS_PRO_BONO}
+								label={consultFields.DISPOSITIONS_PRO_BONO}
+							/>
+							<div className="text-muted" style={{ lineHeight: 1.25 }}><small>Because pro bono availability is EXTRAORDINARILY LIMITED, the person should consider contacting other legal services organizations.</small></div>
+						</p>
+						<p style={{ marginBottom: '0.5rem' }}>
+							<Field
+								component={RadioButton}
+								name={consultFields.DISPOSITIONS}
+								id={consultFields.DISPOSITIONS_COMPELLING}
+								label={consultFields.DISPOSITIONS_COMPELLING}
+							/>
+						</p>
+						<p style={{ marginBottom: '0.5rem' }}>
+							<Field
+								component={RadioButton}
+								name={consultFields.DISPOSITIONS}
+								id={consultFields.DISPOSITIONS_IMMIGRATION}
+								label={consultFields.DISPOSITIONS_IMMIGRATION}
+							/>
+						</p>
 					</RadioButtonGroup>
 
 					<Collapse in={isReferralDispositionChecked}>
 						<div id="referrals">
-
-							<div className="mb-2 text-muted"><small><em>If LRN or PBP is chosen above, please fill out the following to help refer this case.</em></small></div>
 
 							{/* type of law */}
 							<Form.Group as={Row} controlId="typeOfLawPulldown">
@@ -351,6 +361,9 @@ class ConsultationForm extends Component {
 								</Col>
 							</Form.Group>
 
+							<div className="mb-2 text-muted" style={{ lineHeight: 1.25 }}><small><em></em></small></div>
+
+
 							{/* ref summary */}
 							<div className="mb-4">
 								<Field
@@ -358,7 +371,7 @@ class ConsultationForm extends Component {
 									name={consultFields.REF_SUMMARY}
 									id={consultFields.REF_SUMMARY}
 									label="Referral Summary"
-									description="If LRN or PBP is chosen above, add a one- or two-sentence referral summary that can be used independently of the Notes above in order to make a referral to our network."
+									description={'Please add one or two sentences that can be used independently of the Notes above in order to make a referral to our network. This is very important because it is read by the attorneys to whom we refer the clients. If you type something like "Needs referral for civil case" no one will accept the case. Please don\'t type "See notes above," as this will make the referral process much longer, because we will have to read your notes and draft the Summary ourselves'}
 									placeholder="Clinic visitor seeks attorney for representation in landlord-tenant matter. Person is able to pay to retain a lawyer."
 									required={true}
 									rows={3}
@@ -366,6 +379,8 @@ class ConsultationForm extends Component {
 							</div>
 						</div>
 					</Collapse>
+
+					<p className="text-muted">Our Clinic provides BRIEF LEGAL SERVICES and, unfortunately, WE CANNOT GUARANTEE FURTHER FOLLOW-UP.  Please, do NOT tell visitors that "someone will be getting back to them."</p>
 
 					{/* submit */}
 					<Row className="justify-content-start">
