@@ -143,18 +143,14 @@ const Intake = props => {
 			{isRepeat && repeatVisitorSelected &&
 				(
 					<>
-						<div className="mb-3">
-							<div className="form-label">Previous Consultations</div>
-							<p className="mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p>
-							<PreviousConsultations
-								visitorSelected={repeatVisitorSelected}
-								inquirers={props.inquirersObject}
-								consultations={props.consultations}
-								updateConsultation={props.updateConsultation}
-								lawyers={props.lawyersObject}
-								lawTypes={props.lawTypesObject}
-							/>
-						</div>
+						<PreviousConsultations
+							visitorSelected={repeatVisitorSelected}
+							inquirers={props.inquirersObject}
+							consultations={props.consultations}
+							updateConsultation={props.updateConsultation}
+							lawyers={props.lawyersObject}
+							lawTypes={props.lawTypesObject}
+						/>
 						<VisitorAddForm
 							// start with given select obj, return array with full airtable record
 							repeatVisitor={getRecordsFromSelection(repeatVisitorSelected, props.inquirers)[0]}

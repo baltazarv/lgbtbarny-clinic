@@ -83,27 +83,37 @@ const PreviousConsultations = props => {
 		updateConsultation(updateObject);
 	}
 
-	if (dataSource.length === 0) {
+	if (inquirers && dataSource.length === 0) {
 		const consultIds = inquirers[visitorSelected.value][peopleFields.CONSULTATIONS];
-		const visitorConsultations = consultIds.map(id => {
-			return {
-				key: id,
-				...consultations[id],
-			}
-		});
-		formatDataSource(visitorConsultations);
+		// if visitor has any previous consultations
+		if (consultIds) {
+			const visitorConsultations = consultIds.map(id => {
+				return {
+					key: id,
+					...consultations[id],
+				}
+			});
+			formatDataSource(visitorConsultations);
+		}
 	}
 
 	return (
 		<>
-			<EditableTable
-				loading={isLoading}
-				dataSource={dataSource}
-				columns={columns}
-				options={statuses}
-				handleSave={updateDispoStatus}
-				expandedRowRender={ConsultExpandList}
-			/>
+			{dataSource.length > 0 &&
+				<div className="mb-3">
+					<div className="form-label">Previous Consultations</div>
+					<p className="mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p>
+
+					<EditableTable
+						loading={isLoading}
+						dataSource={dataSource}
+						columns={columns}
+						options={statuses}
+						handleSave={updateDispoStatus}
+						expandedRowRender={ConsultExpandList}
+					/>
+				</div>
+			}
 		</>
 	)
 }

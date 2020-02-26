@@ -272,7 +272,7 @@ class ConsultationForm extends Component {
 							component={TextArea}
 							name={consultFields.SITUATION}
 							id={consultFields.SITUATION}
-							label="Consultation Notes"
+							label="Notes"
 							description="Please describe the factual situation as well as the legal assessment. This section is necessary for referrals."
 							// placeholder=""
 							rows={5}
@@ -291,15 +291,15 @@ class ConsultationForm extends Component {
 						touched={touched[consultFields.DISPOSITIONS]}
 						required={true}
 					>
-						<p style={{ marginBottom: '0.5rem' }}>
+						<div style={{ marginBottom: '0.5rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
 								id={consultFields.DISPOSITIONS_NO_FURTHER}
 								label={consultFields.DISPOSITIONS_NO_FURTHER}
 							/>
-						</p>
-						<p style={{ marginBottom: '0.5rem' }}>
+						</div>
+						<div style={{ marginBottom: '0.5rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
@@ -307,8 +307,8 @@ class ConsultationForm extends Component {
 								label={consultFields.DISPOSITIONS_FEE_BASED}
 							/>
 							<div className="text-muted" style={{ lineHeight: 1.25 }}><small>WE CANNOT GUARANTEE that a lawyer will accept the case for consultation or representation.</small></div>
-						</p>
-						<p style={{ marginBottom: '0.5rem' }}>
+						</div>
+						<div style={{ marginBottom: '0.5rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
@@ -316,23 +316,23 @@ class ConsultationForm extends Component {
 								label={consultFields.DISPOSITIONS_PRO_BONO}
 							/>
 							<div className="text-muted" style={{ lineHeight: 1.25 }}><small>Because pro bono availability is EXTRAORDINARILY LIMITED, the person should consider contacting other legal services organizations.</small></div>
-						</p>
-						<p style={{ marginBottom: '0.5rem' }}>
+						</div>
+						<div style={{ marginBottom: '0.5rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
 								id={consultFields.DISPOSITIONS_COMPELLING}
 								label={consultFields.DISPOSITIONS_COMPELLING}
 							/>
-						</p>
-						<p style={{ marginBottom: '0.5rem' }}>
+						</div>
+						<div style={{ marginBottom: '0.5rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
 								id={consultFields.DISPOSITIONS_IMMIGRATION}
 								label={consultFields.DISPOSITIONS_IMMIGRATION}
 							/>
-						</p>
+						</div>
 					</RadioButtonGroup>
 
 					<Collapse in={isReferralDispositionChecked}>
