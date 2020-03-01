@@ -456,7 +456,11 @@ export default withFormik({
 	mapPropsToValues: ({
 		repeatVisitor,
 	}) => {
-		initialValues = { ...INITIAL_VALUES };
+		initialValues = {
+			...INITIAL_VALUES,
+			[peopleFields.LAW_TYPES]: [...INITIAL_VALUES[peopleFields.LAW_TYPES]],
+			[peopleFields.PRONOUNS]: [...INITIAL_VALUES[peopleFields.PRONOUNS]],
+		};
 		if (repeatVisitor) {
 			Object.keys(initialValues).forEach(field => {
 				if (repeatVisitor.hasOwnProperty(field)) {
