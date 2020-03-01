@@ -61,6 +61,7 @@ class EditableTable extends React.Component {
 					size="small"
 					onChange={onChange}
 					expandedRowRender={expandedRowRender}
+					scroll={{ x: '100%' }}
 				/>
 			</div>
 		);

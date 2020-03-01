@@ -91,6 +91,7 @@ const ReferralsTable = props => {
 			title: 'Referral Status',
 			dataIndex: consultFields.STATUS,
 			key: consultFields.STATUS,
+			className: 'referrals-status-col',
 			// edit column
 			editable: true,
 			// filters

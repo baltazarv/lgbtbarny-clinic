@@ -291,7 +291,7 @@ class ConsultationForm extends Component {
 						touched={touched[consultFields.DISPOSITIONS]}
 						required={true}
 					>
-						<div style={{ marginBottom: '0.5rem' }}>
+						<div style={{ marginBottom: '0.7rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
@@ -299,7 +299,7 @@ class ConsultationForm extends Component {
 								label={consultFields.DISPOSITIONS_NO_FURTHER}
 							/>
 						</div>
-						<div style={{ marginBottom: '0.5rem' }}>
+						<div style={{ marginBottom: '0.7rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
@@ -308,7 +308,7 @@ class ConsultationForm extends Component {
 							/>
 							<div className="text-muted" style={{ lineHeight: 1.25 }}><small>WE CANNOT GUARANTEE that a lawyer will accept the case for consultation or representation.</small></div>
 						</div>
-						<div style={{ marginBottom: '0.5rem' }}>
+						<div style={{ marginBottom: '0.7rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
@@ -317,7 +317,7 @@ class ConsultationForm extends Component {
 							/>
 							<div className="text-muted" style={{ lineHeight: 1.25 }}><small>Because pro bono availability is EXTRAORDINARILY LIMITED, the person should consider contacting other legal services organizations.</small></div>
 						</div>
-						<div style={{ marginBottom: '0.5rem' }}>
+						<div style={{ marginBottom: '0.7rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
@@ -325,13 +325,14 @@ class ConsultationForm extends Component {
 								label={consultFields.DISPOSITIONS_COMPELLING}
 							/>
 						</div>
-						<div style={{ marginBottom: '0.5rem' }}>
+						<div style={{ marginBottom: '0.7rem' }}>
 							<Field
 								component={RadioButton}
 								name={consultFields.DISPOSITIONS}
 								id={consultFields.DISPOSITIONS_IMMIGRATION}
 								label={consultFields.DISPOSITIONS_IMMIGRATION}
 							/>
+							<div className="text-muted" style={{ lineHeight: 1.25 }}><small>Only for VERY complicated immigration cases which need review, especially asylum &amp; trafficking.</small></div>
 						</div>
 					</RadioButtonGroup>
 
@@ -371,7 +372,7 @@ class ConsultationForm extends Component {
 									name={consultFields.REF_SUMMARY}
 									id={consultFields.REF_SUMMARY}
 									label="Referral Summary"
-									description={'Please add one or two sentences that can be used independently of the Notes above in order to make a referral to our network. This is very important because it is read by the attorneys to whom we refer the clients. If you type something like "Needs referral for civil case" no one will accept the case. Please don\'t type "See notes above," as this will make the referral process much longer, because we will have to read your notes and draft the Summary ourselves'}
+									description={'Please try to write no more than two sentences to be used independently of the Notes above in order for us to make referrals. This summary will be read by prospective attorneys, so it must be clear, concise, and compelling; otherwise, the referrals are unlikely to be picked up for consultation or representation.'}
 									placeholder="Clinic visitor seeks attorney for representation in landlord-tenant matter. Person is able to pay to retain a lawyer."
 									required={true}
 									rows={3}

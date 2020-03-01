@@ -20,7 +20,10 @@ const columns = [
 		title: 'Disposition(s)',
 		dataIndex: [consultFields.DISPOSITIONS],
 		key: 'dispos',
-		render: dispos => getDispoTagsFromShortNames(dispos),
+		render: dispos => {
+			if (dispos.length > 0) return getDispoTagsFromShortNames(dispos);
+			return 'None made.';
+		},
 	},
 	{
 		title: consultFields.STATUS,

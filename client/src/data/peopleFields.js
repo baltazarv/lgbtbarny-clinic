@@ -35,4 +35,4 @@ export const INTAKE_NOTES = 'Intake Notes';
 export const TERMS = 'Acknowledgment';
 export const TERMS_AGREE = 'I understand and agree to the terms and conditions of the clinic.';
 export const SIGNATURE = 'Digital Signature';
-export const CONSULTATIONS = 'Consultations';
+export const CONSULTATIONS = 'Consultations (Visitor)';

@@ -20,3 +20,9 @@ code {
   border-radius: 4px;
   padding: 4px 11px;
 }
+
+/* Referrals section editable Status selection */
+
+.referrals-status-col .ant-select-selection {
+  width: 120px;
+}
