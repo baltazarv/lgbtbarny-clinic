@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Icon, Modal, Button } from 'antd';
 // components
 import EditableTable from '../../table/EditableTable';
-import InquirerDetails from './InquirerDetails';
 import ConsultExpandList from '../ConsultExpandList';
+import VisitorList from '../VisitorList';
 // data
 import * as consultFields from '../../../data/consultionFields';
 import { statuses, dispoShortNames, getDispoShortNames, getDispoTagsFromShortNames, getStatusForEmptyShortName, filterEligibleConsultations } from '../../../data/consultationData';
-import { formatName, getLawyerNames } from '../../../data/peopleData';
+import * as peopleFields from '../../../data/peopleFields';
+import { formatName, getLawyerNames, getPeopleByIds } from '../../../data/peopleData';
 import { getLawTypes } from '../../../data/lawTypeData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../../utils';
@@ -36,7 +37,7 @@ const ReferralsTable = props => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
 	const [visitorModalShown, setVisitorModalShown] = useState(false);
-	const [inquirersSelected, setInquirersSelected] = useState({});
+	const [inquirerSelected, setInquirerSelected] = useState({});
 	const [visitorModalTitle, setVisitorModalTitle] = useState('');
 
 	// props from parent Referrals
@@ -78,7 +79,7 @@ const ReferralsTable = props => {
 			// },
 		},
 		{
-			title: 'Dispositions(s)',
+			title: 'Dispositions',
 			dataIndex: [consultFields.DISPOSITIONS],
 			key: 'dispos',
 			render: dispos => getDispoTagsFromShortNames(dispos),
@@ -182,13 +183,74 @@ const ReferralsTable = props => {
 		const firstInquirerId = consultations[row.key][consultFields.INQUIRERS][0];
 		const inquirerFields = inquirers[firstInquirerId];
 		setVisitorModalTitle(formatName(inquirerFields))
-		setInquirersSelected({ [firstInquirerId]: inquirerFields });
+		setInquirerSelected({ [firstInquirerId]: inquirerFields });
 		setVisitorModalShown(true);
 	}
 
 	const hideVisitorModal = () => {
-		setInquirersSelected({})
+		setInquirerSelected({})
 		setVisitorModalShown(false);
+	}
+
+	const getConsultationsModalTitle = consultation => {
+		console.log(consultation)
+		if (!objectIsEmpty(consultation)) {
+			const key = Object.keys(consultation)[0];
+			const fields = consultation[key];
+			if (fields[consultFields.INQUIRERS]) {
+				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], inquirers)} on {isoToStandardDate(fields[consultFields.CREATED_ON])}</span>;
+			}
+		}
+		return null;
+	}
+
+	const visitorModalListItems = {
+		fields: [
+			{
+				key: peopleFields.OTHER_NAMES,
+			},
+			{
+				key: peopleFields.LAW_TYPES,
+				title: 'Law Type(s) – determined at intake',
+				emptyDefault: 'Not determined.',
+			},
+			{
+				key: peopleFields.INTAKE_NOTES,
+				title: peopleFields.INTAKE_NOTES, // override
+			},
+			{
+				key: peopleFields.PHONE,
+			},
+			{
+				key: peopleFields.EMAIL,
+			},
+			{
+				key: peopleFields.CONSULTATIONS,
+				listItems: {
+					fields: [
+						{
+							key: consultFields.LAWYERS,
+							emptyDefault: 'Not specified.',
+						},
+						{
+							key: consultFields.SITUATION,
+						},
+						{
+							key: consultFields.DISPOSITIONS,
+						},
+						{
+							key: consultFields.LAW_TYPES,
+						},
+						{
+							key: consultFields.REF_SUMMARY,
+						},
+						{
+							key: consultFields.STATUS,
+						},
+					]
+				}
+			},
+		],
 	}
 
 	return (
@@ -203,12 +265,15 @@ const ReferralsTable = props => {
 						Close
 					</Button>,
 				]}>
-				<InquirerDetails
-					inquirers={inquirers}
-					lawyers={lawyers}
+				{/* visitor needs to be single visitor */}
+				<VisitorList
+					visitor={inquirerSelected}
+					listItems={visitorModalListItems}
 					lawTypes={lawTypes}
+					// constultations
 					consultations={consultations}
-					inquirersSelected={inquirersSelected}
+					lawyers={lawyers}
+					renderConsultModalTitle={getConsultationsModalTitle}
 				/>
 			</Modal>
 

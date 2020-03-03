@@ -54,12 +54,11 @@ class Consultation extends Component {
 			timeSpent: 0,
 		}
 		this.submitConsultation = this.submitConsultation.bind(this);
-		this.handleInquirerSelectChange = this.handleInquirerSelectChange.bind(this);
 		this.submitAddLawyer = this.submitAddLawyer.bind(this);
 		this.submitAddInquirer = this.submitAddInquirer.bind(this);
 	}
 
-	handleInquirerSelectChange(options) {
+	handleInquirerSelectChange = (options) => {
 		// array to object
 		const inquirersSelected = {};
 		options.forEach(option => {

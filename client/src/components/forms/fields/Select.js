@@ -44,7 +44,7 @@ const Select = ({
 	let formLabel = null;
 	let inputCols = 12;
 	if (label) {
-		formLabel = (<Form.Label column sm={3} className="text-md-right">
+		formLabel = (<Form.Label column md={3} className="text-md-right">
 			{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
 		</Form.Label>);
 		inputCols = 9;
@@ -57,7 +57,7 @@ const Select = ({
 		<>
 			<Form.Group as={Row} controlId={name} className="mb-0">
 				{formLabel}
-				<Col sm={inputCols}>
+				<Col md={inputCols}>
 					{infoTxt}
 					<AntSelect
 						// key={new Date()}

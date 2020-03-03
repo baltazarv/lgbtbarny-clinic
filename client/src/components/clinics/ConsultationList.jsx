@@ -1,26 +1,24 @@
 import React from 'react';
 import { List, Typography } from 'antd';
 // data
-import * as consultFields from '../../../data/consultionFields';
-import { getDispoTags, getStatusForEmptyShortName } from '../../../data/consultationData';
-import { getPeopleByIds } from '../../../data/peopleData';
-import { getLawTypes } from '../../../data/lawTypeData';
+import * as consultFields from '../../data/consultionFields';
+import { getDispoTags, getStatusForEmptyShortName } from '../../data/consultationData';
+import { getPeopleByIds } from '../../data/peopleData';
+import { getLawTypes } from '../../data/lawTypeData';
 
-const PrevConsultDetails = props => {
-	// props from InquirerDetails parent
+const ConsultationList = props => {
 	const {
 		consultSelected,
 		lawyers,
 		lawTypes,
 	} = props;
 
-	const {
-		id,
-	} = consultSelected;
+	const key = Object.keys(consultSelected)[0];
+	const fields = consultSelected[key];
 
 	let consultLawyers = 'Consulting lawyer not specified.';
-	if (consultSelected.fields[consultFields.LAWYERS]) {
-		consultLawyers = getPeopleByIds(consultSelected.fields[consultFields.LAWYERS], lawyers);
+	if (fields[consultFields.LAWYERS]) {
+		consultLawyers = getPeopleByIds(fields[consultFields.LAWYERS], lawyers);
 	}
 	let dataSource = [
 		{
@@ -29,23 +27,23 @@ const PrevConsultDetails = props => {
 		},
 		{
 			title: "Consultation Notes",
-			value: consultSelected.fields[consultFields.SITUATION] ? consultSelected.fields[consultFields.SITUATION] : "No notes taken."
+			value: fields[consultFields.SITUATION] ? fields[consultFields.SITUATION] : "No notes taken."
 		},
 		{
 			title: consultFields.DISPOSITIONS,
 			key: consultFields.DISPOSITIONS,
-			value: consultSelected.fields[consultFields.DISPOSITIONS] ? consultSelected.fields[consultFields.DISPOSITIONS] : "No notes taken."
+			value: fields[consultFields.DISPOSITIONS] ? fields[consultFields.DISPOSITIONS] : "No notes taken."
 		},
 	]
 
 	let referralData = [
 		{
 			title: "Type(s) of Law",
-			value: getLawTypes(consultSelected.fields[consultFields.LAW_TYPES], lawTypes),
+			value: getLawTypes(fields[consultFields.LAW_TYPES], lawTypes),
 		},
 		{
 			title: consultFields.REF_SUMMARY,
-			value: consultSelected.fields[consultFields.REF_SUMMARY] ? consultSelected.fields[consultFields.REF_SUMMARY] : 'No summary written.',
+			value: fields[consultFields.REF_SUMMARY] ? fields[consultFields.REF_SUMMARY] : 'No summary written.',
 		},
 	];
 
@@ -58,20 +56,20 @@ const PrevConsultDetails = props => {
 		})
 	}
 
-	if (hasEligible(consultSelected.fields[consultFields.DISPOSITIONS])) {
+	if (hasEligible(fields[consultFields.DISPOSITIONS])) {
 		dataSource = [...dataSource, ...referralData];
 	}
 
-	if (consultSelected.fields[consultFields.EMAIL_TEXT_SENT]) {
+	if (fields[consultFields.EMAIL_TEXT_SENT]) {
 		dataSource.push({
 			title: consultFields.EMAIL_TEXT_SENT,
-			value: consultSelected.fields[consultFields.EMAIL_TEXT_SENT],
+			value: fields[consultFields.EMAIL_TEXT_SENT],
 		})
 	}
 
 	dataSource.push({
 		title: "Referral Status",
-		value: getStatusForEmptyShortName(consultSelected.fields),
+		value: getStatusForEmptyShortName(fields),
 	});
 
 	return (
@@ -84,7 +82,7 @@ const PrevConsultDetails = props => {
 				renderItem={item => {
 					if (item.key && item.key === consultFields.DISPOSITIONS) {
 						return (
-							<List.Item key={id}>
+							<List.Item key={key}>
 								<ul style={{
 									listStyleType: 'none',
 									paddingInlineStart: 'unset'
@@ -95,7 +93,7 @@ const PrevConsultDetails = props => {
 						)
 					}
 					return (
-						<List.Item key={id}>
+						<List.Item key={key}>
 							<Typography.Text code>{item.title}</Typography.Text> {item.value}
 						</List.Item>
 					)
@@ -105,4 +103,4 @@ const PrevConsultDetails = props => {
 	)
 }
 
-export default PrevConsultDetails;
+export default ConsultationList;

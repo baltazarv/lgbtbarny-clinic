@@ -9,15 +9,18 @@ import RadioButtonGroup from '../../forms/fields/RadioButtonGroup';
 import RadioButton from '../../forms/fields/RadioButton';
 import TextArea from '../../forms/fields/TextArea';
 import { InputFeedback } from '../../forms/formElements';
-import InquirerDetails from './InquirerDetails';
+import VisitorList from '../VisitorList';
 import FormModal from '../../modals/FormModal';
 import VisitorAddForm from '../VisitorAddForm';
 import LawyerAddForm from './LawyerAddForm';
 // import ReactSelectWithValidation from '../../../components/forms/fields/ReactSelectWithValidation';
 // data
 import * as consultFields from '../../../data/consultionFields';
-import { getPeopleIntoSelectOptions } from '../../../data/peopleData';
+import * as peopleFields from '../../../data/peopleFields';
+import { getPeopleIntoSelectOptions, getPeopleByIds, formatName } from '../../../data/peopleData';
 import { getLawTypeSelectOptions } from '../../../data/dataTransforms';
+// utils
+import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 
 // determines if referral fields show and validate
 // b/c validate function needs to be outside class, this flag cannot be in the local class state
@@ -122,6 +125,18 @@ class ConsultationForm extends Component {
 		})
 	}
 
+	getConsultationsModalTitle = consultation => {
+		// { id: {...fields} }
+		if (!objectIsEmpty(consultation)) {
+			const key = Object.keys(consultation)[0];
+			const fields = consultation[key];
+			if (fields[consultFields.INQUIRERS]) {
+				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], this.props.inquirersObject)} on {isoToStandardDate(fields[consultFields.CREATED_ON])}</span>;
+			}
+		}
+		return null;
+	}
+
 	render() {
 
 		// formik props
@@ -160,6 +175,85 @@ class ConsultationForm extends Component {
 		// 			Please fill out <span className="font-weight-bold">empty fields in red</span> above!</Col>
 		// 	</Row>;
 		// }
+
+		const visitorModalListItems = {
+			fields: [
+				{
+					key: peopleFields.OTHER_NAMES,
+				},
+				{
+					key: peopleFields.PRONOUNS,
+				},
+				{
+					key: peopleFields.GENDER,
+				},
+				{
+					key: peopleFields.LAW_TYPES,
+					emptyDefault: 'Not determined.',
+				},
+				{
+					key: peopleFields.INCOME,
+				},
+				{
+					key: peopleFields.INTAKE_NOTES,
+				},
+				{
+					key: peopleFields.ADDRESS,
+				},
+				{
+					key: peopleFields.PHONE,
+				},
+				{
+					key: peopleFields.EMAIL,
+				},
+				{
+					key: peopleFields.CONSULTATIONS,
+					title: 'Previous Consultations',
+					listItems: {
+						fields: [
+							{
+								key: consultFields.LAWYERS,
+								emptyDefault: 'Not specified.',
+							},
+							{
+								key: consultFields.SITUATION,
+							},
+							{
+								key: consultFields.DISPOSITIONS,
+							},
+							{
+								key: consultFields.LAW_TYPES,
+							},
+							{
+								key: consultFields.REF_SUMMARY,
+							},
+							{
+								key: consultFields.STATUS,
+							},
+						]
+					}
+				},
+			],
+		};
+
+		let visitorsLists = [];
+		if (!objectIsEmpty(inquirersSelected)) {
+			for (var key in inquirersSelected) {
+				const visitor = {[key]: {...inquirersSelected[key]}};
+				const visitorList = <VisitorList
+					key={key}
+					header={<strong>{formatName(inquirersSelected[key])}</strong>}
+					visitor={visitor}
+					listItems={visitorModalListItems}
+					lawTypes={this.props.lawTypesObject}
+					// constultations
+					consultations={this.props.consultations}
+					lawyers={this.props.lawyersObject}
+					renderConsultModalTitle={this.getConsultationsModalTitle}
+				/>
+				visitorsLists.push(visitorList);
+			}
+		}
 
 		return (
 			<>
@@ -251,20 +345,10 @@ class ConsultationForm extends Component {
 						</Col>
 					</Form.Group>
 
-					{/* selected inquirer info list */}
-					<Collapse in={this.props.inquirers && this.props.inquirers.length > 0} className="mb-4">
-						<div id="visitor-info" className="small">
-							<InquirerDetails
-								// inquirers determines if list shows up:
-								inquirersSelected={inquirersSelected}
-								inquirers={this.props.inquirersObject}
-								consultations={this.props.consultations}
-								// needed for lawyer names:
-								lawyers={this.props.lawyersObject}
-								lawTypes={this.props.lawTypesObject}
-							/>
-						</div>
-					</Collapse>
+					{/* selected visitor list(s) */}
+					{!objectIsEmpty(inquirersSelected) &&
+						<div>{visitorsLists}</div>
+					}
 
 					{/* notes (inquirer's summary) text area */}
 					<div className="mb-4">
