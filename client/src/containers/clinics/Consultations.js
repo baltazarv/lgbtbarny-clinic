@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import { Card, ButtonToolbar, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 
 // components
-import ReferralsTable from '../../components/clinics/referrals/ReferralsTable';
+import ConsultationsTable from '../../components/clinics/consultationsTable/ConsultationsTable';
 // data
 import * as actions from '../../store/actions';
 import styles from './Clinics.module.css';
 
-class Referrals extends Component {
+class Consultations extends Component {
 
 	onToggle = val => {
 		console.log(val);
@@ -41,8 +41,8 @@ class Referrals extends Component {
 					</ToggleButtonGroup>
 				</ButtonToolbar>
 				<Card.Body>
-					<h1 className="h2" > Referrals </h1>
-					<ReferralsTable
+					<h1 className="h2">Referrals</h1>
+					<ConsultationsTable
 						inquirers={this.props.inquirers}
 						lawyers={this.props.lawyers}
 						lawTypes={this.props.lawTypes}
@@ -70,4 +70,4 @@ const mapDispatchToProps = dispatch => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Referrals)
+export default connect(mapStateToProps, mapDispatchToProps)(Consultations)

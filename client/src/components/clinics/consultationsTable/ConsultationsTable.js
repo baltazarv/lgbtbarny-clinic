@@ -40,7 +40,7 @@ const ReferralsTable = props => {
 	const [inquirerSelected, setInquirerSelected] = useState({});
 	const [visitorModalTitle, setVisitorModalTitle] = useState('');
 
-	// props from parent Referrals
+	// props from parent
 	const {
 		inquirers, // inquirersObject
 		lawyers, // lawyersObject

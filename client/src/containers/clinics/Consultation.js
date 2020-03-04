@@ -4,8 +4,8 @@ import axios from 'axios';
 // components
 import { Row, Col } from 'react-bootstrap';
 import { Button } from 'antd';
-import ConsultationForm from '../../components/clinics/consultation/ConsultationForm';
-import EditEmailModal from '../../components/clinics/consultation/EditEmailModal';
+import ConsultationForm from '../../components/clinics/consultationForm/ConsultationForm';
+import EditEmailModal from '../../components/clinics/consultationForm/EditEmailModal';
 import TimerCounter from '../../components/TimerCountdown/index';
 // data
 import * as actions from '../../store/actions/index';

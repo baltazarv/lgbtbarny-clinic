@@ -1,7 +1,5 @@
 @import '~antd/dist/antd.css';
 
-/* /client/src/components/clinics/referrals/EditableReferralsTable.js */
-
 code {
 	color: #262626 !important;
 }
@@ -21,7 +19,7 @@ code {
   padding: 4px 11px;
 }
 
-/* Referrals section editable Status selection */
+/* Consultations section editable Status selection */
 
 .referrals-status-col .ant-select-selection {
   width: 120px;

@@ -11,9 +11,9 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
 // components
-import VisitorSelect from '../../components/clinics/intake/VisitorSelect';
+import VisitorSelect from '../../components/clinics/intakeForm/VisitorSelect';
 import VisitorAddForm from '../../components/clinics/VisitorAddForm';
-import PreviousConsultations from '../../components/clinics/intake/PreviousConsultations';
+import PreviousConsultations from '../../components/clinics/intakeForm/PreviousConsultations';
 // data
 import { formatName, getPeopleIntoSelectOptions } from '../../data/peopleData';
 import { getRecordsFromSelection } from '../../data/dataTransforms';

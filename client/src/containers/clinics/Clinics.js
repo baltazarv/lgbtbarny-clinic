@@ -4,9 +4,9 @@ import { withRouter, Route, Switch, Redirect } from 'react-router-dom';
 import { Container, Card } from 'react-bootstrap';
 import ClinicNav from '../../components/clinics/ClinicNav';
 import ClinicIndex from './index';
-import Consultation from './Consultation';
 import Intake from './Intake';
-import Referrals from './Referrals';
+import Consultation from './Consultation';
+import Consultations from './Consultations';
 // import NoMatch from './NoMatch';
 import * as actions from '../../store/actions';
 // css & images
@@ -87,7 +87,7 @@ class ClinicRoutes extends Component {
       <Intake />
     </Card.Body>
 
-    const referrals = () => <Referrals />
+    const referrals = () => <Consultations />
 
 		const index = () => <Card.Body>
 			<ClinicIndex />
