@@ -20,7 +20,6 @@ import { getRecordsFromSelection } from '../../data/dataTransforms';
 import * as actions from '../../store/actions/index';
 
 const Intake = props => {
-	const { clinicTitle } = props;
 	// shows or hides repeatVisitorSelect
 	const [isRepeat, setIsRepeat] = useState(false);
 	// select pulldown format
@@ -99,7 +98,7 @@ const Intake = props => {
 
 	return (
 		<>
-			<h1 className="h2"><em>{clinicTitle}</em> Intake</h1>
+			<h1 className="h2">Visitor Intake</h1>
 			<p className="text-danger small">*Required</p>
 
 			{/* is repeat visitor Form.Check switch */}

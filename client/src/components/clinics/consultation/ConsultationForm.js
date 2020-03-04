@@ -154,7 +154,6 @@ class ConsultationForm extends Component {
 		// passed by Consultaton parent container
 		const {
 			inquirersSelected,
-			clinicTitle,
 		} = this.props;
 
 		// also redux props: inquirers, lawyers, lawTypes
@@ -257,7 +256,7 @@ class ConsultationForm extends Component {
 
 		return (
 			<>
-				<h1 className="h2"><em>{clinicTitle}</em> Consultation</h1>
+				<h1 className="h2">Consultation with Attorney(s)</h1>
 				<div className="mb-3 small">
 					Please insert the information you collected for each visitor that you spoke to. Give a summary of the visitor's issue and indicate whether or not they need a referral.
 				</div>
@@ -514,8 +513,6 @@ class ConsultationForm extends Component {
 
 const mapStateToProps = state => {
 	return {
-		clinicSettings: state.clinics.clinicSettings,
-		currentClinic: state.clinics.currentClinic,
 		lawyers: state.people.lawyers,
 		consultations: state.consultations.consultations,
 		lawTypes: state.lawTypes.lawTypes,

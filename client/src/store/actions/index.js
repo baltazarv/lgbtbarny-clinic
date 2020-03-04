@@ -15,8 +15,3 @@ export {
 	createConsultation,
 	updateConsultation,
 } from './consultations';
-
-export {
-	getClinicSettings,
-	setCurrentClinic,
-} from './clinic';
