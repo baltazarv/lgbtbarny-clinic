@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import EditableTable from '../../table/EditableTable';
-import ConsultExpandList from '../ConsultExpandList';
+import ConsultationList from '../ConsultationList';
 // data
 import * as peopleFields from '../../../data/peopleFields';
 import { getLawyerNames } from '../../../data/peopleData';
@@ -100,6 +100,15 @@ const PreviousConsultations = props => {
 		}
 	}
 
+	const consultationList = (record) => {
+		const consultSelected = {[record.key]: {...consultations[record.key]}};
+		return <ConsultationList
+			consultSelected={consultSelected}
+			lawyers={lawyers}
+			lawTypes={lawTypes}
+		/>
+	}
+
 	return (
 		<>
 			{dataSource.length > 0 &&
@@ -113,7 +122,7 @@ const PreviousConsultations = props => {
 						columns={columns}
 						options={statuses}
 						handleSave={updateDispoStatus}
-						expandedRowRender={ConsultExpandList}
+						expandedRowRender={consultationList}
 					/>
 				</div>
 			}

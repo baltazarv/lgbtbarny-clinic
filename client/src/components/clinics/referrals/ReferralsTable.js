@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Icon, Modal, Button } from 'antd';
 // components
 import EditableTable from '../../table/EditableTable';
-import ConsultExpandList from '../ConsultExpandList';
+import ConsultationList from '../ConsultationList';
 import VisitorList from '../VisitorList';
 // data
 import * as consultFields from '../../../data/consultionFields';
@@ -253,6 +253,15 @@ const ReferralsTable = props => {
 		],
 	}
 
+	const consultationList = (record) => {
+		const consultSelected = {[record.key]: {...consultations[record.key]}};
+		return <ConsultationList
+			consultSelected={consultSelected}
+			lawyers={lawyers}
+			lawTypes={lawTypes}
+		/>
+	}
+
 	return (
 		<>
 			<Modal
@@ -284,7 +293,7 @@ const ReferralsTable = props => {
 				options={statuses} // edit field pulldown menu items
 				onChange={handleTableChange}
 				handleSave={updateDispoStatus}
-				expandedRowRender={ConsultExpandList}
+				expandedRowRender={consultationList}
 			/>
 		</>
 	)

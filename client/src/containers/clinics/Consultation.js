@@ -37,9 +37,6 @@ class Consultation extends Component {
 		this.state = {
 			// populates inquirer info list for current:
 			inquirersSelected: {},
-			// all consultations for selected inquirers
-			// fetched from this class and pushed to <ConsultationsList />
-			// inqSelectedConsultations: [],
 
 			// prop sent to ConsultationForm (arg sent to a custom message?)
 			serverResponse: null,

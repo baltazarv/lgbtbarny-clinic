@@ -1,6 +1,9 @@
+/**
+ * from consultation form on visitor select
+ * from consultation list on visitor icon click
+ */
 import React, { useState } from 'react';
 import { List, Typography, Button, Modal, Tooltip } from 'antd';
-// import ConsultationListBak from './ConsultationListBak';
 import ConsultationList from './ConsultationList';
 // data
 import * as peopleFields from '../../data/peopleFields';
@@ -184,11 +187,6 @@ const VisitorList = ({
         </Button>,
         ]}
       >
-        {/* <ConsultationListBak
-          consultation={consultSelected}
-          listItems={consultListItems}
-          lawyers={lawyers}
-        /> */}
         <ConsultationList
           consultSelected={consultSelected}
           lawyers={lawyers}

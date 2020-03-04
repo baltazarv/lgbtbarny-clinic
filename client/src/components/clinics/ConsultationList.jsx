@@ -1,3 +1,7 @@
+/** - from intake on repeat visitor select > previous consultations table expanded
+ *  - from consultation form on visitor selected > visitor list on visitor previous consultation item link clicked
+ *  - from consultation on list expanded
+ */
 import React from 'react';
 import { List, Typography } from 'antd';
 // data
