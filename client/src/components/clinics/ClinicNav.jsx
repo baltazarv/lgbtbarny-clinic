@@ -30,14 +30,20 @@ const ClinicNav = (props) => {
           {(clinic === 'tnc' || clinic === 'nj') &&
             <Nav.Link as={Link} to={`/${clinic}/intake`} eventKey="intake" defaultChecked>Intake</Nav.Link>
           }
+          {(clinic === 'tnc' || clinic === 'nj') &&
+            <Nav.Link as={Link} to={`/${clinic}/visitors`} eventKey="visitors" defaultChecked>Visitors</Nav.Link>
+          }
           {(clinic === 'tnc' || clinic === 'youth') &&
-            <Nav.Link as={Link} to={`/${clinic}/consult`} eventKey="consult" >Consult</Nav.Link>
+            <Nav.Link as={Link} to={`/${clinic}/consultation`} eventKey="consultation" >Consultation</Nav.Link>
           }
           {(clinic === 'tnc' || clinic === 'youth') &&
             <Nav.Link as={Link} to={`/${clinic}/completed`} eventKey="completed">Completed</Nav.Link>
           }
           {clinic === 'admin' &&
-            <Nav.Link as={Link} to={`/${clinic}/referrals`} eventKey="referrals">Referrals</Nav.Link>
+            <Nav.Link as={Link} to={`/${clinic}/visitors`} eventKey="visitors">Visitors</Nav.Link>
+          }
+          {clinic === 'admin' &&
+            <Nav.Link as={Link} to={`/${clinic}/consultations`} eventKey="consultations">Consultations</Nav.Link>
           }
         </Nav>
       </Navbar.Collapse>

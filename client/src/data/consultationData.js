@@ -10,8 +10,8 @@ const DISPO_COMPELLING_COLOR = 'magenta';
 const DISPO_IMMIGRATION_COLOR = 'volcano';
 
 export const statuses = [
-	{ group: 'Referral', value: consultFields.STATUS_REFER, text: 'Needed' },
-	{ group: 'Referral', value: consultFields.STATUS_REFERRED, text: 'Made' },
+	{ group: 'Referral', value: consultFields.STATUS_REFER, text: 'Needed Referral' },
+	{ group: 'Referral', value: consultFields.STATUS_REFERRED, text: 'Made Referral' },
 	{ group: 'Referral', value: consultFields.STATUS_REFERRAL_NOT_PICKED_UP, text: 'Not Picked Up' },
 	{ group: 'Referral', value: consultFields.STATUS_REFERRAL_PICKED_UP, text: 'Picked Up' },
 	{ group: 'Impact', value: consultFields.STATUS_POSSIBLE_IMPACT, text: 'Possible' },

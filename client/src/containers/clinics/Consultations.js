@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, ButtonToolbar, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
-
+import { Card } from 'react-bootstrap';
 // components
 import ConsultationsTable from '../../components/clinics/consultationsTable/ConsultationsTable';
+import ToggleButtons from '../../components/ToggleButtons';
 // data
 import * as actions from '../../store/actions';
-import styles from './Clinics.module.css';
 
 class Consultations extends Component {
 
-	onToggle = val => {
+	handleFilterBtnClick = val => {
 		console.log(val);
 	}
 
@@ -21,32 +20,22 @@ class Consultations extends Component {
 			clinic
 		} = this.props;
 
-		let clinicToggleBtns = [];
+		let toggleButtons = null;
 		const settings = {
-			referrals: { buttonLabel: 'Referral Eligible' },
 			impact: { buttonLabel: 'High Impact' },
+			referrals: { buttonLabel: 'Referral Eligible' },
 			all: { buttonLabel: 'All Consultations' },
 		};
-		for (var item in settings) {
-			let key = item, value = settings[item];
-			let toggleBtnStyles = {}
-			toggleBtnStyles = {
-				borderRight: "1px solid rgb(255, 255, 255, .5)",
-				borderLeft: "1px solid rgb(255, 255, 255, .5)",
-			}
-			clinicToggleBtns.push(<ToggleButton key={key} value={key} className="btn-sm" style={toggleBtnStyles}>{value.buttonLabel}</ToggleButton>)
-		}
+		toggleButtons = <ToggleButtons
+			settings={settings}
+			callback={this.handleFilterBtnClick}
+		/>;
 
 		return (
 			<>
-				<ButtonToolbar className={styles.clinicToolbar}>
-					<ToggleButtonGroup type="radio" name="options" onChange={this.onToggle}>
-						{/* defaultValue="referrals" */}
-						{clinicToggleBtns}
-					</ToggleButtonGroup>
-				</ButtonToolbar>
+				{toggleButtons}
 				<Card.Body>
-					<h1 className="h2">{this.props.clinic === 'admin' ? 'Referrals' : 'Consultations Completed'}</h1>
+					<h1 className="h2">{this.props.clinic === 'admin' ? 'Consultations' : 'Consultations Completed'}</h1>
 					<ConsultationsTable
 						clinic={clinic}
 						inquirers={this.props.inquirers}

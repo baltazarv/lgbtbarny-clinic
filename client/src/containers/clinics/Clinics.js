@@ -5,6 +5,7 @@ import { Container, Card } from 'react-bootstrap';
 import ClinicNav from '../../components/clinics/ClinicNav';
 import ClinicIndex from './index';
 import Intake from './Intake';
+import Visitors from './Visitors';
 import Consultation from './Consultation';
 import Consultations from './Consultations';
 // import NoMatch from './NoMatch';
@@ -74,7 +75,7 @@ class Clinics extends Component {
      * </Card>
      */
 
-    const consult = () => <Card.Body>
+    const consultation = () => <Card.Body>
       <Consultation
         clinicTitle={clinicTitle}
         lawyers={this.props.lawyers}
@@ -88,13 +89,17 @@ class Clinics extends Component {
       <Intake />
     </Card.Body>
 
+    const visitors = () => <Visitors
+        clinic={this.getClinicPath()}
+      />
+
     const consultations = () => <Consultations
       clinic={this.getClinicPath()}
     />
 
-		const index = () => <Card.Body>
-			<ClinicIndex />
-		</Card.Body>
+    const index = () => <Card.Body>
+      <ClinicIndex />
+    </Card.Body>
 
     return (
       <>
@@ -112,7 +117,8 @@ class Clinics extends Component {
 
                 {/* tnc */}
                 <Route path="/tnc/intake" component={intake} />
-                <Route path="/tnc/consult" component={consult} />
+                <Route path="/tnc/visitors" component={visitors} />
+                <Route path="/tnc/consultation" component={consultation} />
                 <Route path="/tnc/completed" component={consultations} />
                 <Route path="/tnc">
                   <Redirect to="/tnc/intake" />
@@ -120,22 +126,24 @@ class Clinics extends Component {
 
                 {/* nj */}
                 <Route path="/nj/intake" component={intake} />
+                <Route path="/nj/visitors" component={visitors} />
                 <Route path="/nj/completed" component={consultations} />
                 <Route path="/nj">
                   <Redirect to="/nj/intake" />
                 </Route>
 
                 {/* youth */}
-                <Route path="/youth/consult" component={consult} />
+                <Route path="/youth/consultation" component={consultation} />
                 <Route path="/youth/completed" component={consultations} />
                 <Route path="/youth">
-                  <Redirect to="/youth/consult" />
+                  <Redirect to="/youth/consultation" />
                 </Route>
 
                 {/* admin */}
-                <Route path="/admin/referrals" component={consultations} />
+                <Route path="/admin/visitors" component={visitors} />
+                <Route path="/admin/consultations" component={consultations} />
                 <Route path="/admin">
-                  <Redirect to="/admin/referrals" />
+                  <Redirect to="/admin/visitors" />
                 </Route>
 
                 <Route

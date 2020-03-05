@@ -98,7 +98,7 @@ const Intake = props => {
 
 	return (
 		<>
-			<h1 className="h2">Visitor Intake</h1>
+			<h1 className="h2">Visitor Intake Form</h1>
 			<p className="text-danger small">*Required</p>
 
 			{/* is repeat visitor Form.Check switch */}

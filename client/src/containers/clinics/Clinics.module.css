@@ -5,10 +5,3 @@
 	border: 0; /* .card class overrides this */
 	margin: 1.7em auto 0 auto;
 }
-
-/* used on Consultations */
-.clinicToolbar {
-	background-color: #39C1FA;
-	border-bottom: 2px solid #ffa9a1;
-	border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
-}
