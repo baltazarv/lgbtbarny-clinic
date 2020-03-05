@@ -7,6 +7,7 @@ import { List, Typography, Button, Modal, Tooltip } from 'antd';
 import ConsultationList from './ConsultationList';
 // data
 import * as peopleFields from '../../data/peopleFields';
+import { formatNameNoNick } from '../../data/peopleData';
 import { getLawTypes } from '../../data/lawTypeData';
 import * as consultFields from '../../data/consultionFields';
 import { getDispoTags, getStatusForEmptyShortName } from '../../data/consultationData';
@@ -15,6 +16,9 @@ import { objectIsEmpty, isoToStandardDate } from '../../utils';
 
 // if title not specified, title is field name
 const DEFAULT_VALUES = {
+  fullname: {
+    title: 'Full Name',
+  },
   [peopleFields.OTHER_NAMES]: {
     title: 'Preferred Name',
     emptyDefault: null,
@@ -96,16 +100,24 @@ const VisitorList = ({
       // VALUE
       let value = visitorFields[field.key];
 
-      // if the value is empty
+      // if the value is empty or field not on db
       if (!value) {
-        // explicitly remove field w empty value
-        if (field.emptyDefault === null) return ds;
-        if (field.emptyDefault) {
+        /** Fields not found on DB */
+        if (field.key === 'fullname') {
+          value = formatNameNoNick(visitorFields);
+
+        } else if (field.emptyDefault === null) {
+          // explicitly remove field w empty value
+          return ds;
+
+        } else if (field.emptyDefault) {
           // override default empty value
           value = field.emptyDefault;
+
         } else if (DEFAULT_VALUES[field.key].emptyDefault) {
           // default empty value
           value = DEFAULT_VALUES[field.key].emptyDefault;
+
         } else {
           return ds;
         }
@@ -114,9 +126,11 @@ const VisitorList = ({
         if (field.key === peopleFields.LAW_TYPES) {
           // law types
           value = getLawTypes(visitorFields[field.key], lawTypes);
+
         } else if (field.key === peopleFields.PRONOUNS) {
           // pronouns
           value = visitorFields[field.key].join(', ');
+
         } else if (field.key === peopleFields.CONSULTATIONS) {
           // list items
           // field.listItems = { fields: [{ key, title }] }

@@ -20,6 +20,13 @@ export const formatName = inquirer => {
 	return (firstName ? firstName : '') + (middleName ? ' ' + middleName[0] : '') + ' ' + (lastName ? lastName : '') + (otherNames ? ' "' + otherNames + '"' : '');
 }
 
+export const formatNameNoNick = inquirer => {
+	const firstName = inquirer[peopleFields.FIRST_NAME];
+	const middleName = inquirer[peopleFields.MIDDLE_NAME];
+	const lastName = inquirer[peopleFields.LAST_NAME];
+	return (firstName ? firstName : '') + (middleName ? ' ' + middleName[0] : '') + ' ' + (lastName ? lastName : '');
+}
+
 // given ids and list of full records
 // return string separated by commas
 export const getPeopleByIds = (ids, people) => {

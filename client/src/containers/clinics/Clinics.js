@@ -65,7 +65,8 @@ class Clinics extends Component {
 
   render() {
 
-    let clinicTitle = 'Clinic Administration';
+    let clinicTitle = 'Clinic';
+    if (this.getClinicPath() === 'admin') clinicTitle = 'Clinic Administration';
     if (CLINICS[this.getClinicPath()]) clinicTitle = CLINICS[this.getClinicPath()].title;
 
     /**

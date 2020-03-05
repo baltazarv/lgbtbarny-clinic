@@ -96,7 +96,8 @@ export const getInquirers = () => {
 				peopleFields.INTAKE_NOTES,
 				peopleFields.TERMS,
 				peopleFields.SIGNATURE,
-				peopleFields.CONSULTATIONS
+				peopleFields.CONSULTATIONS,
+				peopleFields.DATE_MODIFIED,
 			],
 			// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
 			// filterByFormula: 'Type = "Inquirer"'

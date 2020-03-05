@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Card } from 'react-bootstrap';
+import VisitorsTable from '../../components/clinics/visitorsTable/VisitorsTable';
 import ToggleButtons from '../../components/ToggleButtons';
+// data
+import * as actions from '../../store/actions';
 
 class Visitors extends Component {
   state ={
@@ -37,10 +41,31 @@ class Visitors extends Component {
         {toggleButtons}
         <Card.Body>
           <h1 className="h2">{clinic === 'admin' ? this.state.adminTitle : 'Visitors Checked In'}</h1>
+					<VisitorsTable
+						inquirers={this.props.inquirers}
+						lawTypes={this.props.lawTypes}
+						consultations={this.props.consultations} // object
+						lawyers={this.props.lawyers}
+					/>
         </Card.Body>
       </>
     )
   }
 }
 
-export default Visitors;
+const mapStateToProps = state => {
+	return {
+		inquirers: state.people.inquirersObject,
+		lawyers: state.people.lawyersObject,
+		lawTypes: state.lawTypes.lawTypesObject,
+		consultations: state.consultations.consultations,
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Visitors)
