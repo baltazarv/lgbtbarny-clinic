@@ -9,13 +9,6 @@ const DISPO_PRO_BONO_COLOR = 'blue';
 const DISPO_COMPELLING_COLOR = 'magenta';
 const DISPO_IMMIGRATION_COLOR = 'volcano';
 
-// export const statuses = [
-// 	consultFields.STATUS_REFER,
-// 	consultFields.STATUS_REFERRED,
-// 	consultFields.STATUS_POSSIBLE_IMPACT,
-// 	consultFields.STATUS_IMPACT_CONSIDERED,
-// ];
-
 export const statuses = [
 	{ group: 'Referral', value: consultFields.STATUS_REFER, text: 'Needed' },
 	{ group: 'Referral', value: consultFields.STATUS_REFERRED, text: 'Made' },
@@ -43,7 +36,6 @@ export const filterEligibleConsultations = consultations => {
 		if (dispoHasEligible) {
 			eligible[key] = consultations[key];
 		}
-		// eligible = Object.assign(eligible, consultations[key]);
 	}
 	return eligible;
 }

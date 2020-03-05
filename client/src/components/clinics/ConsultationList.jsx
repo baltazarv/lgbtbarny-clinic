@@ -10,6 +10,8 @@ import { getDispoTags, getStatusForEmptyShortName } from '../../data/consultatio
 import { getPeopleByIds } from '../../data/peopleData';
 import { getLawTypes } from '../../data/lawTypeData';
 
+const DISPOSTION_DEFAULT_VALUE = 'Dispostion was not specified.';
+
 const ConsultationList = props => {
 	const {
 		consultSelected,
@@ -31,12 +33,12 @@ const ConsultationList = props => {
 		},
 		{
 			title: "Consultation Notes",
-			value: fields[consultFields.SITUATION] ? fields[consultFields.SITUATION] : "No notes taken."
+			value: fields[consultFields.SITUATION] ? fields[consultFields.SITUATION] : "No notes taken.",
 		},
 		{
 			title: consultFields.DISPOSITIONS,
 			key: consultFields.DISPOSITIONS,
-			value: fields[consultFields.DISPOSITIONS] ? fields[consultFields.DISPOSITIONS] : "No notes taken."
+			value: fields[consultFields.DISPOSITIONS] ? fields[consultFields.DISPOSITIONS] : DISPOSTION_DEFAULT_VALUE,
 		},
 	]
 
@@ -51,17 +53,20 @@ const ConsultationList = props => {
 		},
 	];
 
-	const hasEligible = _dispos => {
-		return _dispos.some(dispo => {
-			if (dispo === consultFields.DISPOSITIONS_FEE_BASED) return true;
-			if (dispo === consultFields.DISPOSITIONS_PRO_BONO) return true;
-			if (dispo === consultFields.DISPOSITIONS_COMPELLING) return true;
-			return false;
-		})
-	}
+	if (fields[consultFields.DISPOSITIONS]) {
+		// old consultations were not marked with dispositions
+		const hasEligible = _dispos => {
+			return _dispos.some(dispo => {
+				if (dispo === consultFields.DISPOSITIONS_FEE_BASED) return true;
+				if (dispo === consultFields.DISPOSITIONS_PRO_BONO) return true;
+				if (dispo === consultFields.DISPOSITIONS_COMPELLING) return true;
+				return false;
+			})
+		}
 
-	if (hasEligible(fields[consultFields.DISPOSITIONS])) {
-		dataSource = [...dataSource, ...referralData];
+		if (hasEligible(fields[consultFields.DISPOSITIONS])) {
+			dataSource = [...dataSource, ...referralData];
+		}
 	}
 
 	if (fields[consultFields.EMAIL_TEXT_SENT]) {
@@ -84,7 +89,7 @@ const ConsultationList = props => {
 				dataSource={dataSource}
 				size="small"
 				renderItem={item => {
-					if (item.key && item.key === consultFields.DISPOSITIONS) {
+					if (item.key && item.key === consultFields.DISPOSITIONS && item.value !== DISPOSTION_DEFAULT_VALUE) {
 						return (
 							<List.Item key={key}>
 								<ul style={{

@@ -37,6 +37,8 @@ const PreviousConsultations = props => {
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
+	// to check if data source needs to be updated
+	const [visitorId, setVisitorId] = useState('');
 
 	const {
 		visitorSelected,
@@ -86,7 +88,8 @@ const PreviousConsultations = props => {
 		updateConsultation(updateObject);
 	}
 
-	if (inquirers && dataSource.length === 0) {
+	if (inquirers && (dataSource.length === 0 || visitorSelected.value !== visitorId)) {
+		setVisitorId(visitorSelected.value);
 		const consultIds = inquirers[visitorSelected.value][peopleFields.CONSULTATIONS];
 		// if visitor has any previous consultations
 		if (consultIds) {
@@ -101,7 +104,7 @@ const PreviousConsultations = props => {
 	}
 
 	const consultationList = (record) => {
-		const consultSelected = {[record.key]: {...consultations[record.key]}};
+		const consultSelected = { [record.key]: { ...consultations[record.key] } };
 		return <ConsultationList
 			consultSelected={consultSelected}
 			lawyers={lawyers}

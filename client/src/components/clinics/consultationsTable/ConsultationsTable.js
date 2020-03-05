@@ -32,13 +32,21 @@ const getVisitorNames = (ids, inquirers) => {
 	}
 }
 
-const ReferralsTable = props => {
+const ConsultationsTable = props => {
+
+	// from parent
+	const {
+		clinic
+	} = props;
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
 	const [visitorModalShown, setVisitorModalShown] = useState(false);
 	const [inquirerSelected, setInquirerSelected] = useState({});
 	const [visitorModalTitle, setVisitorModalTitle] = useState('');
+
+	let defaultStatusFilters = [];
+	if (clinic === 'admin') defaultStatusFilters = [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT];
 
 	// props from parent
 	const {
@@ -51,15 +59,23 @@ const ReferralsTable = props => {
 
 	const iconStyle = { fontSize: '18px', color: '#1890ff' };
 
+	const getDispoFilters = () => {
+		let _dispoFilters = [];
+		for (var key in dispoShortNames) {
+			_dispoFilters.push({ text: dispoShortNames[key], value: dispoShortNames[key] })
+		}
+		return _dispoFilters;
+	}
+
 	const columns = [
 		{
 			title: 'Date',
-			dataIndex: consultFields.CREATED_ON,
+			dataIndex: consultFields.DATE,
 			key: 'date',
 			defaultSortOrder: 'descend',
 			sorter: (a, b) => {
-				const dateA = new Date(a[consultFields.CREATED_ON]);
-				const dateB = new Date(b[consultFields.CREATED_ON]);
+				const dateA = new Date(a[consultFields.DATE]);
+				const dateB = new Date(b[consultFields.DATE]);
 				return dateA - dateB;
 			},
 		},
@@ -82,11 +98,11 @@ const ReferralsTable = props => {
 			title: 'Dispositions',
 			dataIndex: [consultFields.DISPOSITIONS],
 			key: 'dispos',
+			filters: getDispoFilters(),
+			onFilter: (value, record) => {
+				return record[consultFields.DISPOSITIONS].some(val => val === value);
+			},
 			render: dispos => getDispoTagsFromShortNames(dispos),
-			// doesn't work!?
-			// sorter: (a, b) => {
-			// 	return a[consultFields.DISPOSITIONS][0] - b[consultFields.DISPOSITIONS][0];
-			// },
 		},
 		{
 			title: 'Referral Status',
@@ -97,7 +113,7 @@ const ReferralsTable = props => {
 			editable: true,
 			// filters
 			filters: statusFilters,
-			defaultFilteredValue: [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT],
+			defaultFilteredValue: defaultStatusFilters,
 			onFilter: (value, record) => {
 				// dispoIsRef: disposition either fee based or pro-bono
 				const dispoIsRef = record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED]) || record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]);
@@ -128,13 +144,14 @@ const ReferralsTable = props => {
 
 	useEffect(() => {
 		const setTableData = () => {
-			const eligible = filterEligibleConsultations(consultations);
+			let eligible = consultations;
+			if (clinic === 'admin') eligible = filterEligibleConsultations(consultations);
 			let data = [];
 			for (var key in eligible) {
 				let fields = eligible[key];
 				const object = {
 					key,
-					[consultFields.CREATED_ON]: isoToStandardDate(fields[consultFields.CREATED_ON]),
+					[consultFields.DATE]: isoToStandardDate(fields[consultFields.DATE]),
 					[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
 					[consultFields.DISPOSITIONS]: getDispoShortNames(fields[consultFields.DISPOSITIONS]),
 					[consultFields.STATUS]: getStatusForEmptyShortName(fields),
@@ -152,7 +169,7 @@ const ReferralsTable = props => {
 			setDataSource(setTableData());
 			setIsLoading(false);
 		}
-	}, [isLoading, consultations, inquirers, lawTypes, lawyers])
+	}, [isLoading, consultations, inquirers, lawTypes, lawyers, clinic])
 
 	const handleTableChange = (pagination, filters, sorter) => {
 		console.log('handleTableChange pagination', pagination, 'filters', filters, 'sorter', sorter)
@@ -193,12 +210,11 @@ const ReferralsTable = props => {
 	}
 
 	const getConsultationsModalTitle = consultation => {
-		console.log(consultation)
 		if (!objectIsEmpty(consultation)) {
 			const key = Object.keys(consultation)[0];
 			const fields = consultation[key];
 			if (fields[consultFields.INQUIRERS]) {
-				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], inquirers)} on {isoToStandardDate(fields[consultFields.CREATED_ON])}</span>;
+				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], inquirers)} on {isoToStandardDate(fields[consultFields.DATE])}</span>;
 			}
 		}
 		return null;
@@ -254,7 +270,7 @@ const ReferralsTable = props => {
 	}
 
 	const consultationList = (record) => {
-		const consultSelected = {[record.key]: {...consultations[record.key]}};
+		const consultSelected = { [record.key]: { ...consultations[record.key] } };
 		return <ConsultationList
 			consultSelected={consultSelected}
 			lawyers={lawyers}
@@ -294,9 +310,10 @@ const ReferralsTable = props => {
 				onChange={handleTableChange}
 				handleSave={updateDispoStatus}
 				expandedRowRender={consultationList}
+				pagination={true}
 			/>
 		</>
 	)
 };
 
-export default ReferralsTable;
+export default ConsultationsTable;

@@ -17,7 +17,7 @@ import bgImageReferrals from '../../assets/images/bg-referrals.png';
 // data
 import { CLINICS } from '../../data/clinics';
 
-class ClinicRoutes extends Component {
+class Clinics extends Component {
   state = {
     bgImageStyle: null,
   }
@@ -50,7 +50,7 @@ class ClinicRoutes extends Component {
     // if section === undefined ? ClinicIndex
     if (section === 'intake') {
       img = bgImageIntake
-    } else if (section === 'referrals') {
+    } else if (section === 'completed') {
       img = bgImageReferrals;
     }
     let imgStyle = {
@@ -64,16 +64,17 @@ class ClinicRoutes extends Component {
 
   render() {
 
-    let clinicTitle = 'Clinics';
+    let clinicTitle = 'Clinic Administration';
     if (CLINICS[this.getClinicPath()]) clinicTitle = CLINICS[this.getClinicPath()].title;
 
     /**
      * <Card>
      *   <ButtonToolbar />
      *   <Card.Body />
+     * </Card>
      */
 
-    const consultation = () => <Card.Body>
+    const consult = () => <Card.Body>
       <Consultation
         clinicTitle={clinicTitle}
         lawyers={this.props.lawyers}
@@ -87,7 +88,9 @@ class ClinicRoutes extends Component {
       <Intake />
     </Card.Body>
 
-    const referrals = () => <Consultations />
+    const consultations = () => <Consultations
+      clinic={this.getClinicPath()}
+    />
 
 		const index = () => <Card.Body>
 			<ClinicIndex />
@@ -106,22 +109,35 @@ class ClinicRoutes extends Component {
 
               <Switch>
                 <Route exact path="/" component={index} />
-                <Route path="/tnc/consultation" component={consultation} />
+
+                {/* tnc */}
                 <Route path="/tnc/intake" component={intake} />
-                <Route path="/tnc/referrals" component={referrals} />
+                <Route path="/tnc/consult" component={consult} />
+                <Route path="/tnc/completed" component={consultations} />
                 <Route path="/tnc">
                   <Redirect to="/tnc/intake" />
                 </Route>
+
+                {/* nj */}
                 <Route path="/nj/intake" component={intake} />
-                <Route path="/nj/referrals" component={referrals} />
+                <Route path="/nj/completed" component={consultations} />
                 <Route path="/nj">
                   <Redirect to="/nj/intake" />
                 </Route>
-                <Route path="/youth/consultation" component={consultation} />
-                <Route path="/youth/referrals" component={referrals} />
+
+                {/* youth */}
+                <Route path="/youth/consult" component={consult} />
+                <Route path="/youth/completed" component={consultations} />
                 <Route path="/youth">
-                  <Redirect to="/youth/consultation" />
+                  <Redirect to="/youth/consult" />
                 </Route>
+
+                {/* admin */}
+                <Route path="/admin/referrals" component={consultations} />
+                <Route path="/admin">
+                  <Redirect to="/admin/referrals" />
+                </Route>
+
                 <Route
                   component={index}
                 />
@@ -152,4 +168,4 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ClinicRoutes));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Clinics));

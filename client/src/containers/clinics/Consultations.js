@@ -16,6 +16,11 @@ class Consultations extends Component {
 
 	render() {
 
+		// from parent
+		const {
+			clinic
+		} = this.props;
+
 		let clinicToggleBtns = [];
 		const settings = {
 			referrals: { buttonLabel: 'Referral Eligible' },
@@ -41,8 +46,9 @@ class Consultations extends Component {
 					</ToggleButtonGroup>
 				</ButtonToolbar>
 				<Card.Body>
-					<h1 className="h2">Referrals</h1>
+					<h1 className="h2">{this.props.clinic === 'admin' ? 'Referrals' : 'Consultations Completed'}</h1>
 					<ConsultationsTable
+						clinic={clinic}
 						inquirers={this.props.inquirers}
 						lawyers={this.props.lawyers}
 						lawTypes={this.props.lawTypes}

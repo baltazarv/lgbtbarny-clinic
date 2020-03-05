@@ -24,6 +24,7 @@ class EditableTable extends React.Component {
 			onChange,
 			options,
 			expandedRowRender,
+			pagination = false,
 		} = this.props;
 
 		const components = {
@@ -57,7 +58,7 @@ class EditableTable extends React.Component {
 					dataSource={dataSource}
 					columns={_columns}
 					options={options}
-					pagination={false}
+					pagination={pagination}
 					size="small"
 					onChange={onChange}
 					expandedRowRender={expandedRowRender}

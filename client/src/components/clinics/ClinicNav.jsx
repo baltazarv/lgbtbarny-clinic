@@ -31,9 +31,12 @@ const ClinicNav = (props) => {
             <Nav.Link as={Link} to={`/${clinic}/intake`} eventKey="intake" defaultChecked>Intake</Nav.Link>
           }
           {(clinic === 'tnc' || clinic === 'youth') &&
-            <Nav.Link as={Link} to={`/${clinic}/consultation`} eventKey="consultation" >Consultation</Nav.Link>
+            <Nav.Link as={Link} to={`/${clinic}/consult`} eventKey="consult" >Consult</Nav.Link>
           }
-          {(clinic === 'tnc' || clinic === 'nj' || clinic === 'youth') &&
+          {(clinic === 'tnc' || clinic === 'youth') &&
+            <Nav.Link as={Link} to={`/${clinic}/completed`} eventKey="completed">Completed</Nav.Link>
+          }
+          {clinic === 'admin' &&
             <Nav.Link as={Link} to={`/${clinic}/referrals`} eventKey="referrals">Referrals</Nav.Link>
           }
         </Nav>
