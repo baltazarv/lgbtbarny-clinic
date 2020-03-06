@@ -140,7 +140,7 @@ const VisitorAddForm = props => {
 			<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">{message}</Col>
 		</Row>
 	}
-	if (props.repeatVisitor) btnLabel = 'Update Info';
+	if (props.repeatVisitor) btnLabel = 'Process Visitor';
 	// if update form vs create form
 	buttons = <>
 		<Button

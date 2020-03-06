@@ -12,9 +12,9 @@ import Consultations from './Consultations';
 import * as actions from '../../store/actions';
 // css & images
 import styles from './Clinics.module.css';
-import bgImageIntake from '../../assets/images/bg-intake.png';
-import bgImageConsult from '../../assets/images/bg-consultation.png';
-import bgImageReferrals from '../../assets/images/bg-referrals.png';
+import bgImageRedish from '../../assets/images/bg-redish.png';
+import bgImageBluish from '../../assets/images/bg-bluish.png';
+import bgImageGreenish from '../../assets/images/bg-greenish.png';
 // data
 import { CLINICS } from '../../data/clinics';
 
@@ -46,14 +46,10 @@ class Clinics extends Component {
   }
 
   setBgImageStyle = () => {
-    let img = bgImageConsult;
+    let img = bgImageBluish; // section = 'consultations' || 'completed'
     const section = this.getSection();
-    // if section === undefined ? ClinicIndex
-    if (section === 'intake') {
-      img = bgImageIntake
-    } else if (section === 'completed') {
-      img = bgImageReferrals;
-    }
+    if (section === 'intake' || section === 'visitors') img = bgImageGreenish;
+    if (this.getClinicPath() === 'admin') img = bgImageRedish;
     let imgStyle = {
       background: `url(${img}) repeat-x top center fixed`,
       backgroundSize: "auto 278px",
