@@ -88,9 +88,16 @@ class Consultation extends Component {
 				}
 			})
 			payload = { ...payload, ...SUBMIT_FIELDS_DEFAULT };
-			// add custom text
+			// add custom email text
 			payload[consultFields.EMAIL_TEXT_SENT] = this.state.customEmailText;
 
+			//set clinic
+			let clinicValue = consultFields.CLINIC_TNC;
+			if (this.props.clinic === 'nj') clinicValue = consultFields.CLINIC_NJ;
+			if (this.props.clinic === 'youth') clinicValue = consultFields.CLINIC_YOUTH;
+			payload[consultFields.CLINIC_NAME] = clinicValue;
+
+			// reset same lawyer after submission
 			const selectedLawyers = values[consultFields.LAWYERS];
 
 			const serverResponse = await this.props.createConsultation(payload);

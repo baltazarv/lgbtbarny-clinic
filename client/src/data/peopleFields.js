@@ -3,6 +3,13 @@
 export const REPEAT_VISIT = 'Repeat Visit?';
 export const TYPE = 'Type';
 // export const HOW_FOUND = 'How Found Clinic';
+
+// clinic name
+export const CLINIC_NAME = 'Clinic Name';
+export const CLINIC_TNC = 'Tuesday Night Clinic';
+export const CLINIC_NJ = 'New Jersey Clinic';
+export const CLINIC_YOUTH = 'Youth Qlinic';
+
 // name
 export const FIRST_NAME = 'First Name';
 export const MIDDLE_NAME = 'Middle Name';
@@ -38,3 +45,7 @@ export const SIGNATURE = 'Digital Signature';
 export const CONSULTATIONS = 'Consultations (Visitor)';
 
 export const DATE_MODIFIED = 'Last Modified Date';
+//nj clinic
+export const DISPOSITION = 'Disposition';
+export const DISPOSITION_INFO = 'General info given';
+export const DISPOSITION_REVIEW = 'Review by LeGaL';

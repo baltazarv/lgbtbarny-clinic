@@ -78,7 +78,7 @@ class Clinics extends Component {
 
     const consultation = () => <Card.Body>
       <Consultation
-        clinicTitle={clinicTitle}
+        clinic={this.getClinicPath()}
         lawyers={this.props.lawyers}
         inquirers={this.props.inquirers}
         lawTypes={this.props.lawTypes}
@@ -87,12 +87,14 @@ class Clinics extends Component {
     </Card.Body>
 
     const intake = () => <Card.Body>
-      <Intake />
+      <Intake
+        clinic={this.getClinicPath()}
+      />
     </Card.Body>
 
     const visitors = () => <Visitors
-        clinic={this.getClinicPath()}
-      />
+      clinic={this.getClinicPath()}
+    />
 
     const consultations = () => <Consultations
       clinic={this.getClinicPath()}

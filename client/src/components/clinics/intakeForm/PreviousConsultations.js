@@ -1,8 +1,8 @@
+/** PrevConsultationTable */
 import React, { useState } from 'react';
 import EditableTable from '../../table/EditableTable';
 import ConsultationList from '../ConsultationList';
 // data
-import * as peopleFields from '../../../data/peopleFields';
 import { getLawyerNames } from '../../../data/peopleData';
 import * as consultFields from '../../../data/consultionFields';
 import { statuses, getDispoTagsFromShortNames, getStatusForEmptyShortName, getDispoShortNames } from '../../../data/consultationData';
@@ -37,20 +37,20 @@ const PreviousConsultations = props => {
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
-	// to check if data source needs to be updated
-	const [visitorId, setVisitorId] = useState('');
+	// to not set dataSource more than once for same visitor
+	const [consultIds, setConsultIds] = useState([]);
 
 	const {
-		visitorSelected,
-		inquirers,
+		selectedConsultations,
 		consultations,
 		updateConsultation,
 		lawyers,
 		lawTypes,
 	} = props;
 
-	const formatDataSource = consultations => {
-		const _dataSource = consultations.reduce((acc, cur) => {
+	const formatDataSource = _selectedConsultations => {
+		console.log(_selectedConsultations)
+		const _dataSource = _selectedConsultations.reduce((acc, cur) => {
 			acc.push({
 				key: cur.key,
 				[consultFields.CREATED_ON]: isoToStandardDate(cur[consultFields.CREATED_ON]),
@@ -88,19 +88,11 @@ const PreviousConsultations = props => {
 		updateConsultation(updateObject);
 	}
 
-	if (inquirers && (dataSource.length === 0 || visitorSelected.value !== visitorId)) {
-		setVisitorId(visitorSelected.value);
-		const consultIds = inquirers[visitorSelected.value][peopleFields.CONSULTATIONS];
-		// if visitor has any previous consultations
-		if (consultIds) {
-			const visitorConsultations = consultIds.map(id => {
-				return {
-					key: id,
-					...consultations[id],
-				}
-			});
-			formatDataSource(visitorConsultations);
-		}
+	// check that the dataSource not set more than once for same visitor
+	const _consultIds = selectedConsultations.map(consult => consult.key);
+	if (!consultIds.some(id => id === selectedConsultations[0].key)) {
+		setConsultIds(_consultIds);
+		formatDataSource(selectedConsultations);
 	}
 
 	const consultationList = (record) => {

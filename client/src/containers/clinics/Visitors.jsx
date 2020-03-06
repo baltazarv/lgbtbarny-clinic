@@ -42,6 +42,7 @@ class Visitors extends Component {
         <Card.Body>
           <h1 className="h2">{clinic === 'admin' ? this.state.adminTitle : 'Visitors Checked In'}</h1>
 					<VisitorsTable
+            clinic={clinic}
 						inquirers={this.props.inquirers}
 						lawTypes={this.props.lawTypes}
 						consultations={this.props.consultations} // object

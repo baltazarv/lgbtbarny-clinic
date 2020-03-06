@@ -97,6 +97,7 @@ export const getInquirers = () => {
 				peopleFields.TERMS,
 				peopleFields.SIGNATURE,
 				peopleFields.CONSULTATIONS,
+				peopleFields.CLINIC_NAME,
 				peopleFields.DATE_MODIFIED,
 			],
 			// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'

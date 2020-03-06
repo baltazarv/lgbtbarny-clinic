@@ -15,11 +15,17 @@ import VisitorSelect from '../../components/clinics/intakeForm/VisitorSelect';
 import VisitorAddForm from '../../components/clinics/VisitorAddForm';
 import PreviousConsultations from '../../components/clinics/intakeForm/PreviousConsultations';
 // data
+import * as peopleFields from '../../data/peopleFields';
 import { formatName, getPeopleIntoSelectOptions } from '../../data/peopleData';
 import { getRecordsFromSelection } from '../../data/dataTransforms';
 import * as actions from '../../store/actions/index';
 
 const Intake = props => {
+
+	const {
+		clinic,
+	} = props;
+
 	// shows or hides repeatVisitorSelect
 	const [isRepeat, setIsRepeat] = useState(false);
 	// select pulldown format
@@ -39,7 +45,14 @@ const Intake = props => {
 	}
 
 	const submitCreateInquirer = async (values, resetForm) => {
-		const serverResponse = await props.createInquirer(values);
+		let payload = { ...values };
+
+		//set clinic
+		let clinicValue = peopleFields.CLINIC_TNC;
+		if (props.clinic === 'nj') clinicValue = peopleFields.CLINIC_NJ;
+		payload[peopleFields.CLINIC_NAME] = clinicValue;
+
+		const serverResponse = await props.createInquirer(payload);
 		setServerResponse(serverResponse);
 		if (serverResponse.status === 'success' && serverResponse.type === 'createInquirer') {
 			resetForm();
@@ -96,95 +109,117 @@ const Intake = props => {
 		)
 	}
 
-	return (
-		<>
-			<h1 className="h2">Visitor Intake Form</h1>
-			<p className="text-danger small">*Required</p>
+	const renderPreviousConsultations = () => {
+		const consultIds = props.inquirersObject[repeatVisitorSelected.value][peopleFields.CONSULTATIONS];
+		if (consultIds) {
+			const visitorConsultations = consultIds.map(id => {
+				return {
+					key: id,
+					...props.consultations[id],
+				}
+			});
+			return <PreviousConsultations
+				selectedConsultations={visitorConsultations}
+				inquirers={props.inquirersObject}
+				consultations={props.consultations}
+				updateConsultation={props.updateConsultation}
+				lawyers={props.lawyersObject}
+				lawTypes={props.lawTypesObject}
+			/>
+		} else {
+			return <Card className="mb-3 text-center">
+			<Card.Body>
+				<span className="text-muted">No consultations have been saved for the visitor.</span>
+			</Card.Body>
+		</Card>
+;
+		}
+	}
 
-			{/* is repeat visitor Form.Check switch */}
+		return (
+			<>
+				<h1 className="h2">Visitor Intake Form</h1>
+				<p className="text-danger small">*Required</p>
 
-			<Row>
-				<Col>
-					<Form.Group className="mb-2">
-						<Form.Label className="mb-0">Have you been to the clinic before?&nbsp;&nbsp;</Form.Label>
-						<span className="ml-2">
-							No&nbsp;&nbsp;<Form.Check
-								type="switch"
-								id="custom-switch"
-								aria-label="repeat"
-								label="Yes"
-								inline={true}
-								onChange={handleRepeatSwitch}
+				{/* is repeat visitor Form.Check switch */}
+
+				<Row>
+					<Col>
+						<Form.Group className="mb-2">
+							<Form.Label className="mb-0">Have you been to the clinic before?&nbsp;&nbsp;</Form.Label>
+							<span className="ml-2">
+								No&nbsp;&nbsp;<Form.Check
+									type="switch"
+									id="custom-switch"
+									aria-label="repeat"
+									label="Yes"
+									inline={true}
+									onChange={handleRepeatSwitch}
+								/>
+							</span>
+						</Form.Group>
+					</Col>
+				</Row>
+				<Row>
+					{repeatInstructions()}
+				</Row>
+
+				{/* new visitor */}
+				{!isRepeat &&
+					<VisitorAddForm
+						clinic={clinic}
+						lawTypes={props.lawTypes}
+						submitForm={submitCreateInquirer}
+						serverResponse={serverResponse}
+					/>
+				}
+
+				{/* repeat visitor */}
+				{isRepeat &&
+					repeatVisitorSelect()
+				}
+
+				{/* repeat visitor selected for editing */}
+				{isRepeat && repeatVisitorSelected &&
+					(
+						<>
+							{renderPreviousConsultations()}
+							<VisitorAddForm
+								clinic={clinic}
+								// start with given select obj, return array with full airtable record
+								repeatVisitor={getRecordsFromSelection(repeatVisitorSelected, props.inquirers)[0]}
+								lawTypes={props.lawTypes}
+								submitForm={submitUpdateInquirer}
+								serverResponse={serverResponse}
 							/>
-						</span>
-					</Form.Group>
-				</Col>
-			</Row>
-			<Row>
-				{repeatInstructions()}
-			</Row>
+						</>
+					)
+				}
 
-			{/* new visitor */}
-			{!isRepeat &&
-				<VisitorAddForm
-					lawTypes={props.lawTypes}
-					submitForm={submitCreateInquirer}
-					serverResponse={serverResponse}
-				/>
-			}
+				{/* repeat visitor edits submitted: success message */}
+				{isRepeat && visitorWasUpdated &&
+					visitorUpdatedMessage(serverResponse)
+				}
+			</>
+		);
+	};
 
-			{/* repeat visitor */}
-			{isRepeat &&
-				repeatVisitorSelect()
-			}
-
-			{/* repeat visitor selected for editing */}
-			{isRepeat && repeatVisitorSelected &&
-				(
-					<>
-						<PreviousConsultations
-							visitorSelected={repeatVisitorSelected}
-							inquirers={props.inquirersObject}
-							consultations={props.consultations}
-							updateConsultation={props.updateConsultation}
-							lawyers={props.lawyersObject}
-							lawTypes={props.lawTypesObject}
-						/>
-						<VisitorAddForm
-							// start with given select obj, return array with full airtable record
-							repeatVisitor={getRecordsFromSelection(repeatVisitorSelected, props.inquirers)[0]}
-							lawTypes={props.lawTypes}
-							submitForm={submitUpdateInquirer}
-							serverResponse={serverResponse}
-						/>
-					</>
-				)
-			}
-
-			{/* repeat visitor edits submitted: success message */}
-			{isRepeat && visitorWasUpdated &&
-				visitorUpdatedMessage(serverResponse)
-			}
-		</>
-	);
-};
-
-const mapStateToProps = state => {
-	return {
-		inquirers: state.people.inquirers,
-		consultations: state.consultations.consultations,
-		inquirersObject: state.people.inquirersObject,
-		lawyersObject: state.people.lawyersObject,
-		lawTypes: state.lawTypes.lawTypes, // for <VisitorAddForm />
-		lawTypesObject: state.lawTypes.lawTypesObject,
+	const mapStateToProps = state => {
+		return {
+			inquirers: state.people.inquirers,
+			consultations: state.consultations.consultations,
+			inquirersObject: state.people.inquirersObject,
+			lawyersObject: state.people.lawyersObject,
+			lawTypes: state.lawTypes.lawTypes, // for <VisitorAddForm />
+			lawTypesObject: state.lawTypes.lawTypesObject,
+		}
 	}
-}
-const mapDispatchToProps = dispatch => {
-	return {
-		// call from parent Clinics?
-		createInquirer: inq => dispatch(actions.createInquirer(inq)),
-		updateInquirer: inqValues => dispatch(actions.updateInquirer(inqValues)),
-		updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
+	const mapDispatchToProps = dispatch => {
+		return {
+			// call from parent Clinics?
+			createInquirer: inq => dispatch(actions.createInquirer(inq)),
+			updateInquirer: inqValues => dispatch(actions.updateInquirer(inqValues)),
+			updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
+		}
 	}
-}
-export default connect(mapStateToProps, mapDispatchToProps)(Intake);
+	export default connect(mapStateToProps, mapDispatchToProps)(Intake);

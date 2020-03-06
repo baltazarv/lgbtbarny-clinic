@@ -2,10 +2,16 @@
 export const CREATED_ON = 'Created On';
 export const NAME = 'Name'; // calc field
 export const DATE = 'Date';
-export const TYPE = 'Type';
+export const TYPE = 'Type'; // 'Clinic'
 export const LAWYERS = 'Lawyer'; // array
 export const INQUIRERS = 'Inquirer'; // array
 export const SITUATION = 'Inquirer\'s Situation';
+
+// clinic name
+export const CLINIC_NAME = 'Clinic Name';
+export const CLINIC_TNC = 'Tuesday Night Clinic';
+export const CLINIC_NJ = 'New Jersey Clinic';
+export const CLINIC_YOUTH = 'Youth Qlinic';
 
 // dispositions
 export const DISPOSITIONS = 'Disposition'; // array

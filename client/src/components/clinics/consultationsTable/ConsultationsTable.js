@@ -145,22 +145,24 @@ const ConsultationsTable = props => {
 	useEffect(() => {
 		const setTableData = () => {
 			let eligible = consultations;
-			if (clinic === 'admin') eligible = filterEligibleConsultations(consultations);
+			// if (clinic === 'admin') eligible = filterEligibleConsultations(consultations);
 			let data = [];
 			for (var key in eligible) {
 				let fields = eligible[key];
-				const object = {
-					key,
-					[consultFields.DATE]: isoToStandardDate(fields[consultFields.DATE]),
-					[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
-					[consultFields.DISPOSITIONS]: getDispoShortNames(fields[consultFields.DISPOSITIONS]),
-					[consultFields.STATUS]: getStatusForEmptyShortName(fields),
-					[consultFields.LAWYERS]: getLawyerNames(fields[consultFields.LAWYERS], lawyers),
-					[consultFields.LAW_TYPES]: getLawTypes(fields[consultFields.LAW_TYPES], lawTypes),
-					[consultFields.SITUATION]: fields[consultFields.SITUATION],
-					[consultFields.REF_SUMMARY]: fields[consultFields.REF_SUMMARY],
+				if (clinic === 'admin' || (clinic === 'tnc' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_TNC) || (clinic === 'youth' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_YOUTH)) {
+					const object = {
+						key,
+						[consultFields.DATE]: isoToStandardDate(fields[consultFields.DATE]),
+						[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
+						[consultFields.DISPOSITIONS]: getDispoShortNames(fields[consultFields.DISPOSITIONS]),
+						[consultFields.STATUS]: getStatusForEmptyShortName(fields),
+						[consultFields.LAWYERS]: getLawyerNames(fields[consultFields.LAWYERS], lawyers),
+						[consultFields.LAW_TYPES]: getLawTypes(fields[consultFields.LAW_TYPES], lawTypes),
+						[consultFields.SITUATION]: fields[consultFields.SITUATION],
+						[consultFields.REF_SUMMARY]: fields[consultFields.REF_SUMMARY],
+					}
+					data.push(object)
 				}
-				data.push(object)
 			}
 			return data;
 		}

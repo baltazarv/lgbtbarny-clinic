@@ -37,9 +37,9 @@ const INITIAL_VALUES = {
 	[peopleFields.INCOME]: '', // radio buttons
 	[peopleFields.TERMS]: '', // single-checkbox string
 	[peopleFields.SIGNATURE]: '',
-	// repeat visit
 	[peopleFields.OTHER_NAMES]: '',
 	[peopleFields.MIDDLE_NAME]: '',
+	[peopleFields.DISPOSITION]: [], // multi-checkbox array
 	// id
 }
 
@@ -113,8 +113,9 @@ const VisitorAddForm = props => {
 		isSubmitting,
 		dirty,
 
-		// parent <Intake />
+		// parent
 		lawTypes,
+		clinic,
 	} = props;
 
 	const termsAcceptClasses = {
@@ -167,9 +168,76 @@ const VisitorAddForm = props => {
 				</button> */}
 	</>
 
+	// acknowldegment
+	const acknowAndSign = <Card className="mb-3">
+		<Card.Body className="pb-0">
+			<CheckboxGroup
+				id={peopleFields.TERMS}
+				label={peopleFields.TERMS}
+				description="I understand that LeGaL does not provide representation, nor will LeGaL or the volunteer attorney become my legal representative by virtue of the Clinic consultation. I understand that the assistance provided by the volunteer attorney is limited to the Clinic session. I understand that the volunteer attorney is not obligated to provide information or referrals outside the Clinic. I understand that abusive behavior towards any of the Clinic staff or others waiting for the Clinic may result in my being barred from the Clinic."
+				value={values[peopleFields.TERMS]}
+				error={errors[peopleFields.TERMS]}
+				touched={touched[peopleFields.TERMS]}
+				onChange={setFieldValue}
+				onBlur={setFieldTouched}
+				required={true}
+				className="mb-2"
+			>
+				<Field
+					component={Checkbox}
+					name={peopleFields.TERMS}
+					id={peopleFields.TERMS_AGREE}
+					label={peopleFields.TERMS_AGREE}
+					className={termsAcceptClasses}
+				/>
+			</CheckboxGroup>
+			<div className="mb-4">
+				<InputField
+					name={peopleFields.SIGNATURE}
+					type="text"
+					label={peopleFields.SIGNATURE}
+					info="Please write your name below, serving as your digital signature."
+					placeholder="Full Name"
+					required={true}
+					style={{
+						width: "98%",
+					}}
+				/>
+			</div>
+		</Card.Body>
+	</Card>
+
+	// nj clinic disposition
+	let dispositions = null;
+	if (clinic === 'nj') {
+		dispositions = <CheckboxGroup
+			id={peopleFields.DISPOSITION}
+			label="Action(s) Taken and Description of Disposition (Check all that apply)"
+			value={values[peopleFields.DISPOSITION]}
+			error={errors[peopleFields.DISPOSITION]}
+			touched={touched[peopleFields.DISPOSITION]}
+			onChange={setFieldValue}
+			onBlur={setFieldTouched}
+		>
+			<Field
+				component={Checkbox}
+				name={peopleFields.DISPOSITION}
+				id={peopleFields.DISPOSITION_INFO}
+				label="General Info., including information regarding legal and social services"
+				/>
+			<Field
+				component={Checkbox}
+				name={peopleFields.DISPOSITION}
+				id={peopleFields.DISPOSITION_REVIEW}
+				label="Review by LeGaL for possible referral to network lawyers for representation or for high-impact litigation"
+			/>
+		</CheckboxGroup>
+	}
+
 	return <Card>
 		<Card.Body>
 			<FormikForm onSubmit={handleSubmit}>
+				{acknowAndSign}
 				<Row>
 					<Col className="label form-label mb-2">Visitor Name</Col>
 				</Row>
@@ -221,7 +289,7 @@ const VisitorAddForm = props => {
 					}}
 				/>
 				<Card className="mb-3">
-					<Card.Body style={{backgroundColor: '#39c1fa1a'}}>
+					<Card.Body style={{ backgroundColor: '#39c1fa1a' }}>
 						<Select
 							name={peopleFields.LAW_TYPES}
 							options={lawTypes}
@@ -296,7 +364,7 @@ const VisitorAddForm = props => {
 					/>
 				</div>
 				<CheckboxGroup
-					id={peopleFields.PRONOUNS} // id=local parent
+					id={peopleFields.PRONOUNS}
 					label="Gender Pronouns"
 					value={values[peopleFields.PRONOUNS]}
 					error={errors[peopleFields.PRONOUNS]}
@@ -306,7 +374,7 @@ const VisitorAddForm = props => {
 				>
 					<Field
 						component={Checkbox}
-						name={peopleFields.PRONOUNS} // name=local parent
+						name={peopleFields.PRONOUNS}
 						id={peopleFields.PRONOUNS_SHE} // id=child
 						label={peopleFields.PRONOUNS_SHE}
 					/>
@@ -400,44 +468,15 @@ const VisitorAddForm = props => {
 						component={TextArea}
 						name={peopleFields.INTAKE_NOTES}
 						id={peopleFields.INTAKE_NOTES}
-						label="Optional/additional Notes"
+						label={clinic === 'nj' ? 'Factual Description of the Situation' : 'Optional/Additional Notes'}
 						placeholder="Anything else the attorney should know."
 						rows={2}
 					/>
 				</div>
-				<CheckboxGroup
-					id={peopleFields.TERMS} // id=local parent
-					label={peopleFields.TERMS}
-					description="I understand that LeGaL does not provide representation, nor will LeGaL or the volunteer attorney become my legal representative by virtue of the Clinic consultation. I understand that the assistance provided by the volunteer attorney is limited to the Clinic session. I understand that the volunteer attorney is not obligated to provide information or referrals outside the Clinic. I understand that abusive behavior towards any of the Clinic staff or others waiting for the Clinic may result in my being barred from the Clinic."
-					value={values[peopleFields.TERMS]}
-					error={errors[peopleFields.TERMS]}
-					touched={touched[peopleFields.TERMS]}
-					onChange={setFieldValue}
-					onBlur={setFieldTouched}
-					required={true}
-					className="mb-4"
-				>
-					<Field
-						component={Checkbox}
-						name={peopleFields.TERMS} // name=local parent
-						id={peopleFields.TERMS_AGREE} // id=child
-						label={peopleFields.TERMS_AGREE}
-						className={termsAcceptClasses}
-					/>
-				</CheckboxGroup>
-				<div className="mb-4">
-					<InputField
-						name={peopleFields.SIGNATURE}
-						type="text"
-						label={peopleFields.SIGNATURE}
-						info="Please write your name below, serving as your digital signature."
-						placeholder="Full Name"
-						required={true}
-						style={{
-							width: "98%",
-						}}
-					/>
-				</div>
+
+				{/* previous acknowledgement & signature location */}
+
+				{dispositions}
 
 				{/* TO-DO: list error messages here? */}
 

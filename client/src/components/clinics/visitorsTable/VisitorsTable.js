@@ -17,6 +17,7 @@ const VisitorsTable = props => {
 
 	// props from parent
 	const {
+		clinic,
 		inquirers, // inquirersObject
 		lawTypes, // lawTypesObject
 		consultations,
@@ -53,13 +54,15 @@ const VisitorsTable = props => {
 			let data = [];
 			for (var key in inquirers) {
 				let fields = inquirers[key];
-				const object = {
-					key,
-					[peopleFields.DATE_MODIFIED]: isoToStandardDate(fields[peopleFields.DATE_MODIFIED]),
-					fullname: formatName(fields),
-					[peopleFields.LAW_TYPES]: getLawTypes(fields[peopleFields.LAW_TYPES], lawTypes),
+				if (clinic === 'admin' || (clinic === 'tnc' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_TNC) || (clinic === 'nj' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_NJ)) {
+					const object = {
+						key,
+						[peopleFields.DATE_MODIFIED]: isoToStandardDate(fields[peopleFields.DATE_MODIFIED]),
+						fullname: formatName(fields),
+						[peopleFields.LAW_TYPES]: getLawTypes(fields[peopleFields.LAW_TYPES], lawTypes),
+					}
+					data.push(object)
 				}
-				data.push(object)
 			}
 			return data;
 		}
@@ -68,7 +71,7 @@ const VisitorsTable = props => {
 			setDataSource(setTableData());
 			setIsLoading(false);
 		}
-	}, [isLoading, inquirers, lawTypes])
+	}, [isLoading, inquirers, lawTypes, clinic])
 
 	const visitorListItems = {
 		fields: [
