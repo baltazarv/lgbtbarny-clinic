@@ -2,7 +2,9 @@
 export const CREATED_ON = 'Created On';
 export const NAME = 'Name'; // calc field
 export const DATE = 'Date';
-export const TYPE = 'Type'; // 'Clinic'
+export const DATETIME = 'DateTime';
+export const TYPE = 'Type';
+export const TYPE_CLINIC = 'Clinic';
 export const LAWYERS = 'Lawyer'; // array
 export const INQUIRERS = 'Inquirer'; // array
 export const SITUATION = 'Inquirer\'s Situation';

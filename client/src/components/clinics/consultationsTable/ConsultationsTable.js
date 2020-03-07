@@ -6,7 +6,7 @@ import ConsultationList from '../ConsultationList';
 import VisitorList from '../VisitorList';
 // data
 import * as consultFields from '../../../data/consultionFields';
-import { statuses, dispoShortNames, getDispoShortNames, getDispoTagsFromShortNames, getStatusForEmptyShortName, filterEligibleConsultations } from '../../../data/consultationData';
+import { statuses, dispoShortNames, getDispoShortNames, getDispoTagsFromShortNames, getStatusForEmptyShortName } from '../../../data/consultationData'; // , filterEligibleConsultations
 import * as peopleFields from '../../../data/peopleFields';
 import { formatName, getLawyerNames, getPeopleByIds } from '../../../data/peopleData';
 import { getLawTypes } from '../../../data/lawTypeData';
@@ -70,12 +70,12 @@ const ConsultationsTable = props => {
 	const columns = [
 		{
 			title: 'Date',
-			dataIndex: consultFields.DATE,
+			dataIndex: consultFields.DATETIME,
 			key: 'date',
 			defaultSortOrder: 'descend',
 			sorter: (a, b) => {
-				const dateA = new Date(a[consultFields.DATE]);
-				const dateB = new Date(b[consultFields.DATE]);
+				const dateA = new Date(a[consultFields.DATETIME]);
+				const dateB = new Date(b[consultFields.DATETIME]);
 				return dateA - dateB;
 			},
 		},
@@ -152,7 +152,7 @@ const ConsultationsTable = props => {
 				if (clinic === 'admin' || (clinic === 'tnc' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_TNC) || (clinic === 'youth' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_YOUTH)) {
 					const object = {
 						key,
-						[consultFields.DATE]: isoToStandardDate(fields[consultFields.DATE]),
+						[consultFields.DATETIME]: isoToStandardDate(fields[consultFields.DATETIME]),
 						[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
 						[consultFields.DISPOSITIONS]: getDispoShortNames(fields[consultFields.DISPOSITIONS]),
 						[consultFields.STATUS]: getStatusForEmptyShortName(fields),
@@ -216,7 +216,7 @@ const ConsultationsTable = props => {
 			const key = Object.keys(consultation)[0];
 			const fields = consultation[key];
 			if (fields[consultFields.INQUIRERS]) {
-				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], inquirers)} on {isoToStandardDate(fields[consultFields.DATE])}</span>;
+				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], inquirers)} on {isoToStandardDate(fields[consultFields.DATETIME])}</span>;
 			}
 		}
 		return null;

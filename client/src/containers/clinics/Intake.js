@@ -51,6 +51,8 @@ const Intake = props => {
 		let clinicValue = peopleFields.CLINIC_TNC;
 		if (props.clinic === 'nj') clinicValue = peopleFields.CLINIC_NJ;
 		payload[peopleFields.CLINIC_NAME] = clinicValue;
+		// set datetime stamp
+		payload[peopleFields.DATETIME] = new Date();
 
 		const serverResponse = await props.createInquirer(payload);
 		setServerResponse(serverResponse);
@@ -60,7 +62,11 @@ const Intake = props => {
 	}
 
 	const submitUpdateInquirer = async (values) => {
-		const serverResponse = await props.updateInquirer(values);
+		let payload = {...values};
+		// set datetime stamp
+		payload[peopleFields.DATETIME] = new Date();
+
+		const serverResponse = await props.updateInquirer(payload);
 		setServerResponse(serverResponse);
 		if (serverResponse.status === 'success') {
 			// unload VisitorAddForm and reload switch Select

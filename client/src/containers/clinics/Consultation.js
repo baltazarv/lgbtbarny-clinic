@@ -16,16 +16,6 @@ import { formatName } from '../../data/peopleData';
 // import { getInquirerConsultations } from '../../../data/consultationData';
 import { EMAIL_OPTIONS, mergeCustomAndDefaultHtml } from '../../emails/visitorPostConsultation';
 import { objectIsEmpty } from '../../utils';
-// utils
-
-const TYPE_CLINIC = 'Clinic';
-
-// AirTable fields in peopleFields and consultFields
-const SUBMIT_FIELDS_DEFAULT = {
-	[consultFields.TYPE]: TYPE_CLINIC,
-	// TO-DO: check to see if entry date is correct. Need toLocaleTimeString?
-	[consultFields.DATE]: new Date().toISOString().substr(0, 10),
-};
 
 // make into a stateless component?
 class Consultation extends Component {
@@ -87,15 +77,23 @@ class Consultation extends Component {
 					payload[key] = value;
 				}
 			})
-			payload = { ...payload, ...SUBMIT_FIELDS_DEFAULT };
-			// add custom email text
-			payload[consultFields.EMAIL_TEXT_SENT] = this.state.customEmailText;
 
-			//set clinic
+			// set as type 'Clinic'
+			payload[consultFields.TYPE] = consultFields.TYPE_CLINIC;
+
+			// // set old date field -
+			// payload[consultFields.DATE] = new Date().toISOString().substr(0, 10);
+			// set new datetime stamp
+			payload[consultFields.DATETIME] = new Date();
+
+			// set clinic
 			let clinicValue = consultFields.CLINIC_TNC;
 			if (this.props.clinic === 'nj') clinicValue = consultFields.CLINIC_NJ;
 			if (this.props.clinic === 'youth') clinicValue = consultFields.CLINIC_YOUTH;
 			payload[consultFields.CLINIC_NAME] = clinicValue;
+
+			// add custom email text
+			payload[consultFields.EMAIL_TEXT_SENT] = this.state.customEmailText;
 
 			// reset same lawyer after submission
 			const selectedLawyers = values[consultFields.LAWYERS];

@@ -229,7 +229,7 @@ const VisitorAddForm = props => {
 				component={Checkbox}
 				name={peopleFields.DISPOSITION}
 				id={peopleFields.DISPOSITION_REVIEW}
-				label="Review by LeGaL for possible referral to network lawyers for representation or for high-impact litigation"
+				label="Review by LeGaL for possible referral to network lawyers for representation or for high-impact litigation. But note that referrals in NJ are EXTREMELY limited."
 			/>
 		</CheckboxGroup>
 	}

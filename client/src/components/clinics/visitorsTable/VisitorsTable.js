@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table } from 'antd';
+import { Table, Avatar } from 'antd';
 import VisitorList from '../VisitorList';
 // data
 import * as peopleFields from '../../../data/peopleFields';
@@ -26,13 +26,32 @@ const VisitorsTable = props => {
 
 	const columns = [
 		{
+			title: '',
+			dataIndex: peopleFields.CLINIC_NAME,
+			key: peopleFields.CLINIC_NAME,
+			render: (clinicName) => {
+				console.log(clinicName, peopleFields.CLINIC_NJ)
+				let clinicText = 'TN';
+				let color = '#f56a00';
+				if (clinicName === peopleFields.CLINIC_NJ) {
+					clinicText = 'NJ';
+					color = '#00a2ae';
+				}
+				if (clinicName === peopleFields.CLINIC_YOUTH) {
+					clinicText = 'Y';
+					color = '#7265e6';
+				}
+				return <Avatar style={{ backgroundColor: color, verticalAlign: 'middle' }} size="small">{clinicText}</Avatar>
+			}
+		},
+		{
 			title: 'Update Date',
-			dataIndex: peopleFields.DATE_MODIFIED,
-			key: peopleFields.DATE_MODIFIED,
+			dataIndex: peopleFields.DATETIME,
+			key: peopleFields.DATETIME,
 			defaultSortOrder: 'descend',
 			sorter: (a, b) => {
-				const dateA = new Date(a[peopleFields.DATE_MODIFIED]);
-				const dateB = new Date(b[peopleFields.DATE_MODIFIED]);
+				const dateA = new Date(a[peopleFields.DATETIME]);
+				const dateB = new Date(b[peopleFields.DATETIME]);
 				return dateA - dateB;
 			},
 		},
@@ -57,7 +76,8 @@ const VisitorsTable = props => {
 				if (clinic === 'admin' || (clinic === 'tnc' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_TNC) || (clinic === 'nj' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_NJ)) {
 					const object = {
 						key,
-						[peopleFields.DATE_MODIFIED]: isoToStandardDate(fields[peopleFields.DATE_MODIFIED]),
+						[peopleFields.CLINIC_NAME]: fields[peopleFields.CLINIC_NAME],
+						[peopleFields.DATETIME]: isoToStandardDate(fields[peopleFields.DATETIME]),
 						fullname: formatName(fields),
 						[peopleFields.LAW_TYPES]: getLawTypes(fields[peopleFields.LAW_TYPES], lawTypes),
 					}
@@ -143,7 +163,7 @@ const VisitorsTable = props => {
 			const key = Object.keys(consultation)[0];
 			const fields = consultation[key];
 			if (fields[consultFields.INQUIRERS]) {
-				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], inquirers)} on {isoToStandardDate(fields[consultFields.DATE])}</span>;
+				return <span>Consultation for {getPeopleByIds(fields[consultFields.INQUIRERS], inquirers)} on {isoToStandardDate(fields[consultFields.DATETIME])}</span>;
 			}
 		}
 		return null;

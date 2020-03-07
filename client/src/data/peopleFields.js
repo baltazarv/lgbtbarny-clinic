@@ -3,6 +3,7 @@
 export const REPEAT_VISIT = 'Repeat Visit?';
 export const TYPE = 'Type';
 // export const HOW_FOUND = 'How Found Clinic';
+export const DATETIME = 'Inquirer DateTime';
 
 // clinic name
 export const CLINIC_NAME = 'Clinic Name';

@@ -99,6 +99,7 @@ export const getInquirers = () => {
 				peopleFields.CONSULTATIONS,
 				peopleFields.CLINIC_NAME,
 				peopleFields.DATE_MODIFIED,
+				peopleFields.DATETIME,
 			],
 			// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
 			// filterByFormula: 'Type = "Inquirer"'
