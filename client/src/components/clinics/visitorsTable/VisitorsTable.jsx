@@ -18,6 +18,8 @@ const VisitorsTable = props => {
 	// props from parent
 	const {
 		clinic,
+		filteredValues,
+		changeFilters,
 		inquirers, // inquirersObject
 		lawTypes, // lawTypesObject
 		consultations,
@@ -31,6 +33,13 @@ const VisitorsTable = props => {
 			title: '',
 			dataIndex: peopleFields.CLINIC_NAME,
 			key: peopleFields.CLINIC_NAME,
+			filters: [
+				{ text: consultFields.CLINIC_TNC, value: consultFields.CLINIC_TNC },
+				{ text: consultFields.CLINIC_NJ, value: consultFields.CLINIC_NJ },
+				{ text: consultFields.CLINIC_YOUTH, value: consultFields.CLINIC_YOUTH },
+			],
+			onFilter: (value, record) => value === record[peopleFields.CLINIC_NAME],
+			filteredValue: filteredValues[peopleFields.CLINIC_NAME],
 			render: (clinicName) => {
 				let clinicText = 'TN';
 				let color = '#f56a00';
@@ -66,11 +75,21 @@ const VisitorsTable = props => {
 		render: (visitor) => <strong>{visitor}</strong>,
 	});
 
-	columns.push({
-		title: 'Visit Regarding',
-		dataIndex: peopleFields.LAW_TYPES,
-		key: 'visitor',
-	})
+	if (clinic === 'tnc') {
+		columns.push({
+			title: 'Visit Regarding',
+			dataIndex: peopleFields.LAW_TYPES,
+			key: 'visitor',
+		});
+	}
+
+	if (clinic === 'admin' || clinic === 'nj') {
+		columns.push({
+			title: 'Actions/Dispo.',
+			dataIndex: peopleFields.DISPOSITION,
+			key: peopleFields.DISPOSITION,
+		});
+	}
 
 	useEffect(() => {
 		const setTableData = () => {
@@ -84,6 +103,7 @@ const VisitorsTable = props => {
 						[peopleFields.DATETIME]: isoToStandardDate(fields[peopleFields.DATETIME]),
 						fullname: formatName(fields),
 						[peopleFields.LAW_TYPES]: getLawTypes(fields[peopleFields.LAW_TYPES], lawTypes),
+						[peopleFields.DISPOSITION]: fields[peopleFields.DISPOSITION] ? fields[peopleFields.DISPOSITION].join(', ') : '',
 					}
 					data.push(object)
 				}
@@ -186,6 +206,10 @@ const VisitorsTable = props => {
 		/>
 	}
 
+  const handleChange = (pagination, filters) => {
+		changeFilters(filters);
+	};
+
 	return (
 		<>
 			<Table
@@ -195,6 +219,7 @@ const VisitorsTable = props => {
 				pagination={true}
 				size="small"
 				expandedRowRender={renderVisitorList}
+				onChange={handleChange}
 			// scroll={{ x: '100%' }}
 			/>
 		</>

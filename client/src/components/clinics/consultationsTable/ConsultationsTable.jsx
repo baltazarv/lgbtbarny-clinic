@@ -118,9 +118,10 @@ const ConsultationsTable = props => {
 	});
 
 	columns.push({
-		title: 'Dispositions',
+		title: 'Disposition(s)',
 		dataIndex: [consultFields.DISPOSITIONS],
 		key: 'dispos',
+		ellipsis: true,
 		filters: getDispoFilters(),
 		onFilter: (value, record) => {
 			return record[consultFields.DISPOSITIONS].some(val => val === value);

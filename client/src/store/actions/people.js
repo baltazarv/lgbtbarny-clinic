@@ -81,6 +81,9 @@ export const getInquirers = () => {
 		airtableBase(PEOPLE_TABLE).select({
 			view: INQUIRERS_VIEW,
 			fields: [
+				peopleFields.CLINIC_NAME,
+				peopleFields.DATE_MODIFIED,
+				peopleFields.DATETIME,
 				peopleFields.REPEAT_VISIT,
 				peopleFields.FIRST_NAME,
 				peopleFields.MIDDLE_NAME,
@@ -96,10 +99,8 @@ export const getInquirers = () => {
 				peopleFields.INTAKE_NOTES,
 				peopleFields.TERMS,
 				peopleFields.SIGNATURE,
+				peopleFields.DISPOSITION,
 				peopleFields.CONSULTATIONS,
-				peopleFields.CLINIC_NAME,
-				peopleFields.DATE_MODIFIED,
-				peopleFields.DATETIME,
 			],
 			// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
 			// filterByFormula: 'Type = "Inquirer"'

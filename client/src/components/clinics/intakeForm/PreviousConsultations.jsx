@@ -49,7 +49,6 @@ const PreviousConsultations = props => {
 	} = props;
 
 	const formatDataSource = _selectedConsultations => {
-		console.log(_selectedConsultations)
 		const _dataSource = _selectedConsultations.reduce((acc, cur) => {
 			acc.push({
 				key: cur.key,

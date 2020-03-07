@@ -15,6 +15,7 @@ const toggleBtnStyles = {
 const ToggleButtons = ({
   settings,
   callback,
+  defaultValue,
 }) => {
 
 	const onToggle = val => {
@@ -30,7 +31,7 @@ const ToggleButtons = ({
   }
 
   return <ButtonToolbar style={toolbarStyles}>
-    <ToggleButtonGroup type="radio" name="options" onChange={onToggle}>
+    <ToggleButtonGroup type="radio" name="options" defaultValue={defaultValue} onChange={onToggle}>
       {toggleButtons}
     </ToggleButtonGroup>
   </ButtonToolbar>
