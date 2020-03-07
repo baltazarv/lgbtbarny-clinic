@@ -24,13 +24,14 @@ const VisitorsTable = props => {
 		lawyers, // lawyersObject
 	} = props;
 
-	const columns = [
-		{
+	let columns = [];
+
+	if (clinic === 'admin') {
+		columns.push({
 			title: '',
 			dataIndex: peopleFields.CLINIC_NAME,
 			key: peopleFields.CLINIC_NAME,
 			render: (clinicName) => {
-				console.log(clinicName, peopleFields.CLINIC_NJ)
 				let clinicText = 'TN';
 				let color = '#f56a00';
 				if (clinicName === peopleFields.CLINIC_NJ) {
@@ -43,30 +44,33 @@ const VisitorsTable = props => {
 				}
 				return <Avatar style={{ backgroundColor: color, verticalAlign: 'middle' }} size="small">{clinicText}</Avatar>
 			}
+		});
+	}
+
+	columns.push({
+		title: 'Update Date',
+		dataIndex: peopleFields.DATETIME,
+		key: peopleFields.DATETIME,
+		defaultSortOrder: 'descend',
+		sorter: (a, b) => {
+			const dateA = new Date(a[peopleFields.DATETIME]);
+			const dateB = new Date(b[peopleFields.DATETIME]);
+			return dateA - dateB;
 		},
-		{
-			title: 'Update Date',
-			dataIndex: peopleFields.DATETIME,
-			key: peopleFields.DATETIME,
-			defaultSortOrder: 'descend',
-			sorter: (a, b) => {
-				const dateA = new Date(a[peopleFields.DATETIME]);
-				const dateB = new Date(b[peopleFields.DATETIME]);
-				return dateA - dateB;
-			},
-		},
-		{
-			title: 'Name',
-			dataIndex: 'fullname',
-			key: 'fullname',
-			render: (visitor) => <strong>{visitor}</strong>,
-		},
-		{
-			title: 'Visit Regarding',
-			dataIndex: peopleFields.LAW_TYPES,
-			key: 'visitor',
-		},
-	];
+	});
+
+	columns.push({
+		title: 'Name',
+		dataIndex: 'fullname',
+		key: 'fullname',
+		render: (visitor) => <strong>{visitor}</strong>,
+	});
+
+	columns.push({
+		title: 'Visit Regarding',
+		dataIndex: peopleFields.LAW_TYPES,
+		key: 'visitor',
+	})
 
 	useEffect(() => {
 		const setTableData = () => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon, Modal, Button } from 'antd';
+import { Icon, Modal, Button, Avatar } from 'antd';
 // components
 import EditableTable from '../../table/EditableTable';
 import ConsultationList from '../ConsultationList';
@@ -67,80 +67,93 @@ const ConsultationsTable = props => {
 		return _dispoFilters;
 	}
 
-	const columns = [
-		{
-			title: 'Date',
-			dataIndex: consultFields.DATETIME,
-			key: 'date',
-			defaultSortOrder: 'descend',
-			sorter: (a, b) => {
-				const dateA = new Date(a[consultFields.DATETIME]);
-				const dateB = new Date(b[consultFields.DATETIME]);
-				return dateA - dateB;
-			},
-		},
-		{
-			title: 'Visitor(s)',
-			dataIndex: consultFields.INQUIRERS,
-			key: 'visitor',
-			render: (visitors, row) => (
-				<span>
-					{visitors} <Icon style={iconStyle} type="user" onClick={() => showVisitorModal(row)} />
-					{/* <Button type="link" onClick={() => showVisitorModal(row)}>{visitors} <Icon style={iconStyle} type="user" /></Button> */}
-				</span>
-			),
-			// doesn't work!?
-			// sorter: (a, b) => {
-			// 	return a[consultFields.INQUIRERS][0] - b[consultFields.INQUIRERS][0];
-			// },
-		},
-		{
-			title: 'Dispositions',
-			dataIndex: [consultFields.DISPOSITIONS],
-			key: 'dispos',
-			filters: getDispoFilters(),
-			onFilter: (value, record) => {
-				return record[consultFields.DISPOSITIONS].some(val => val === value);
-			},
-			render: dispos => getDispoTagsFromShortNames(dispos),
-		},
-		{
-			title: 'Referral Status',
-			dataIndex: consultFields.STATUS,
-			key: consultFields.STATUS,
-			className: 'referrals-status-col',
-			// edit column
-			editable: true,
-			// filters
-			filters: statusFilters,
-			defaultFilteredValue: defaultStatusFilters,
-			onFilter: (value, record) => {
-				// dispoIsRef: disposition either fee based or pro-bono
-				const dispoIsRef = record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED]) || record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]);
-				// dispoIsCompelling: disposition is highly compelling
-				const dispoIsCompelling = record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING]);
-				if (!record[consultFields.STATUS] && value === consultFields.STATUS_REFER && dispoIsRef) {
-					// status is blank, 'Referral Needed' selected, & dispoIsRef
-					return true;
-				} else if (!record[consultFields.STATUS] && value === consultFields.STATUS_POSSIBLE_IMPACT && dispoIsCompelling) {
-					// status is blank, 'Impact Litigation' selected, & dispoIsCompelling
-					return true;
-				} else {
-					return value === record[consultFields.STATUS];
+	const columns = [];
+
+	if (clinic === 'admin') {
+		columns.push({
+			title: '',
+			dataIndex: consultFields.CLINIC_NAME,
+			key: consultFields.CLINIC_NAME,
+			width: 36,
+			render: (clinicName) => {
+				console.log(clinicName, consultFields.CLINIC_NJ)
+				let clinicText = 'TN';
+				let color = '#f56a00';
+				if (clinicName === consultFields.CLINIC_NJ) {
+					clinicText = 'NJ';
+					color = '#00a2ae';
 				}
-			},
+				if (clinicName === consultFields.CLINIC_YOUTH) {
+					clinicText = 'Y';
+					color = '#7265e6';
+				}
+				return <Avatar style={{ backgroundColor: color, verticalAlign: 'middle' }} size="small">{clinicText}</Avatar>
+			}
+		});
+	}
+
+	columns.push({
+		title: 'Date',
+		dataIndex: consultFields.DATETIME,
+		key: 'date',
+		width: 70,
+		defaultSortOrder: 'descend',
+		sorter: (a, b) => {
+			const dateA = new Date(a[consultFields.DATETIME]);
+			const dateB = new Date(b[consultFields.DATETIME]);
+			return dateA - dateB;
 		},
-		// {
-		// 	title: 'Actions',
-		// 	dataIndex: 'action',
-		// 	key: 'action',
-		// 	render: () => {
-		// 		return <span>
-		// 			<a style={iconStyle}><Icon type="form" /></a>
-		// 		</span>
-		// 	}
-		// },
-	];
+	});
+
+	columns.push({
+		title: 'Visitor(s)',
+		dataIndex: consultFields.INQUIRERS,
+		key: 'visitor',
+		render: (visitors, row) => (
+			<span>
+				{visitors} <Icon style={iconStyle} type="user" onClick={() => showVisitorModal(row)} />
+				{/* <Button type="link" onClick={() => showVisitorModal(row)}>{visitors} <Icon style={iconStyle} type="user" /></Button> */}
+			</span>
+		),
+	});
+
+	columns.push({
+		title: 'Dispositions',
+		dataIndex: [consultFields.DISPOSITIONS],
+		key: 'dispos',
+		filters: getDispoFilters(),
+		onFilter: (value, record) => {
+			return record[consultFields.DISPOSITIONS].some(val => val === value);
+		},
+		render: dispos => getDispoTagsFromShortNames(dispos),
+	});
+
+	columns.push({
+		title: 'Referral Status',
+		dataIndex: consultFields.STATUS,
+		key: consultFields.STATUS,
+		className: 'referrals-status-col',
+		// edit column
+		editable: true,
+		// filters
+		filters: statusFilters,
+		defaultFilteredValue: defaultStatusFilters,
+		onFilter: (value, record) => {
+			// dispoIsRef: disposition either fee based or pro-bono
+			const dispoIsRef = record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED]) || record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]);
+			// dispoIsCompelling: disposition is highly compelling
+			const dispoIsCompelling = record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING]);
+			if (!record[consultFields.STATUS] && value === consultFields.STATUS_REFER && dispoIsRef) {
+				// status is blank, 'Referral Needed' selected, & dispoIsRef
+				return true;
+			} else if (!record[consultFields.STATUS] && value === consultFields.STATUS_POSSIBLE_IMPACT && dispoIsCompelling) {
+				// status is blank, 'Impact Litigation' selected, & dispoIsCompelling
+				return true;
+			} else {
+				return value === record[consultFields.STATUS];
+			}
+		},
+	});
 
 	useEffect(() => {
 		const setTableData = () => {
