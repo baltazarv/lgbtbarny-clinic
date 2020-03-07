@@ -500,6 +500,7 @@ class ConsultationForm extends Component {
 					onHide={this.hideVisitorAddModal}
 					header="Add a New Visitor"
 					body={<VisitorAddForm
+						clinic={this.props.clinic}
 						onHide={this.hideVisitorAddModal}
 						lawTypes={this.props.lawTypes}
 						submitForm={this.submitAddInquirer}

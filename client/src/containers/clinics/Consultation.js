@@ -259,6 +259,7 @@ class Consultation extends Component {
 		return (
 			<>
 				<ConsultationForm
+					clinic={this.props.clinic}
 					inquirers={this.props.inquirers}
 					inquirersObject={this.props.inquirersObject}
 					lawyers={this.props.lawyers}

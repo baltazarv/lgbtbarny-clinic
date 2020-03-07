@@ -46,14 +46,6 @@ const Intake = props => {
 
 	const submitCreateInquirer = async (values, resetForm) => {
 		let payload = { ...values };
-
-		//set clinic
-		let clinicValue = peopleFields.CLINIC_TNC;
-		if (props.clinic === 'nj') clinicValue = peopleFields.CLINIC_NJ;
-		payload[peopleFields.CLINIC_NAME] = clinicValue;
-		// set datetime stamp
-		payload[peopleFields.DATETIME] = new Date();
-
 		const serverResponse = await props.createInquirer(payload);
 		setServerResponse(serverResponse);
 		if (serverResponse.status === 'success' && serverResponse.type === 'createInquirer') {
@@ -63,9 +55,6 @@ const Intake = props => {
 
 	const submitUpdateInquirer = async (values) => {
 		let payload = {...values};
-		// set datetime stamp
-		payload[peopleFields.DATETIME] = new Date();
-
 		const serverResponse = await props.updateInquirer(payload);
 		setServerResponse(serverResponse);
 		if (serverResponse.status === 'success') {

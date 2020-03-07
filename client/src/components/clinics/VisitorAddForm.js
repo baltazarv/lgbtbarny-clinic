@@ -94,7 +94,16 @@ const validate = (values, props) => {
 
 const handleSubmit = (values, actions) => {
 	const { props, setSubmitting, resetForm } = actions;
-	props.submitForm(values, resetForm);
+	let payload = { ...values };
+	//set clinic
+	let clinicValue = peopleFields.CLINIC_TNC;
+	if (props.clinic === 'nj') clinicValue = peopleFields.CLINIC_NJ;
+	if (props.clinic === 'youth') clinicValue = peopleFields.CLINIC_YOUTH;
+	payload[peopleFields.CLINIC_NAME] = clinicValue;
+	// set datetime stamp
+	payload[peopleFields.DATETIME] = new Date();
+
+	props.submitForm(payload, resetForm);
 
 	// only if serverResponse.status === 'success'
 	setSubmitting(false);
