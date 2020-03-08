@@ -36,33 +36,43 @@ class Consultations extends Component {
 	}
 
 	handleFilterBtnClick = val => {
+		let toggleButtonValue = '';
 		let dispoFilters = [];
 		let statusFilters = [];
 		let clinicFilters = [];
 		let adminTitle = adminPageTitles['default'];
 		if (val === 'action') {
+      toggleButtonValue = 'action';
 			statusFilters = [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT]
 			adminTitle = adminPageTitles['action'];
 		}
 		if (val === 'impact') {
+      toggleButtonValue = 'impact';
 			dispoFilters = [dispoShortNames[consultFields.DISPOSITIONS_COMPELLING], dispoShortNames[consultFields.DISPOSITIONS_IMMIGRATION]];
 			adminTitle = adminPageTitles['impact'];
 		}
 		if (val === 'referrals') {
+      toggleButtonValue = 'referrals';
 			dispoFilters = [dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED], dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]];
 			adminTitle = adminPageTitles['referrals'];
 		}
 		if (val === 'tnc') {
+      toggleButtonValue = 'tnc';
 			clinicFilters = [consultFields.CLINIC_TNC];
 			adminTitle = adminPageTitles['tnc'];
 		}
 		if (val === 'nj') {
+      toggleButtonValue = 'nj';
 			clinicFilters = [consultFields.CLINIC_NJ];
 			adminTitle = adminPageTitles['nj'];
 		}
 		if (val === 'youth') {
+      toggleButtonValue = 'youth';
 			clinicFilters = [consultFields.CLINIC_YOUTH];
 			adminTitle = adminPageTitles['youth'];
+		}
+		if (val === 'all') {
+      toggleButtonValue = 'all';
 		}
 		const filteredValues = {
 			[consultFields.DISPOSITIONS]: dispoFilters,
@@ -71,6 +81,7 @@ class Consultations extends Component {
 		}
 
 		this.setState({
+			toggleButtonValue,
 			filteredValues,
 			adminTitle,
 		})
@@ -78,6 +89,7 @@ class Consultations extends Component {
 
 	changeFilters = filteredValues => {
 		this.setState({
+			toggleButtonValue: '',
 			adminTitle: adminPageTitles['default'],
 			filteredValues,
 		})
@@ -105,6 +117,7 @@ class Consultations extends Component {
 				defaultValue="action"
 				settings={settings}
 				callback={this.handleFilterBtnClick}
+				value={this.state.toggleButtonValue}
 			/>;
 		}
 

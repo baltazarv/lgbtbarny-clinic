@@ -39,21 +39,29 @@ class Visitors extends Component {
 
   // button group only on admin route
   handleFilterBtnClick = val => {
+    let toggleButtonValue = '';
     let clinicFilters = [];
     let adminTitle = adminPageTitles['default'];
     if (val === 'nj') {
+      toggleButtonValue = 'nj';
       clinicFilters = [peopleFields.CLINIC_NJ];
       adminTitle = adminPageTitles['nj'];
     }
     if (val === 'tnc') {
+      toggleButtonValue = 'tnc';
       clinicFilters = [peopleFields.CLINIC_TNC];
       adminTitle = adminPageTitles['tnc'];
     }
     if (val === 'youth') {
+      toggleButtonValue = 'youth';
       clinicFilters = [peopleFields.CLINIC_YOUTH];
       adminTitle = adminPageTitles['youth'];
     }
+    if (val === 'all') {
+      toggleButtonValue = 'all';
+    }
     this.setState({
+      toggleButtonValue,
       filteredValues: { [peopleFields.CLINIC_NAME]: clinicFilters },
       adminTitle,
     })
@@ -61,6 +69,7 @@ class Visitors extends Component {
 
   changeFilters = filteredValues => {
     this.setState({
+      toggleButtonValue: '',
       filteredValues,
       adminTitle: adminPageTitles['default'],
     })
@@ -84,6 +93,7 @@ class Visitors extends Component {
         defaultValue="nj"
         settings={settings}
         callback={this.handleFilterBtnClick}
+        value={this.state.toggleButtonValue}
       />;
     }
 
