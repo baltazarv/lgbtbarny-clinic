@@ -17,15 +17,22 @@ const adminPageTitles = {
 	tnc: 'Tuesday Night Clinic Consultations',
 	nj: 'NJ Clinic Consultations',
 	youth: 'Youth Qlinic Consultations',
-	// all: 'Clinic Consultations',
 };
 
 class Consultations extends Component {
-	state = {
-		adminTitle: adminPageTitles['action'],
-		filteredValues: {
-			[consultFields.STATUS]: [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT],
-		},
+
+	constructor(props) {
+		super(props);
+		let filteredValues = [];
+		if (this.props.clinic === 'admin') {
+			filteredValues = {
+				[consultFields.STATUS]: [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT],
+			}
+		}
+		this.state = {
+			adminTitle: adminPageTitles['action'],
+			filteredValues,
+		}
 	}
 
 	handleFilterBtnClick = val => {
@@ -62,7 +69,7 @@ class Consultations extends Component {
 			[consultFields.STATUS]: statusFilters,
 			[consultFields.CLINIC_NAME]: clinicFilters,
 		}
-		console.log(filteredValues);
+
 		this.setState({
 			filteredValues,
 			adminTitle,
@@ -84,20 +91,22 @@ class Consultations extends Component {
 		} = this.props;
 
 		let toggleButtons = null;
-		const settings = {
-			action: { buttonLabel: 'Action Required' },
-			impact: { buttonLabel: 'High Impact' },
-			referrals: { buttonLabel: 'Referral-Eligible' },
-			tnc: { buttonLabel: 'TNC' },
-			nj: { buttonLabel: 'NJ' },
-			youth: { buttonLabel: 'Youth' },
-			all: { buttonLabel: 'All' },
-		};
-		toggleButtons = <ToggleButtons
-			defaultValue="action"
-			settings={settings}
-			callback={this.handleFilterBtnClick}
-		/>;
+		if (clinic === 'admin') {
+			const settings = {
+				action: { buttonLabel: 'Action Required' },
+				impact: { buttonLabel: 'High Impact' },
+				referrals: { buttonLabel: 'Referral-Eligible' },
+				tnc: { buttonLabel: 'TNC' },
+				nj: { buttonLabel: 'NJ' },
+				youth: { buttonLabel: 'Youth' },
+				all: { buttonLabel: 'All' },
+			};
+			toggleButtons = <ToggleButtons
+				defaultValue="action"
+				settings={settings}
+				callback={this.handleFilterBtnClick}
+			/>;
+		}
 
 		return (
 			<>

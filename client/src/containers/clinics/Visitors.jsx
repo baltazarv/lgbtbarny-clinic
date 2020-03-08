@@ -15,12 +15,20 @@ const adminPageTitles = {
 };
 
 class Visitors extends Component {
-  state = {
-    adminTitle: adminPageTitles['nj'],
-    filteredValues: {
-      [peopleFields.CLINIC_NAME]: [peopleFields.CLINIC_NJ],
-    },
-  }
+
+	constructor(props) {
+		super(props);
+		let filteredValues = [];
+		if (this.props.clinic === 'admin') {
+			filteredValues = {
+        [peopleFields.CLINIC_NAME]: [peopleFields.CLINIC_NJ],
+      }
+		}
+		this.state = {
+			adminTitle: adminPageTitles['action'],
+			filteredValues,
+		}
+	}
 
   // button group only on admin route
   handleFilterBtnClick = val => {
@@ -52,6 +60,8 @@ class Visitors extends Component {
   }
 
   render() {
+
+
 
     // from parent
     const {
