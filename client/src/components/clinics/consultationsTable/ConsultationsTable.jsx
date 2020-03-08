@@ -36,7 +36,15 @@ const ConsultationsTable = props => {
 
 	// from parent
 	const {
-		clinic
+		clinic,
+		filteredValues,
+		changeFilters,
+
+		inquirers, // inquirersObject
+		lawyers, // lawyersObject
+		lawTypes, // lawTypesObject
+		consultations,
+		updateConsultation, // redux function
 	} = props;
 
 	const [isLoading, setIsLoading] = useState(true);
@@ -44,18 +52,6 @@ const ConsultationsTable = props => {
 	const [visitorModalShown, setVisitorModalShown] = useState(false);
 	const [inquirerSelected, setInquirerSelected] = useState({});
 	const [visitorModalTitle, setVisitorModalTitle] = useState('');
-
-	let defaultStatusFilters = [];
-	if (clinic === 'admin') defaultStatusFilters = [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT];
-
-	// props from parent
-	const {
-		inquirers, // inquirersObject
-		lawyers, // lawyersObject
-		lawTypes, // lawTypesObject
-		consultations,
-		updateConsultation, // redux function
-	} = props;
 
 	const iconStyle = { fontSize: '18px', color: '#1890ff' };
 
@@ -75,8 +71,14 @@ const ConsultationsTable = props => {
 			dataIndex: consultFields.CLINIC_NAME,
 			key: consultFields.CLINIC_NAME,
 			width: 36,
+			filters: [
+				{ text: consultFields.CLINIC_TNC, value: consultFields.CLINIC_TNC },
+				{ text: consultFields.CLINIC_NJ, value: consultFields.CLINIC_NJ },
+				{ text: consultFields.CLINIC_YOUTH, value: consultFields.CLINIC_YOUTH },
+			],
+			onFilter: (value, record) => value === record[consultFields.CLINIC_NAME],
+			filteredValue: filteredValues[consultFields.CLINIC_NAME],
 			render: (clinicName) => {
-				console.log(clinicName, consultFields.CLINIC_NJ)
 				let clinicText = 'TN';
 				let color = '#f56a00';
 				if (clinicName === consultFields.CLINIC_NJ) {
@@ -126,6 +128,7 @@ const ConsultationsTable = props => {
 		onFilter: (value, record) => {
 			return record[consultFields.DISPOSITIONS].some(val => val === value);
 		},
+		filteredValue: filteredValues[consultFields.DISPOSITIONS],
 		render: dispos => getDispoTagsFromShortNames(dispos),
 	});
 
@@ -138,7 +141,6 @@ const ConsultationsTable = props => {
 		editable: true,
 		// filters
 		filters: statusFilters,
-		defaultFilteredValue: defaultStatusFilters,
 		onFilter: (value, record) => {
 			// dispoIsRef: disposition either fee based or pro-bono
 			const dispoIsRef = record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED]) || record[consultFields.DISPOSITIONS].some(dispo => dispo === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]);
@@ -154,6 +156,7 @@ const ConsultationsTable = props => {
 				return value === record[consultFields.STATUS];
 			}
 		},
+		filteredValue: filteredValues[consultFields.STATUS],
 	});
 
 	useEffect(() => {
@@ -166,6 +169,7 @@ const ConsultationsTable = props => {
 				if (clinic === 'admin' || (clinic === 'tnc' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_TNC) || (clinic === 'youth' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_YOUTH)) {
 					const object = {
 						key,
+						[consultFields.CLINIC_NAME]: fields[consultFields.CLINIC_NAME],
 						[consultFields.DATETIME]: isoToStandardDate(fields[consultFields.DATETIME]),
 						[consultFields.INQUIRERS]: getVisitorNames(fields[consultFields.INQUIRERS], inquirers),
 						[consultFields.DISPOSITIONS]: getDispoShortNames(fields[consultFields.DISPOSITIONS]),
@@ -187,8 +191,8 @@ const ConsultationsTable = props => {
 		}
 	}, [isLoading, consultations, inquirers, lawTypes, lawyers, clinic])
 
-	const handleTableChange = (pagination, filters, sorter) => {
-		console.log('handleTableChange pagination', pagination, 'filters', filters, 'sorter', sorter)
+	const handleChange = (pagination, filters) => {
+		changeFilters(filters);
 	};
 
 	const updateDispoStatus = tableRow => {
@@ -323,7 +327,7 @@ const ConsultationsTable = props => {
 				dataSource={dataSource}
 				columns={columns}
 				options={statuses} // edit field pulldown menu items
-				onChange={handleTableChange}
+				onChange={handleChange}
 				handleSave={updateDispoStatus}
 				expandedRowRender={consultationList}
 				pagination={true}

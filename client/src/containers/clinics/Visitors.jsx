@@ -7,9 +7,16 @@ import ToggleButtons from '../../components/ToggleButtons';
 import * as actions from '../../store/actions';
 import * as peopleFields from '../../data/peopleFields';
 
+const adminPageTitles = {
+  default: 'Clinic Visitors',
+  nj: 'NJ Clinic Visitors',
+  tnc: 'Tuesday Night Clinic Visitors',
+  youth: 'Youth Qlinic Visitors',
+};
+
 class Visitors extends Component {
   state = {
-    adminTitle: 'New Jersey Intake Visitors',
+    adminTitle: adminPageTitles['nj'],
     filteredValues: {
       [peopleFields.CLINIC_NAME]: [peopleFields.CLINIC_NJ],
     },
@@ -17,22 +24,22 @@ class Visitors extends Component {
 
   // button group only on admin route
   handleFilterBtnClick = val => {
-    let clinicDefaultFilter = [];
-    let adminTitle = '';
+    let clinicFilters = [];
+    let adminTitle = adminPageTitles['default'];
     if (val === 'nj') {
-      clinicDefaultFilter = [peopleFields.CLINIC_NJ];
-      adminTitle = 'NJ Intake Visitors';
+      clinicFilters = [peopleFields.CLINIC_NJ];
+      adminTitle = adminPageTitles['nj'];
     }
     if (val === 'tnc') {
-      clinicDefaultFilter = [peopleFields.CLINIC_TNC];
-      adminTitle = 'Tuesday Night Clinic Intake Visitors';
+      clinicFilters = [peopleFields.CLINIC_TNC];
+      adminTitle = adminPageTitles['tnc'];
     }
     if (val === 'youth') {
-      clinicDefaultFilter = [peopleFields.CLINIC_YOUTH];
-      adminTitle = 'Youth Qlinic Intake Visitors';
+      clinicFilters = [peopleFields.CLINIC_YOUTH];
+      adminTitle = adminPageTitles['youth'];
     }
     this.setState({
-      filteredValues: { [peopleFields.CLINIC_NAME]: clinicDefaultFilter },
+      filteredValues: { [peopleFields.CLINIC_NAME]: clinicFilters },
       adminTitle,
     })
   }
@@ -40,6 +47,7 @@ class Visitors extends Component {
   changeFilters = filteredValues => {
     this.setState({
       filteredValues,
+      adminTitle: adminPageTitles['default'],
     })
   }
 
@@ -54,8 +62,8 @@ class Visitors extends Component {
     if (clinic === 'admin') {
       const settings = {
         nj: { buttonLabel: 'NJ Clinic' },
-        tnc: { buttonLabel: 'Tues Night Clinic' },
         youth: { buttonLabel: 'Youth Qlinic' },
+        tnc: { buttonLabel: 'Tues Night Clinic' },
         all: { buttonLabel: 'All Clinics' },
       };
       toggleButtons = <ToggleButtons

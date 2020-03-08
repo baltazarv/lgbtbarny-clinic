@@ -6,11 +6,74 @@ import ConsultationsTable from '../../components/clinics/consultationsTable/Cons
 import ToggleButtons from '../../components/ToggleButtons';
 // data
 import * as actions from '../../store/actions';
+import * as consultFields from '../../data/consultionFields';
+import { dispoShortNames } from '../../data/consultationData';
+
+const adminPageTitles = {
+	default: 'Clinic Consultations',
+	action: 'Consultations Requiring Action',
+	impact: 'High Impact Consultations',
+	referrals: 'Referral-Eligible Consultations',
+	tnc: 'Tuesday Night Clinic Consultations',
+	nj: 'NJ Clinic Consultations',
+	youth: 'Youth Qlinic Consultations',
+	// all: 'Clinic Consultations',
+};
 
 class Consultations extends Component {
+	state = {
+		adminTitle: adminPageTitles['action'],
+		filteredValues: {
+			[consultFields.STATUS]: [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT],
+		},
+	}
 
 	handleFilterBtnClick = val => {
-		console.log(val);
+		let dispoFilters = [];
+		let statusFilters = [];
+		let clinicFilters = [];
+		let adminTitle = adminPageTitles['default'];
+		if (val == 'action') {
+			statusFilters = [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT]
+			adminTitle = adminPageTitles['action'];
+		}
+		if (val === 'impact') {
+			dispoFilters = [dispoShortNames[consultFields.DISPOSITIONS_COMPELLING], dispoShortNames[consultFields.DISPOSITIONS_IMMIGRATION]];
+			adminTitle = adminPageTitles['impact'];
+		}
+		if (val === 'referrals') {
+			dispoFilters = [dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED], dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]];
+			adminTitle = adminPageTitles['referrals'];
+		}
+		if (val == 'tnc') {
+			clinicFilters = [consultFields.CLINIC_TNC];
+			adminTitle = adminPageTitles['tnc'];
+		}
+		if (val == 'nj') {
+			clinicFilters = [consultFields.CLINIC_NJ];
+			adminTitle = adminPageTitles['nj'];
+		}
+		if (val == 'youth') {
+			clinicFilters = [consultFields.CLINIC_YOUTH];
+			adminTitle = adminPageTitles['youth'];
+		}
+		const filteredValues = {
+			[consultFields.DISPOSITIONS]: dispoFilters,
+			[consultFields.STATUS]: statusFilters,
+			[consultFields.CLINIC_NAME]: clinicFilters,
+		}
+		console.log(filteredValues);
+		this.setState({
+			filteredValues,
+			adminTitle,
+		})
+	}
+
+	changeFilters = filteredValues => {
+		this.setState({
+			adminTitle: adminPageTitles['default'],
+			filteredValues,
+		})
 	}
 
 	render() {
@@ -22,11 +85,16 @@ class Consultations extends Component {
 
 		let toggleButtons = null;
 		const settings = {
+			action: { buttonLabel: 'Action Required' },
 			impact: { buttonLabel: 'High Impact' },
-			referrals: { buttonLabel: 'Referral Eligible' },
-			all: { buttonLabel: 'All Consultations' },
+			referrals: { buttonLabel: 'Referral-Eligible' },
+			tnc: { buttonLabel: 'TNC' },
+			nj: { buttonLabel: 'NJ' },
+			youth: { buttonLabel: 'Youth' },
+			all: { buttonLabel: 'All' },
 		};
 		toggleButtons = <ToggleButtons
+			defaultValue="action"
 			settings={settings}
 			callback={this.handleFilterBtnClick}
 		/>;
@@ -35,9 +103,11 @@ class Consultations extends Component {
 			<>
 				{toggleButtons}
 				<Card.Body>
-					<h1 className="h2">{this.props.clinic === 'admin' ? 'Consultations' : 'Consultations Completed'}</h1>
+					<h1 className="h2">{this.props.clinic === 'admin' ? this.state.adminTitle : 'Consultations Completed'}</h1>
 					<ConsultationsTable
 						clinic={clinic}
+						filteredValues={this.state.filteredValues}
+						changeFilters={this.changeFilters}
 						inquirers={this.props.inquirers}
 						lawyers={this.props.lawyers}
 						lawTypes={this.props.lawTypes}

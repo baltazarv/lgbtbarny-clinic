@@ -34,9 +34,9 @@ const VisitorsTable = props => {
 			dataIndex: peopleFields.CLINIC_NAME,
 			key: peopleFields.CLINIC_NAME,
 			filters: [
-				{ text: consultFields.CLINIC_TNC, value: consultFields.CLINIC_TNC },
-				{ text: consultFields.CLINIC_NJ, value: consultFields.CLINIC_NJ },
-				{ text: consultFields.CLINIC_YOUTH, value: consultFields.CLINIC_YOUTH },
+				{ text: peopleFields.CLINIC_TNC, value: peopleFields.CLINIC_TNC },
+				{ text: peopleFields.CLINIC_NJ, value: peopleFields.CLINIC_NJ },
+				{ text: peopleFields.CLINIC_YOUTH, value: peopleFields.CLINIC_YOUTH },
 			],
 			onFilter: (value, record) => value === record[peopleFields.CLINIC_NAME],
 			filteredValue: filteredValues[peopleFields.CLINIC_NAME],
