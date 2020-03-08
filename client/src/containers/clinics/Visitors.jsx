@@ -25,10 +25,17 @@ class Visitors extends Component {
       }
 		}
 		this.state = {
-			adminTitle: adminPageTitles['action'],
+			adminTitle: adminPageTitles['nj'],
 			filteredValues,
 		}
-	}
+  }
+
+  getPageTitle = () => {
+    let pageTitle = 'Visitors Entered';
+    if (this.props.clinic === 'admin') pageTitle = this.state.adminTitle;
+    if (this.props.clinic === 'tnc') pageTitle = 'Visitors Checked In';
+    return pageTitle;
+  }
 
   // button group only on admin route
   handleFilterBtnClick = val => {
@@ -60,9 +67,6 @@ class Visitors extends Component {
   }
 
   render() {
-
-
-
     // from parent
     const {
       clinic,
@@ -87,7 +91,7 @@ class Visitors extends Component {
       <>
         {toggleButtons}
         <Card.Body>
-          <h1 className="h2">{clinic === 'admin' ? this.state.adminTitle : 'Visitors Checked In'}</h1>
+          <h1 className="h2">{this.getPageTitle()}</h1>
           <VisitorsTable
             clinic={clinic}
             filteredValues={this.state.filteredValues}

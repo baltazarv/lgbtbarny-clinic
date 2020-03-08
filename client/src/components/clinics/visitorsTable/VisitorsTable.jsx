@@ -75,7 +75,7 @@ const VisitorsTable = props => {
 		render: (visitor) => <strong>{visitor}</strong>,
 	});
 
-	if (clinic === 'tnc') {
+	if (clinic === 'tnc' || clinic === 'youth') {
 		columns.push({
 			title: 'Visit Regarding',
 			dataIndex: peopleFields.LAW_TYPES,
@@ -96,7 +96,7 @@ const VisitorsTable = props => {
 			let data = [];
 			for (var key in inquirers) {
 				let fields = inquirers[key];
-				if (clinic === 'admin' || (clinic === 'tnc' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_TNC) || (clinic === 'nj' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_NJ)) {
+				if (clinic === 'admin' || (clinic === 'tnc' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_TNC) || (clinic === 'nj' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_NJ) || (clinic === 'youth' && fields[peopleFields.CLINIC_NAME] === peopleFields.CLINIC_YOUTH)) {
 					const object = {
 						key,
 						[peopleFields.CLINIC_NAME]: fields[peopleFields.CLINIC_NAME],

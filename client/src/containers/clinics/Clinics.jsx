@@ -133,6 +133,7 @@ class Clinics extends Component {
 
                 {/* youth */}
                 <Route path="/youth/consultation" component={consultation} />
+                <Route path="/youth/visitors" component={visitors} />
                 <Route path="/youth/completed" component={consultations} />
                 <Route path="/youth">
                   <Redirect to="/youth/consultation" />

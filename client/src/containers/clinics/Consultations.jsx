@@ -40,7 +40,7 @@ class Consultations extends Component {
 		let statusFilters = [];
 		let clinicFilters = [];
 		let adminTitle = adminPageTitles['default'];
-		if (val == 'action') {
+		if (val === 'action') {
 			statusFilters = [consultFields.STATUS_REFER, consultFields.STATUS_POSSIBLE_IMPACT]
 			adminTitle = adminPageTitles['action'];
 		}
@@ -52,15 +52,15 @@ class Consultations extends Component {
 			dispoFilters = [dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED], dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO]];
 			adminTitle = adminPageTitles['referrals'];
 		}
-		if (val == 'tnc') {
+		if (val === 'tnc') {
 			clinicFilters = [consultFields.CLINIC_TNC];
 			adminTitle = adminPageTitles['tnc'];
 		}
-		if (val == 'nj') {
+		if (val === 'nj') {
 			clinicFilters = [consultFields.CLINIC_NJ];
 			adminTitle = adminPageTitles['nj'];
 		}
-		if (val == 'youth') {
+		if (val === 'youth') {
 			clinicFilters = [consultFields.CLINIC_YOUTH];
 			adminTitle = adminPageTitles['youth'];
 		}
