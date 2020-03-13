@@ -11,31 +11,6 @@ export const getLawTypeSelectOptions = (arr) => {
 	}, []);
 }
 
-/**
- * Given pulldown selected object(s) from a pulldown (w/ `value` key),
- * get full AirTable record(s) (w/ `id' key)
- */
-export const getRecordsFromSelection = (selection, recordsIn) => {
-	if (!selection) return [];
-	let recordsOut = [];
-	let selectArray = [];
-	// if selection is not an array, push into one
-	if (Array.isArray(selection)) {
-		selectArray = selection;
-	} else {
-		selectArray.push(selection);
-	}
-	if (selectArray.length > 0) {
-		selectArray.forEach(opt => {
-			const recFound = recordsIn.find(rec => {
-				return rec.id === opt.value;
-			})
-			recordsOut = [...recordsOut, recFound];
-		});
-	}
-	return recordsOut;
-}
-
 export const recordForUpdate = data => {
 	let fields = objectWithoutProps(data, ['id']);
 	let payload = {};

@@ -301,10 +301,10 @@ const VisitorAddForm = props => {
 					<Card.Body style={{ backgroundColor: '#39c1fa1a' }}>
 						<Select
 							name={peopleFields.LAW_TYPES}
-							options={lawTypes}
-							optFunc={getLawTypeOptions}
+							options={getLawTypeOptions(lawTypes)}
 							label={peopleFields.LAW_TYPES}
 							required={false}
+							mode="multiple"
 							value={values[peopleFields.LAW_TYPES]}
 							onChange={values => setFieldValue(peopleFields.LAW_TYPES, values)}
 							onBlur={() => setFieldTouched(peopleFields.LAW_TYPES, true)}

@@ -8,10 +8,8 @@ import classNames from 'classnames';
 import { reqAsterisk, InputFeedback } from '../formElements';
 
 const Select = ({
-	// data array
+	// antd <Options> array
 	options,
-	// function to transform data array into select options, eg, etPeopleOptions, getLawTypeOptions
-	optFunc,
 
 	// name for formik touched and errors
 	name,
@@ -28,6 +26,7 @@ const Select = ({
 	label,
 	// for asterisk
 	required,
+	mode = '', // multiple, tags
 	isDisabled,
 	info,
 }) => {
@@ -44,10 +43,10 @@ const Select = ({
 	let formLabel = null;
 	let inputCols = 12;
 	if (label) {
-		formLabel = (<Form.Label column md={3} className="text-md-right">
+		formLabel = (<Form.Label column sm={4} className="text-sm-right">
 			{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
 		</Form.Label>);
-		inputCols = 9;
+		inputCols = 8;
 	}
 
 	let infoTxt = null;
@@ -57,11 +56,12 @@ const Select = ({
 		<>
 			<Form.Group as={Row} controlId={name} className="mb-0">
 				{formLabel}
-				<Col md={inputCols}>
+				<Col sm={inputCols}>
 					{infoTxt}
 					<AntSelect
 						// key={new Date()}
-						mode="multiple"
+						mode={mode}
+						showSearch={mode === 'multiple' ? true : false}
 						style={{ width: '100%' }}
 						placeholder="Select..."
 						// defaultValue=""
@@ -72,7 +72,7 @@ const Select = ({
 						allowClear={true}
 					// autoFocus={true}
 					>
-						{optFunc(options)}
+						{options}
 					</AntSelect>
 				</Col>
 			</Form.Group>

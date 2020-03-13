@@ -260,11 +260,13 @@ class Consultation extends Component {
 			<>
 				<ConsultationForm
 					clinic={this.props.clinic}
+					consultations={this.props.consultations}
 					inquirers={this.props.inquirers}
 					inquirersObject={this.props.inquirersObject}
 					lawyers={this.props.lawyers}
 					lawyersObject={this.props.lawyersObject}
 					lawTypes={this.props.lawTypes}
+					lawTypesObject={this.props.lawTypesObject}
 					// container will handle state
 					handleInquirerSelectChange={this.handleInquirerSelectChange}
 					submitForm={this.submitConsultation}
@@ -303,8 +305,12 @@ class Consultation extends Component {
 
 const mapStateToProps = state => {
 	return {
+		consultations: state.consultations.consultations,
 		inquirersObject: state.people.inquirersObject,
+		lawyers: state.people.lawyers,
 		lawyersObject: state.people.lawyersObject,
+		lawTypes: state.lawTypes.lawTypes,
+		lawTypesObject: state.lawTypes.lawTypesObject,
 		currentLawyers: state.people.currentLawyers, // REMOVE?
 	}
 }

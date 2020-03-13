@@ -1,9 +1,7 @@
 /**
- * Props for react-select:
- * * option: { value: 'xxx', label: 'Baltazar Villegas' }
- * * isMulti
- *
- * For react-select async option loading, import AsyncSelect from react-select/lib/Async or the AsyncCreatable -- can then use loadOptions, defaultOptions, cacheOptions props.
+ * Props for antd:
+ * * options: <Options>{value}</Options>
+ * * mode: 'multiple', 'tags'
  *
  * Props for fornik:
  *  * name: fornik name
@@ -15,36 +13,34 @@
  *  *
  */
 import React, { useState } from 'react';
-import ReactSelect from 'react-select';
+import { Select } from 'antd';
 import { Form, Row, Col } from 'react-bootstrap';
 import { reqAsterisk } from '../../forms/formElements';
 import classNames from 'classnames';
 
 const VisitorSelect = ({
 	options,
-	defaultValue,
+	name,
 	value,
-	label,
-	info,
 	onChange,
 	onBlur,
+	label,
 	required,
-	isMulti,
 	isDisabled,
-	name,
+	info,
 }) => {
 	let [touched, setTouched] = useState(false);
 	let [error, setError] = useState(null);
 
 	const handleChange = selection => {
-		setError(validate());
 		if (onChange) onChange(selection);
+		setError(validate());
 	}
 
 	const handleBlur = evt => {
-		setError(validate());
 		setTouched(true);
 		if (onBlur) onBlur(value);
+		setError(validate());
 	}
 
 	const validate = () => {
@@ -74,24 +70,8 @@ const VisitorSelect = ({
 	let infoTxt = null;
 	if (info) infoTxt = <Form.Text className="text-muted mt-0 mb-1">{info}</Form.Text>
 
-	const customStyles = {
-		control: (provided, state) => {
-			let borderColor = 'hsl(0,0%,80%)';
-			if (error && touched) borderColor = 'red';
-			return { ...provided, borderColor };
-		},
-		placeholder: (provided, state) => {
-			let color = '#212529';
-			if (error && touched) {
-				color = 'red';
-			}
-			return { ...provided, color };
-		},
-		option: (provided, state) => ({
-			...provided,
-			color: state.isSelected ? 'white' : 'black',
-		}),
-	}
+	let selectErrorClass = '';
+	if (touched && error) selectErrorClass = 'has-error';
 
 	return (
 		<>
@@ -99,19 +79,21 @@ const VisitorSelect = ({
 				{formLabel}
 				<Col sm={inputCols}>
 					{infoTxt}
-					<ReactSelect
-						// key={}
-						options={options}
-						defaultValue={defaultValue}
-						onChange={handleChange}
-						onBlur={handleBlur}
-						isClearable
-						isMulti={isMulti}
-						// isDisabled={disabled}
-						styles={customStyles}
-						// isLoading={true} // Is the select in a state of loading (async)
-						value={value} // setting this clears the value when unmounting
-					/>
+					<div className={selectErrorClass}>
+						<Select
+							showSearch
+							style={{ width: '100%' }}
+							placeholder="Select..."
+							value={value}
+							onChange={handleChange}
+							onBlur={handleBlur}
+							optionFilterProp="children"
+							allowClear={true}
+							autoFocus={true}
+						>
+							{options}
+						</Select>
+					</div>
 				</Col>
 			</Form.Group>
 			<Row>

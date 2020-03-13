@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Row, Col, Form, Button, Collapse } from 'react-bootstrap';
@@ -11,7 +10,7 @@ import TextArea from '../../forms/fields/TextArea';
 import { InputFeedback } from '../../forms/formElements';
 import VisitorList from '../VisitorList';
 import FormModal from '../../modals/FormModal';
-import VisitorAddForm from '../VisitorAddForm';
+import NewAndRepeatVisitor from '../NewAndRepeatVisitor';
 import LawyerAddForm from './LawyerAddForm';
 // import ReactSelectWithValidation from '../../../components/forms/fields/ReactSelectWithValidation';
 // data
@@ -494,16 +493,13 @@ class ConsultationForm extends Component {
 					/>}
 				/>
 
-				{/* modal to add visitor from [+] button */}
+				{/* modal to add/update visitor from [+] button */}
 				<FormModal
 					show={this.state.visitorAddModalShown}
 					onHide={this.hideVisitorAddModal}
-					header="Add a New Visitor"
-					body={<VisitorAddForm
+					header="Add/Update Visitor"
+					body={<NewAndRepeatVisitor
 						clinic={this.props.clinic}
-						onHide={this.hideVisitorAddModal}
-						lawTypes={this.props.lawTypes}
-						submitForm={this.submitAddInquirer}
 					/>}
 					size="lg"
 				/>
@@ -512,23 +508,7 @@ class ConsultationForm extends Component {
 	}
 }
 
-const mapStateToProps = state => {
-	return {
-		lawyers: state.people.lawyers,
-		consultations: state.consultations.consultations,
-		lawTypes: state.lawTypes.lawTypes,
-		lawTypesObject: state.lawTypes.lawTypesObject,
-
-		// passed by parent
-		// clinicTitle={this.props.clinicTitle}
-		// inquirers={this.props.inquirers}
-		// lawyersObject: state.people.lawyersObject,
-		// lawyers={this.props.lawyers}
-		// lawTypes={this.props.lawTypes}
-	}
-}
-
-export default connect(mapStateToProps)(withFormik({
+export default withFormik({
 	mapPropsToValues: props => {
 		return {
 			[consultFields.LAWYERS]: [],
@@ -542,4 +522,4 @@ export default connect(mapStateToProps)(withFormik({
 	validate,
 	handleSubmit,
 	displayName: 'consultationForm',
-})(ConsultationForm));
+})(ConsultationForm);
