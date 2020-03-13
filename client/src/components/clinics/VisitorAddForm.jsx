@@ -4,7 +4,7 @@
  * (2) Update inquirer from Intake.
  * (3) Create inquirer from ConsultationForm's modal.
  */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Form, Row, Col, Button, Card } from 'react-bootstrap';
@@ -18,7 +18,7 @@ import InputField from '../forms/fields/InputField'
 // data
 import * as peopleFields from '../../data/peopleFields';
 import { formatName } from '../../data/peopleData';
-import { getLawTypeOptions } from '../../data/lawTypeData';
+import { getOptionsForLawTypes } from '../../data/lawTypeData';
 // styles
 import classNames from "classnames";
 import { reqAsterisk } from '../forms/formElements';
@@ -123,130 +123,133 @@ const VisitorAddForm = props => {
 		dirty,
 
 		// parent
-		lawTypes,
+		lawTypesObject,
 		clinic,
 	} = props;
 
-	const termsAcceptClasses = {
-		label: classNames({
-			'font-weight-bold': !errors[peopleFields.TERMS] || !touched[peopleFields.TERMS],
-			'text-danger': errors[peopleFields.TERMS] && touched[peopleFields.TERMS],
-		})
-	}
+	const acknowAndSign = useRef();
+	const successMessage = useRef();
+	const dispositions = useRef();
+	const buttons = useRef();
 
-	let buttons = null;
-	let btnLabel = 'Enter Visitor';
-	let serverRespMessage = null;
-	if (props.serverResponse && props.serverResponse.payload && props.serverResponse.status === 'success' && props.serverResponse.type === 'createInquirer') {
-		const visitor = props.serverResponse.payload.fields;
-		let message = '';
-		let name = <span className="font-weight-bold">{formatName(visitor)}</span>;
-		if (props.serverResponse.type === 'createInquirer') {
-			message = <>{name} was added!</>
+	useEffect(() => {
+		const termsAcceptClasses = {
+			label: classNames({
+				'font-weight-bold': !errors[peopleFields.TERMS] || !touched[peopleFields.TERMS],
+				'text-danger': errors[peopleFields.TERMS] && touched[peopleFields.TERMS],
+			})
 		}
-		btnLabel = 'Enter Another Visitor';
-		serverRespMessage = <Row>
-			<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">{message}</Col>
-		</Row>
-	}
-	if (props.repeatVisitor) btnLabel = 'Process Visitor';
-	// if update form vs create form
-	buttons = <>
-		<Button
-			variant="primary"
-			type="submit"
-			disabled={!dirty || isSubmitting}
-			className="mr-2"
-		>
-			{btnLabel}
-		</Button>
-		{/* <Button
-			variant="secondary"
-			disabled={!dirty || isSubmitting}
-		>
-			Consultation with {formatName(props.serverResponse.payload)}
-		</Button> */}
-		{/* HANDLE RESET! */}
-		{/* <button
-					type="button"
-					className="outline"
-					onClick={handleReset}
-					disabled={!dirty || isSubmitting}
-				>
-					Reset
-				</button> */}
-	</>
 
-	// acknowldegment
-	const acknowAndSign = <Card className="mb-3">
-		<Card.Body className="pb-0">
-			<CheckboxGroup
-				id={peopleFields.TERMS}
-				label={peopleFields.TERMS}
-				description="I understand that LeGaL does not provide representation, nor will LeGaL or the volunteer attorney become my legal representative by virtue of the Clinic consultation. I understand that the assistance provided by the volunteer attorney is limited to the Clinic session. I understand that the volunteer attorney is not obligated to provide information or referrals outside the Clinic. I understand that abusive behavior towards any of the Clinic staff or others waiting for the Clinic may result in my being barred from the Clinic."
-				value={values[peopleFields.TERMS]}
-				error={errors[peopleFields.TERMS]}
-				touched={touched[peopleFields.TERMS]}
+		// submit button & success message
+		let btnLabel = 'Enter Visitor';
+		successMessage.current = <Row>
+			<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">blank</Col>
+		</Row>;
+		// console.log('server resp', props.serverResponse)
+		if (props.serverResponse && props.serverResponse.payload && props.serverResponse.status === 'success') { // && props.serverResponse.type === 'createInquirer'
+			console.log('passed test', props.serverResponse)
+			const visitor = props.serverResponse.payload.fields;
+			let message = '';
+			let name = <span className="font-weight-bold">{formatName(visitor)}</span>;
+			if (props.serverResponse.type === 'createInquirer') {
+				message = <>{name} was added!</>
+			}
+			btnLabel = 'Enter Another Visitor';
+			successMessage.current = <Row>
+				<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">{message}</Col>
+			</Row>
+		}
+		if (props.repeatVisitor) btnLabel = 'Process Visitor';
+		// if update form vs create form
+		buttons.current = <>
+			<Button
+				variant="primary"
+				type="submit"
+				disabled={!dirty || isSubmitting}
+				className="mr-2"
+			>
+				{btnLabel}
+			</Button>
+		</>
+
+		// acknowldegment -- it may move depending on the clinic
+		acknowAndSign.current = <Card className="mb-3">
+			<Card.Body className="pb-0">
+				<CheckboxGroup
+					id={peopleFields.TERMS}
+					label={peopleFields.TERMS}
+					description="I understand that LeGaL does not provide representation, nor will LeGaL or the volunteer attorney become my legal representative by virtue of the Clinic consultation. I understand that the assistance provided by the volunteer attorney is limited to the Clinic session. I understand that the volunteer attorney is not obligated to provide information or referrals outside the Clinic. I understand that abusive behavior towards any of the Clinic staff or others waiting for the Clinic may result in my being barred from the Clinic."
+					value={values[peopleFields.TERMS]}
+					error={errors[peopleFields.TERMS]}
+					touched={touched[peopleFields.TERMS]}
+					onChange={setFieldValue}
+					onBlur={setFieldTouched}
+					required={true}
+					className="mb-2"
+				>
+					<Field
+						component={Checkbox}
+						name={peopleFields.TERMS}
+						id={peopleFields.TERMS_AGREE}
+						label={peopleFields.TERMS_AGREE}
+						className={termsAcceptClasses}
+					/>
+				</CheckboxGroup>
+				<div className="mb-4">
+					<InputField
+						name={peopleFields.SIGNATURE}
+						type="text"
+						label={peopleFields.SIGNATURE}
+						info="Please write your name below, serving as your digital signature."
+						placeholder="Full Name"
+						required={true}
+						style={{
+							width: "98%",
+						}}
+					/>
+				</div>
+			</Card.Body>
+		</Card>
+
+		// nj clinic disposition
+		if (clinic === 'nj') {
+			dispositions.current = <CheckboxGroup
+				id={peopleFields.DISPOSITION}
+				label="Action(s) Taken and Description of Disposition (Check all that apply)"
+				value={values[peopleFields.DISPOSITION]}
+				error={errors[peopleFields.DISPOSITION]}
+				touched={touched[peopleFields.DISPOSITION]}
 				onChange={setFieldValue}
 				onBlur={setFieldTouched}
-				required={true}
-				className="mb-2"
 			>
 				<Field
 					component={Checkbox}
-					name={peopleFields.TERMS}
-					id={peopleFields.TERMS_AGREE}
-					label={peopleFields.TERMS_AGREE}
-					className={termsAcceptClasses}
+					name={peopleFields.DISPOSITION}
+					id={peopleFields.DISPOSITION_INFO}
+					label="General Info., including information regarding legal and social services"
+				/>
+				<Field
+					component={Checkbox}
+					name={peopleFields.DISPOSITION}
+					id={peopleFields.DISPOSITION_REVIEW}
+					label="Review by LeGaL for possible referral to network lawyers for representation or for high-impact litigation. But note that referrals in NJ are EXTREMELY limited."
 				/>
 			</CheckboxGroup>
-			<div className="mb-4">
-				<InputField
-					name={peopleFields.SIGNATURE}
-					type="text"
-					label={peopleFields.SIGNATURE}
-					info="Please write your name below, serving as your digital signature."
-					placeholder="Full Name"
-					required={true}
-					style={{
-						width: "98%",
-					}}
-				/>
-			</div>
-		</Card.Body>
-	</Card>
+		}
 
-	// nj clinic disposition
-	let dispositions = null;
-	if (clinic === 'nj') {
-		dispositions = <CheckboxGroup
-			id={peopleFields.DISPOSITION}
-			label="Action(s) Taken and Description of Disposition (Check all that apply)"
-			value={values[peopleFields.DISPOSITION]}
-			error={errors[peopleFields.DISPOSITION]}
-			touched={touched[peopleFields.DISPOSITION]}
-			onChange={setFieldValue}
-			onBlur={setFieldTouched}
-		>
-			<Field
-				component={Checkbox}
-				name={peopleFields.DISPOSITION}
-				id={peopleFields.DISPOSITION_INFO}
-				label="General Info., including information regarding legal and social services"
-				/>
-			<Field
-				component={Checkbox}
-				name={peopleFields.DISPOSITION}
-				id={peopleFields.DISPOSITION_REVIEW}
-				label="Review by LeGaL for possible referral to network lawyers for representation or for high-impact litigation. But note that referrals in NJ are EXTREMELY limited."
-			/>
-		</CheckboxGroup>
-	}
+		return function visitorAddFormCleanup() {
+			// console.log('visitorAddFormCleanup');
+		};
+	});
 
 	return <Card>
 		<Card.Body>
 			<FormikForm onSubmit={handleSubmit}>
-				{acknowAndSign}
+
+				{/* acknowldegment */}
+				{acknowAndSign.current}
+
+				{/* name */}
 				<Row>
 					<Col className="label form-label mb-2">Visitor Name</Col>
 				</Row>
@@ -287,6 +290,8 @@ const VisitorAddForm = props => {
 						/>
 					</Col>
 				</Form.Row>
+
+				{/* preferred name */}
 				<InputField
 					name={peopleFields.OTHER_NAMES}
 					type="text"
@@ -297,11 +302,13 @@ const VisitorAddForm = props => {
 						display: "inline",
 					}}
 				/>
+
+				{/* law types */}
 				<Card className="mb-3">
 					<Card.Body style={{ backgroundColor: '#39c1fa1a' }}>
 						<Select
 							name={peopleFields.LAW_TYPES}
-							options={getLawTypeOptions(lawTypes)}
+							options={getOptionsForLawTypes(lawTypesObject)}
 							label={peopleFields.LAW_TYPES}
 							required={false}
 							mode="multiple"
@@ -313,6 +320,8 @@ const VisitorAddForm = props => {
 						/>
 					</Card.Body>
 				</Card>
+
+				{/* email */}
 				<Card className="mb-3">
 					<Card.Body className="pb-0">
 						<Card.Title className="small text-muted">
@@ -350,6 +359,8 @@ const VisitorAddForm = props => {
 						</Form.Row>
 					</Card.Body>
 				</Card>
+
+				{/* address */}
 				<InputField
 					name={peopleFields.ADDRESS}
 					type="text"
@@ -361,6 +372,8 @@ const VisitorAddForm = props => {
 						display: "inline",
 					}}
 				/>
+
+				{/* gender */}
 				<div className="mb-4">
 					<InputField
 						name={peopleFields.GENDER}
@@ -372,6 +385,8 @@ const VisitorAddForm = props => {
 						}}
 					/>
 				</div>
+
+				{/* pronouns */}
 				<CheckboxGroup
 					id={peopleFields.PRONOUNS}
 					label="Gender Pronouns"
@@ -406,6 +421,8 @@ const VisitorAddForm = props => {
 						label={peopleFields.PRONOUNS_OTHER}
 					/>
 				</CheckboxGroup>
+
+				{/* income */}
 				<RadioButtonGroup
 					id={peopleFields.INCOME}
 					label="Annual Household Income"
@@ -472,6 +489,8 @@ const VisitorAddForm = props => {
 						label="Decline To Answer"
 					/>
 				</RadioButtonGroup>
+
+				{/* intake notes */}
 				<div className="mb-4">
 					<Field
 						component={TextArea}
@@ -485,14 +504,17 @@ const VisitorAddForm = props => {
 
 				{/* previous acknowledgement & signature location */}
 
-				{dispositions}
+				{/* NJ disposition */}
+				{dispositions.current}
 
 				{/* TO-DO: list error messages here? */}
 
-				{serverRespMessage}
+				{/* success message */}
+				{successMessage.current}
+
 				<Row className="justify-content-start">
 					<Col>
-						{buttons}
+						{buttons.current}
 					</Col>
 				</Row>
 			</FormikForm>
@@ -537,5 +559,4 @@ export default withFormik({
 	handleSubmit,
 	enableReinitialize: true,
 	displayName: 'visitorForm',
-	// enableReinitialize: true,
 })(VisitorAddForm);

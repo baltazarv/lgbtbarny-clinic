@@ -24,6 +24,7 @@ class Clinics extends Component {
   }
 
   async componentDidMount() {
+    // console.log('Clinics componentDidMount')
     this.setBgImageStyle();
     this.props.getLawyers();
     this.props.getInquirers();
@@ -32,9 +33,14 @@ class Clinics extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    // console.log('Clinics componentDidUpdate')
     if (this.props.location !== prevProps.location) {
       this.setBgImageStyle();
     }
+  }
+
+  componentWillUnmount() {
+    // console.log('Clinics componentWillUnmount')
   }
 
   getClinicPath = () => {

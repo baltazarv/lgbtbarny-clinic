@@ -42,14 +42,13 @@ class Consultation extends Component {
 		}
 		this.submitConsultation = this.submitConsultation.bind(this);
 		this.submitAddLawyer = this.submitAddLawyer.bind(this);
-		this.submitAddInquirer = this.submitAddInquirer.bind(this);
 	}
 
 	handleInquirerSelectChange = (options) => {
 		// array to object
 		const inquirersSelected = {};
 		options.forEach(option => {
-			inquirersSelected[option.value] = this.props.inquirersObject[option.value];
+			inquirersSelected[option] = this.props.inquirersObject[option];
 		});
 		this.setState({
 			inquirersSelected,
@@ -68,7 +67,7 @@ class Consultation extends Component {
 				if (Array.isArray(value)) {
 					// convert objects array into array id strings
 					payload[key] = value.map(item => {
-						return item.value;
+						return item;
 					});
 				} else if (key === consultFields.DISPOSITIONS) {
 					// radio buttons on UI, but multiple select on AirTable -- may make match
@@ -148,25 +147,6 @@ class Consultation extends Component {
 				});
 				const selectedLawyers = getPeopleIntoSelectOptions([serverResponse.payload]);
 				setFieldValue(consultFields.LAWYERS, selectedLawyers);
-
-				// resetForm(); // `Warning: Can't perform a React state update on an unmounted component.`
-			}
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	async submitAddInquirer(values, setFieldValue) {
-		try {
-			const serverResponse = await this.props.createInquirer(values);
-			if (serverResponse.status === 'success' && serverResponse.type === 'createInquirer') {
-				this.setState({
-					serverResponse
-				});
-				let inquirer = serverResponse.payload.fields;
-				inquirer.id = serverResponse.payload.id;
-				const selectedInquirer = getPeopleIntoSelectOptions([inquirer]);
-				setFieldValue(consultFields.INQUIRERS, selectedInquirer);
 
 				// resetForm(); // `Warning: Can't perform a React state update on an unmounted component.`
 			}
@@ -272,7 +252,6 @@ class Consultation extends Component {
 					submitForm={this.submitConsultation}
 					// modal > ConsultationForm > Consultation
 					submitAddLawyer={this.submitAddLawyer}
-					submitAddInquirer={this.submitAddInquirer}
 					// hide visitor info list when `success`
 					serverResponse={this.state.serverResponse}
 					// when add new inquirers reload from db
@@ -319,7 +298,6 @@ const mapDispatchToProps = dispatch => {
 	return {
 		createConsultation: consult => dispatch(actions.createConsultation(consult)),
 		createLawyer: lawyer => dispatch(actions.createLawyer(lawyer)),
-		createInquirer: inquirer => dispatch(actions.createInquirer(inquirer)),
 	}
 }
 

@@ -1,20 +1,22 @@
 import React from 'react';
 import { Select as AntSelect } from 'antd';
 // data
+import { objectIsEmpty } from '../utils';
 export const LAW_TYPES_TABLE = 'Type Of Law';
 export const NAME = 'Name';
 
 const { Option } = AntSelect;
 
-// works with antd Select
-export const getLawTypeOptions = lawTypes => {
-	if (lawTypes && lawTypes.length > 0) {
-		const options = lawTypes.reduce((_options, item) => {
-			const lawType = <Option key={item.id} value={item.id}>{item[NAME]}</Option>
-			return [..._options, lawType];
-		}, []);
-		return options;
+// works with antd Select with law types data object
+export const getOptionsForLawTypes = lawTypes => {
+	const options = [];
+	if (!objectIsEmpty(lawTypes)) {
+		for (var key in lawTypes) {
+			const fields = lawTypes[key];
+			options.push(<Option key={key} value={key}>{fields[NAME]}</Option>)
+		}
 	}
+	return options;
 }
 
 // takes ids & full law type records

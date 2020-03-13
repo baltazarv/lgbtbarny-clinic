@@ -1,15 +1,5 @@
 /** Functions that are specific to the AirTable db schema.
- *  Select options in react-select component in format:
- *    [{ label: "Alligators", value: 1 }].
  */
-import * as lawTypeData from './lawTypeData';
-
-// format type of law state into select options
-export const getLawTypeSelectOptions = (arr) => {
-	return arr.reduce((acc, curr) => {
-		return [...acc, { value: curr.id, label: curr[lawTypeData.NAME] }]
-	}, []);
-}
 
 export const recordForUpdate = data => {
 	let fields = objectWithoutProps(data, ['id']);

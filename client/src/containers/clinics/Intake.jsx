@@ -14,7 +14,6 @@ const Intake = props => {
 			<NewAndRepeatVisitor
 				clinic={clinic}
 			/>
-
 		</>
 	);
 };

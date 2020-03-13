@@ -2,22 +2,20 @@ import React, { Component } from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Row, Col, Form, Button, Collapse } from 'react-bootstrap';
-import ReactSelect from 'react-select';
+import Select from '../../forms/fields/Select';
 import { Button as AntButton, Tooltip } from 'antd'; // { Select }
 import RadioButtonGroup from '../../forms/fields/RadioButtonGroup';
 import RadioButton from '../../forms/fields/RadioButton';
 import TextArea from '../../forms/fields/TextArea';
-import { InputFeedback } from '../../forms/formElements';
 import VisitorList from '../VisitorList';
 import FormModal from '../../modals/FormModal';
 import NewAndRepeatVisitor from '../NewAndRepeatVisitor';
 import LawyerAddForm from './LawyerAddForm';
-// import ReactSelectWithValidation from '../../../components/forms/fields/ReactSelectWithValidation';
 // data
 import * as consultFields from '../../../data/consultionFields';
 import * as peopleFields from '../../../data/peopleFields';
-import { getPeopleIntoSelectOptions, getPeopleByIds, formatName } from '../../../data/peopleData';
-import { getLawTypeSelectOptions } from '../../../data/dataTransforms';
+import { getOptionsForPeople, getPeopleByIds, formatName } from '../../../data/peopleData';
+import { getOptionsForLawTypes } from '../../../data/lawTypeData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 
@@ -69,7 +67,6 @@ class ConsultationForm extends Component {
 
 	constructor(props) {
 		super(props);
-		// this.inquirerForm = React.createRef();
 		this.state = {
 			lawyerAddModalShown: false,
 			visitorAddModalShown: false,
@@ -90,12 +87,6 @@ class ConsultationForm extends Component {
 	 **/
 	submitAddLawyer = (value) => {
 		this.props.submitAddLawyer(value, this.props.setFieldValue);
-	}
-
-	// const handleSubmit outside componet
-
-	submitAddInquirer = (values) => {
-		this.props.submitAddInquirer(values, this.props.setFieldValue);
 	}
 
 	// modals
@@ -147,8 +138,6 @@ class ConsultationForm extends Component {
 			setFieldTouched,
 			// isSubmitting,
 		} = this.props;
-
-		// console.log('ConsultationForm render values:', values, 'errors:', errors)
 
 		// passed by Consultaton parent container
 		const {
@@ -237,7 +226,7 @@ class ConsultationForm extends Component {
 		let visitorsLists = [];
 		if (!objectIsEmpty(inquirersSelected)) {
 			for (var key in inquirersSelected) {
-				const visitor = {[key]: {...inquirersSelected[key]}};
+				const visitor = { [key]: { ...inquirersSelected[key] } };
 				const visitorList = <VisitorList
 					key={key}
 					header={<strong>{formatName(inquirersSelected[key])}</strong>}
@@ -260,10 +249,8 @@ class ConsultationForm extends Component {
 					Please insert the information you collected for each visitor that you spoke to. Give a summary of the visitor's issue and indicate whether or not they need a referral.
 				</div>
 				<p className="text-danger small">*<sup> &ndash; </sup>Required</p>
-				<FormikForm
-				// onSubmit={this.props.handleSubmit}
-				// ref={this.inquirerForm}
-				>
+				<FormikForm>
+
 					{/* lawyers select */}
 					<Form.Group as={Row} controlId="lawyerPulldown">
 						<Form.Label column sm={3} className="text-md-right">
@@ -275,16 +262,16 @@ class ConsultationForm extends Component {
 							</Form.Text>
 							<Row>
 								<Col xs={10}>
-									<ReactSelect
+									<Select
 										name={consultFields.LAWYERS}
-										id={[consultFields.LAWYERS]}
-										options={getPeopleIntoSelectOptions(this.props.lawyers)}
-										isClearable
-										isMulti={true}
+										options={getOptionsForPeople(this.props.lawyersObject)}
+										required={true}
+										mode="multiple"
+										value={values[consultFields.LAWYERS]}
 										onChange={values => setFieldValue(consultFields.LAWYERS, values)}
 										onBlur={() => setFieldTouched(consultFields.LAWYERS, true)}
-										value={values[consultFields.LAWYERS]}
-										defaultValue=""
+										touched={touched[consultFields.LAWYERS]}
+										error={errors[consultFields.LAWYERS]}
 									/>
 								</Col>
 								<Col xs={2} className="justify-content-left">
@@ -293,10 +280,6 @@ class ConsultationForm extends Component {
 									</Tooltip>
 								</Col>
 							</Row>
-							{touched[consultFields.LAWYERS] && <InputFeedback error={errors[consultFields.LAWYERS]} />}
-							{/* <div className="text-right text-muted">
-								<small>If lawyer not on pulldown, click</small> <strong>+</strong> <small>above to add.</small>
-							</div> */}
 						</Col>
 					</Form.Group>
 
@@ -311,15 +294,17 @@ class ConsultationForm extends Component {
 							</Form.Text>
 							<Row>
 								<Col xs={9} sm={8} md={9}>
-									<ReactSelect
+									<Select
 										name={consultFields.INQUIRERS}
-										options={getPeopleIntoSelectOptions(this.props.inquirers)}
-										isClearable
-										isMulti={true}
+										options={getOptionsForPeople(this.props.inquirersObject)}
+										// label={}
+										required={true}
+										mode="multiple"
+										value={values[consultFields.INQUIRERS]}
 										onChange={values => this.handleInquirerSelectChange(values)}
 										onBlur={() => setFieldTouched(consultFields.INQUIRERS, true)}
-										value={values[consultFields.INQUIRERS]}
-										defaultValue=""
+										touched={touched[consultFields.INQUIRERS]}
+										error={errors[consultFields.INQUIRERS]}
 									/>
 								</Col>
 								<Col xs={3} sm={4} md={3} className="justify-content-left">
@@ -336,10 +321,6 @@ class ConsultationForm extends Component {
 									</Tooltip>
 								</Col>
 							</Row>
-							{touched[consultFields.INQUIRERS] && <InputFeedback error={errors[consultFields.INQUIRERS]} />}
-							{/* <div className="text-right text-muted">
-								<small>If visitor not in the system, click</small> <strong>+</strong> <small>above to add.</small>
-							</div> */}
 						</Col>
 					</Form.Group>
 
@@ -430,17 +411,17 @@ class ConsultationForm extends Component {
 									<Form.Text className="text-muted">
 										Choose any relevant types of law.
 									</Form.Text>
-									<ReactSelect
-										name={[consultFields.LAW_TYPES]}
-										options={getLawTypeSelectOptions(this.props.lawTypes)}
-										isClearable
-										isMulti={true}
-										onChange={value => setFieldValue(consultFields.LAW_TYPES, value)}
-										onBlur={() => setFieldTouched(consultFields.LAW_TYPES, true)}
+									<Select
+										name={consultFields.LAW_TYPES}
+										options={getOptionsForLawTypes(this.props.lawTypesObject)}
+										required={true}
+										mode="multiple"
 										value={values[consultFields.LAW_TYPES]}
-										defaultValue=""
+										onChange={values => setFieldValue(consultFields.LAW_TYPES, values)}
+										onBlur={() => setFieldTouched(consultFields.LAW_TYPES, true)}
+										touched={touched[consultFields.LAW_TYPES]}
+										error={errors[consultFields.LAW_TYPES]}
 									/>
-									{touched[consultFields.LAW_TYPES] && <InputFeedback error={errors[consultFields.LAW_TYPES]} />}
 								</Col>
 							</Form.Group>
 

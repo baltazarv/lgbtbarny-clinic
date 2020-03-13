@@ -15,7 +15,7 @@ import VisitorAddForm from './VisitorAddForm';
 import PreviousConsultations from './intakeForm/PreviousConsultations';
 // data
 import * as peopleFields from '../../data/peopleFields';
-import { getOptionsForPeople, formatName } from '../../data/peopleData';
+import { getOptionsForPeople } from '../../data/peopleData';
 import * as actions from '../../store/actions';
 
 const NewAndRepeatVisitor = (props) => {
@@ -31,11 +31,12 @@ const NewAndRepeatVisitor = (props) => {
 	// set to true to show success message when visitor is submitted
 	const [visitorWasUpdated, setVisitorWasUpdated] = useState(false);
 	// prop sent to VisitorAddForm & arg sent to visitorUpdatedMessage
-	const [serverResponse, setServerResponse] = useState({});
-
+	const [serverResponse, setServerResponse] = useState({ status: 'pending' });
 
 	const handleRepeatSwitch = () => {
 		setVisitorWasUpdated(false);
+		// if is not repeat visitor...
+		if (isRepeat) setRepeatVisitorId('');
 		setIsRepeat(!isRepeat);
 	}
 
@@ -45,21 +46,21 @@ const NewAndRepeatVisitor = (props) => {
 
 	const submitCreateInquirer = async (values, resetForm) => {
 		let payload = { ...values };
-		const serverResponse = await props.createInquirer(payload);
-		setServerResponse(serverResponse);
-		if (serverResponse.status === 'success' && serverResponse.type === 'createInquirer') {
-			resetForm();
+		const _serverResponse = await props.createInquirer(payload);
+		setServerResponse(_serverResponse);
+		console.log('created', _serverResponse)
+		if (_serverResponse.status === 'success' && _serverResponse.type === 'createInquirer') {
+			// resetForm();
 		}
 	}
 
 	const submitUpdateInquirer = async (values) => {
 		let payload = { ...values };
-		const serverResponse = await props.updateInquirer(payload);
-		setServerResponse(serverResponse);
-		if (serverResponse.status === 'success') {
-			// unload VisitorAddForm and reload switch Select
+		const _serverResponse = await props.updateInquirer(payload);
+		if (_serverResponse.status === 'success') {
+			setServerResponse(_serverResponse);
 			setVisitorWasUpdated(true);
-			repeatVisitorId('')
+			setRepeatVisitorId('')
 		}
 	}
 
@@ -125,15 +126,6 @@ const NewAndRepeatVisitor = (props) => {
 		}
 	}
 
-	const visitorUpdatedMessage = serverResponse => {
-		const visitor = serverResponse.payload[0].fields;
-		return (
-			<Row>
-				<Col xs={8} className="mx-auto w-50 pb-3 text-center font-italic text-success">The record for <span className="font-weight-bold">{formatName(visitor)}</span> was&nbsp;updated!</Col>
-			</Row>
-		)
-	}
-
 	return (
 		<>
 			{/* is repeat visitor Form.Check switch */}
@@ -162,13 +154,13 @@ const NewAndRepeatVisitor = (props) => {
 			{!isRepeat &&
 				<VisitorAddForm
 					clinic={clinic}
-					lawTypes={props.lawTypes}
+					lawTypesObject={props.lawTypesObject}
 					submitForm={submitCreateInquirer}
 					serverResponse={serverResponse}
 				/>
 			}
 
-			{/* repeat visitor */}
+			{/* repeat visitor switch */}
 			{isRepeat &&
 				renderRepeatVisitorSelect()
 			}
@@ -180,19 +172,19 @@ const NewAndRepeatVisitor = (props) => {
 						{renderPreviousConsultations()}
 						<VisitorAddForm
 							clinic={clinic}
-							lawTypes={props.lawTypes}
+							lawTypesObject={props.lawTypesObject}
 							submitForm={submitUpdateInquirer}
 							serverResponse={serverResponse}
-							repeatVisitor={getRepeatVisitor()}
+							repeatVisitor={getRepeatVisitor(serverResponse)}
 						/>
 					</>
 				)
 			}
 
 			{/* repeat visitor edits submitted: success message */}
-			{isRepeat && visitorWasUpdated &&
-				visitorUpdatedMessage(serverResponse)
-			}
+			{/* {isRepeat && visitorWasUpdated && */}
+			{/* {submissionMessage} */}
+			{/* } */}
 		</>
 	)
 }
