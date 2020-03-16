@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Form, Row, Col, Button, Card } from 'react-bootstrap';
@@ -120,38 +120,15 @@ const VisitorAddForm = props => {
 		clinic,
 	} = props;
 
-	const acknowAndSign = useRef();
-	const dispositions = useRef();
-	const buttons = useRef();
-
-	useEffect(() => {
-		// submit button & success message
-		let btnLabel = 'Enter Visitor';
-		if (props.serverResponse && props.serverResponse.payload && props.serverResponse.status === 'success') { // && props.serverResponse.type === 'createInquirer'
-			btnLabel = 'Enter Another Visitor';
-		}
-		if (props.repeatVisitor) btnLabel = 'Process Visitor';
-		// if update form vs create form
-		buttons.current = <>
-			<Button
-				variant="primary"
-				type="submit"
-				disabled={!dirty || isSubmitting}
-				className="mr-2"
-			>
-				{btnLabel}
-			</Button>
-		</>
-
+	const acknowAndSign = () => {
 		// acknowldegment -- it may move depending on the clinic
 		const termsAcceptClasses = {
 			label: classNames({
 				'font-weight-bold': !errors[peopleFields.TERMS] || !touched[peopleFields.TERMS],
 				'text-danger': errors[peopleFields.TERMS] && touched[peopleFields.TERMS],
 			})
-		}
-
-		acknowAndSign.current = <Card className="mb-3">
+		};
+		return <Card className="mb-3">
 			<Card.Body className="pb-0">
 				<CheckboxGroup
 					id={peopleFields.TERMS}
@@ -188,40 +165,33 @@ const VisitorAddForm = props => {
 				</div>
 			</Card.Body>
 		</Card>
+	}
 
-		// nj clinic disposition
-		if (clinic === 'nj') {
-			dispositions.current = <CheckboxGroup
-				id={peopleFields.DISPOSITION}
-				label="Action(s) Taken and Description of Disposition (Check all that apply)"
-				value={values[peopleFields.DISPOSITION]}
-				error={errors[peopleFields.DISPOSITION]}
-				touched={touched[peopleFields.DISPOSITION]}
-				onChange={setFieldValue}
-				onBlur={setFieldTouched}
-			>
-				<Field
-					component={Checkbox}
-					name={peopleFields.DISPOSITION}
-					id={peopleFields.DISPOSITION_INFO}
-					label="General Info., including information regarding legal and social services"
-				/>
-				<Field
-					component={Checkbox}
-					name={peopleFields.DISPOSITION}
-					id={peopleFields.DISPOSITION_REVIEW}
-					label="Review by LeGaL for possible referral to network lawyers for representation or for high-impact litigation. But note that referrals in NJ are EXTREMELY limited."
-				/>
-			</CheckboxGroup>
+	const submitButton = () => {
+		// submit button & success message
+		let btnLabel = 'Enter Visitor';
+		if (props.serverResponse && props.serverResponse.payload && props.serverResponse.status === 'success') { // && props.serverResponse.type === 'createInquirer'
+			btnLabel = 'Enter Another Visitor';
 		}
-
-	}, [clinic, props.serverResponse, props.repeatVisitor, values, dirty, errors, isSubmitting, setFieldTouched, setFieldValue, touched]);
+		if (props.repeatVisitor) btnLabel = 'Process Visitor';
+		// if update form vs create form
+		return <>
+			<Button
+				variant="primary"
+				type="submit"
+				disabled={!dirty || isSubmitting}
+				className="mr-2"
+			>
+				{btnLabel}
+			</Button>
+		</>
+	}
 
 	return <>
 		<FormikForm onSubmit={handleSubmit}>
 
 			{/* acknowldegment */}
-			{acknowAndSign.current}
+			{acknowAndSign()}
 
 			{/* name */}
 			<Row>
@@ -479,11 +449,34 @@ const VisitorAddForm = props => {
 			{/* previous acknowledgement & signature location */}
 
 			{/* NJ disposition */}
-			{dispositions.current}
+			{clinic === 'nj' &&
+				<CheckboxGroup
+					id={peopleFields.DISPOSITION}
+					label="Action(s) Taken and Description of Disposition (Check all that apply)"
+					value={values[peopleFields.DISPOSITION]}
+					error={errors[peopleFields.DISPOSITION]}
+					touched={touched[peopleFields.DISPOSITION]}
+					onChange={setFieldValue}
+					onBlur={setFieldTouched}
+				>
+					<Field
+						component={Checkbox}
+						name={peopleFields.DISPOSITION}
+						id={peopleFields.DISPOSITION_INFO}
+						label="General Info., including information regarding legal and social services"
+					/>
+					<Field
+						component={Checkbox}
+						name={peopleFields.DISPOSITION}
+						id={peopleFields.DISPOSITION_REVIEW}
+						label="Review by LeGaL for possible referral to network lawyers for representation or for high-impact litigation. But note that referrals in NJ are EXTREMELY limited."
+					/>
+				</CheckboxGroup>
+			}
 
 			<Row className="justify-content-start">
 				<Col>
-					{buttons.current}
+					{submitButton()}
 				</Col>
 			</Row>
 		</FormikForm>
