@@ -34,28 +34,12 @@ export const getPeopleByIds = (ids, people) => {
 	return ids.map(id => formatName(people[id])).join(', ');
 }
 
-// react-select options with people array -- deprecate
-export const getPeopleIntoSelectOptions = (arr) => {
-	return arr.reduce((options, item) => {
-		if (item[peopleFields.FIRST_NAME] || item[peopleFields.LAST_NAME]) {
-			const inqObj = {
-				value: item.id,
-				label: formatName(item),
-			}
-			return [...options, inqObj]
-		} else {
-			return options;
-		}
-	}, []);
-}
-
 // works with antd Select with people data object
 export const getOptionsForPeople = people => {
 	const options = [];
 	if (!objectIsEmpty(people)) {
 		for (var key in people) {
 			const fields = people[key];
-			// console.log(key, fields)
 			if(fields[peopleFields.FIRST_NAME] || fields[peopleFields.LAST_NAME]) {
 				options.push(<Option key={key} value={key}>{formatName(fields)}</Option>)
 			}

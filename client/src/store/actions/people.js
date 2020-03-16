@@ -1,8 +1,14 @@
 import * as actionTypes from './actionTypes';
 import airtableBase from '../../airtableBase';
 import * as peopleFields from '../../data/peopleFields'; //
-import { PEOPLE_TABLE, INQUIRERS_VIEW, LAWYERS_VIEW } from '../../data/peopleData';
-import { recordForUpdate } from '../../data/dataTransforms';
+import {
+	PEOPLE_TABLE,
+	INQUIRERS_VIEW,
+	LAWYERS_VIEW
+} from '../../data/peopleData';
+import {
+	recordForUpdate
+} from '../../data/dataTransforms';
 
 // async action creators
 
@@ -52,7 +58,6 @@ export const createLawyer = lawyer => {
 				[peopleFields.TYPE]: [
 					"Lawyer"
 				],
-				[peopleFields.REPEAT_VISIT]: 'Yes',
 			};
 			airtableBase(PEOPLE_TABLE).create(payload, function (error, record) {
 				if (error) {
@@ -62,7 +67,10 @@ export const createLawyer = lawyer => {
 						error,
 					});
 				}
-				let lawyer = {...record.fields, id: record.id};
+				const lawyer = {
+					...record.fields,
+					id: record.id
+				};
 				dispatch(addLawyer(lawyer));
 				return resolve({
 					status: 'success',
@@ -134,7 +142,7 @@ export const createInquirer = inquirer => {
 				[peopleFields.TYPE]: [
 					"Inquirer"
 				],
-				[peopleFields.REPEAT_VISIT]: 'Yes',
+				[peopleFields.REPEAT_VISIT]: 'No',
 			};
 			airtableBase(PEOPLE_TABLE).create(payload, function (error, record) {
 				if (error) {
@@ -144,12 +152,15 @@ export const createInquirer = inquirer => {
 						error,
 					});
 				}
-				// payload is one inquirer object with `id` and `fields` props
+				const inquirer = {
+					...record.fields,
+					id: record.id
+				};
 				dispatch(addInquirer(inquirer));
 				return resolve({
 					status: 'success',
 					type: 'createInquirer',
-					payload: record,
+					payload: inquirer,
 				});
 			});
 		})
@@ -169,20 +180,21 @@ export const updateInquirer = info => {
 						error,
 					});
 				}
-				// could getInquirers(), but expensive
-				const _record = record[0].fields;
-				_record.id = record[0].id;
-				dispatch(updateInquirers(_record)); // _record
+				// record is array
+				const inquirer = {
+					...record[0].fields,
+					id: record[0].id
+				};
+				dispatch(updateInquirers(inquirer));
 				return resolve({
 					status: 'success',
 					type: 'updateInquirer',
-					payload: record, // record
+					payload: inquirer,
 				})
 			});
 		});
 	}
 }
-
 
 // sync action creators
 

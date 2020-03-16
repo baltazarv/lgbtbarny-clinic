@@ -15,7 +15,7 @@ import VisitorAddForm from './VisitorAddForm';
 import PreviousConsultations from './intakeForm/PreviousConsultations';
 // data
 import * as peopleFields from '../../data/peopleFields';
-import { getOptionsForPeople } from '../../data/peopleData';
+import { getOptionsForPeople, formatName } from '../../data/peopleData';
 import * as actions from '../../store/actions';
 
 const NewAndRepeatVisitor = (props) => {
@@ -29,12 +29,12 @@ const NewAndRepeatVisitor = (props) => {
 	// select pulldown format
 	const [repeatVisitorId, setRepeatVisitorId] = useState('');
 	// set to true to show success message when visitor is submitted
-	const [visitorWasUpdated, setVisitorWasUpdated] = useState(false);
+	// const [visitorWasUpdated, setVisitorWasUpdated] = useState(false);
 	// prop sent to VisitorAddForm & arg sent to visitorUpdatedMessage
 	const [serverResponse, setServerResponse] = useState({ status: 'pending' });
 
 	const handleRepeatSwitch = () => {
-		setVisitorWasUpdated(false);
+		// setVisitorWasUpdated(false);
 		// if is not repeat visitor...
 		if (isRepeat) setRepeatVisitorId('');
 		setIsRepeat(!isRepeat);
@@ -48,19 +48,19 @@ const NewAndRepeatVisitor = (props) => {
 		let payload = { ...values };
 		const _serverResponse = await props.createInquirer(payload);
 		setServerResponse(_serverResponse);
-		console.log('created', _serverResponse)
-		if (_serverResponse.status === 'success' && _serverResponse.type === 'createInquirer') {
-			// resetForm();
+		if (_serverResponse.status === 'success' && (_serverResponse.type === 'createInquirer')) {
+			resetForm();
 		}
 	}
 
 	const submitUpdateInquirer = async (values) => {
 		let payload = { ...values };
 		const _serverResponse = await props.updateInquirer(payload);
-		if (_serverResponse.status === 'success') {
-			setServerResponse(_serverResponse);
-			setVisitorWasUpdated(true);
-			setRepeatVisitorId('')
+		setServerResponse(_serverResponse);
+		if (_serverResponse.status === 'success' && _serverResponse.type === 'updateInquirer') {
+			// setVisitorWasUpdated(true);
+			setRepeatVisitorId('');
+			// resetForm();
 		}
 	}
 
@@ -75,6 +75,17 @@ const NewAndRepeatVisitor = (props) => {
 		}
 		return <Col className={style}>&nbsp;<strong>No &mdash; </strong> Enter new visitor:</Col>
 	};
+
+	const renderSuccessMessage = () => {
+		let renderMessage = null;
+		if (serverResponse && serverResponse.status === 'success' && (serverResponse.type === 'createInquirer' || serverResponse.type === 'updateInquirer')) {
+			const name = formatName(serverResponse.payload);
+			renderMessage = <Row>
+				<Col xs={8} className="mx-auto w-50 pt-3 pb-0 text-center font-italic text-success"><span className="font-weight-bold">{name}</span> was {serverResponse.type === 'createInquirer'? 'added' : 'updated'}!</Col>
+			</Row>;
+		}
+		return renderMessage;
+	}
 
 	const renderRepeatVisitorSelect = () => {
 		return (
@@ -150,41 +161,44 @@ const NewAndRepeatVisitor = (props) => {
 				{repeatInstructions()}
 			</Row>
 
-			{/* new visitor */}
-			{!isRepeat &&
-				<VisitorAddForm
-					clinic={clinic}
-					lawTypesObject={props.lawTypesObject}
-					submitForm={submitCreateInquirer}
-					serverResponse={serverResponse}
-				/>
-			}
-
-			{/* repeat visitor switch */}
-			{isRepeat &&
-				renderRepeatVisitorSelect()
-			}
-
-			{/* repeat visitor selected for editing */}
-			{isRepeat && repeatVisitorId &&
-				(
-					<>
-						{renderPreviousConsultations()}
+			<Card>
+				<Card.Body>
+					{/* new visitor */}
+					{!isRepeat &&
 						<VisitorAddForm
 							clinic={clinic}
 							lawTypesObject={props.lawTypesObject}
-							submitForm={submitUpdateInquirer}
+							submitForm={submitCreateInquirer}
 							serverResponse={serverResponse}
-							repeatVisitor={getRepeatVisitor(serverResponse)}
 						/>
-					</>
-				)
-			}
+					}
 
-			{/* repeat visitor edits submitted: success message */}
-			{/* {isRepeat && visitorWasUpdated && */}
-			{/* {submissionMessage} */}
-			{/* } */}
+					{/* repeat visitor switch */}
+					{isRepeat &&
+						renderRepeatVisitorSelect()
+					}
+
+					{/* repeat visitor selected for editing */}
+					{isRepeat && repeatVisitorId &&
+						(
+							<>
+								{renderPreviousConsultations()}
+								<VisitorAddForm
+									clinic={clinic}
+									lawTypesObject={props.lawTypesObject}
+									submitForm={submitUpdateInquirer}
+									serverResponse={serverResponse}
+									repeatVisitor={getRepeatVisitor(serverResponse)}
+								/>
+							</>
+						)
+					}
+
+					{/* success message */}
+					{renderSuccessMessage()}
+
+				</Card.Body>
+			</Card>
 		</>
 	)
 }

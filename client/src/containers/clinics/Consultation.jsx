@@ -11,7 +11,6 @@ import TimerCounter from '../../components/TimerCountdown/index';
 import * as actions from '../../store/actions/index';
 import * as consultFields from '../../data/consultionFields';
 import * as peopleFields from '../../data/peopleFields';
-import { getPeopleIntoSelectOptions } from '../../data/peopleData';
 import { formatName } from '../../data/peopleData';
 // import { getInquirerConsultations } from '../../../data/consultationData';
 import { EMAIL_OPTIONS, mergeCustomAndDefaultHtml } from '../../emails/visitorPostConsultation';
@@ -145,10 +144,10 @@ class Consultation extends Component {
 				this.setState({
 					serverResponse
 				});
-				const selectedLawyers = getPeopleIntoSelectOptions([serverResponse.payload]);
-				setFieldValue(consultFields.LAWYERS, selectedLawyers);
-
-				// resetForm(); // `Warning: Can't perform a React state update on an unmounted component.`
+				console.log('update lawyer select options and set field value!')
+				// const selectedLawyers = [serverResponse.payload.id];
+				// setFieldValue(consultFields.LAWYERS, selectedLawyers);
+				// resetForm();
 			}
 		} catch (error) {
 			console.log(error)

@@ -24,7 +24,6 @@ class Clinics extends Component {
   }
 
   async componentDidMount() {
-    // console.log('Clinics componentDidMount')
     this.setBgImageStyle();
     this.props.getLawyers();
     this.props.getInquirers();
@@ -33,7 +32,6 @@ class Clinics extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    // console.log('Clinics componentDidUpdate')
     if (this.props.location !== prevProps.location) {
       this.setBgImageStyle();
     }
@@ -51,6 +49,13 @@ class Clinics extends Component {
     return this.props.location.pathname.split('/')[2];
   }
 
+  getTitle = () => {
+    let clinicTitle = 'Clinic';
+    if (this.getClinicPath() === 'admin') clinicTitle = 'Clinic Administration';
+    if (CLINICS[this.getClinicPath()]) clinicTitle = CLINICS[this.getClinicPath()].title;
+    return clinicTitle;
+  }
+
   setBgImageStyle = () => {
     let img = bgImageBluish; // section = 'consultations' || 'completed'
     const section = this.getSection();
@@ -65,46 +70,43 @@ class Clinics extends Component {
     })
   }
 
+  /**
+   * <Card>
+   *   <ButtonToolbar />
+   *   <Card.Body />
+   * </Card>
+   */
+
+  renderIndex = () => <Card.Body>
+    <ClinicIndex />
+  </Card.Body>;
+
+  renderIntake = () => <Card.Body>
+    <Intake
+      clinic={this.getClinicPath()}
+    />
+  </Card.Body>;
+
+  renderVisitors = () => <Visitors
+    clinic={this.getClinicPath()}
+  />;
+
+  renderConsultation = () => <Card.Body>
+    <Consultation
+      clinic={this.getClinicPath()}
+      lawyers={this.props.lawyers}
+      inquirers={this.props.inquirers}
+      lawTypes={this.props.lawTypes}
+      refreshInquirers={this.props.getInquirers}
+    />
+  </Card.Body>;
+
+  renderConsultations = () => <Consultations
+    clinic={this.getClinicPath()}
+  />;
+
+
   render() {
-
-    let clinicTitle = 'Clinic';
-    if (this.getClinicPath() === 'admin') clinicTitle = 'Clinic Administration';
-    if (CLINICS[this.getClinicPath()]) clinicTitle = CLINICS[this.getClinicPath()].title;
-
-    /**
-     * <Card>
-     *   <ButtonToolbar />
-     *   <Card.Body />
-     * </Card>
-     */
-
-    const consultation = () => <Card.Body>
-      <Consultation
-        clinic={this.getClinicPath()}
-        lawyers={this.props.lawyers}
-        inquirers={this.props.inquirers}
-        lawTypes={this.props.lawTypes}
-        refreshInquirers={this.props.getInquirers}
-      />
-    </Card.Body>
-
-    const intake = () => <Card.Body>
-      <Intake
-        clinic={this.getClinicPath()}
-      />
-    </Card.Body>
-
-    const visitors = () => <Visitors
-      clinic={this.getClinicPath()}
-    />
-
-    const consultations = () => <Consultations
-      clinic={this.getClinicPath()}
-    />
-
-    const index = () => <Card.Body>
-      <ClinicIndex />
-    </Card.Body>
 
     return (
       <>
@@ -112,48 +114,48 @@ class Clinics extends Component {
           <ClinicNav
             clinic={this.getClinicPath()}
             section={this.getSection()}
-            clinicTitle={clinicTitle}
+            clinicTitle={this.getTitle()}
           />
           <Container>
             <Card className={styles.cardContainer} style={{ border: 0 }}>
 
               <Switch>
-                <Route exact path="/" component={index} />
+                <Route exact path="/" render={() => this.renderIndex()} />
 
                 {/* tnc */}
-                <Route path="/tnc/intake" component={intake} />
-                <Route path="/tnc/visitors" component={visitors} />
-                <Route path="/tnc/consultation" component={consultation} />
-                <Route path="/tnc/completed" component={consultations} />
+                <Route path="/tnc/intake" render={() => this.renderIntake()} />
+                <Route path="/tnc/visitors" render={() => this.renderVisitors()} />
+                <Route path="/tnc/consultation" render={() => this.renderConsultation()} />
+                <Route path="/tnc/completed" render={() => this.renderConsultations()} />
                 <Route path="/tnc">
                   <Redirect to="/tnc/intake" />
                 </Route>
 
                 {/* nj */}
-                <Route path="/nj/intake" component={intake} />
-                <Route path="/nj/visitors" component={visitors} />
-                <Route path="/nj/completed" component={consultations} />
+                <Route path="/nj/intake" render={() => this.renderIntake()} />
+                <Route path="/nj/visitors" render={() => this.renderVisitors()} />
+                <Route path="/nj/completed" render={() => this.renderConsultations()} />
                 <Route path="/nj">
                   <Redirect to="/nj/intake" />
                 </Route>
 
                 {/* youth */}
-                <Route path="/youth/consultation" component={consultation} />
-                <Route path="/youth/visitors" component={visitors} />
-                <Route path="/youth/completed" component={consultations} />
+                <Route path="/youth/consultation" render={() => this.renderConsultation()} />
+                <Route path="/youth/visitors" render={() => this.renderVisitors()} />
+                <Route path="/youth/completed" render={() => this.renderConsultations()} />
                 <Route path="/youth">
                   <Redirect to="/youth/consultation" />
                 </Route>
 
                 {/* admin */}
-                <Route path="/admin/visitors" component={visitors} />
-                <Route path="/admin/consultations" component={consultations} />
+                <Route path="/admin/visitors" render={() => this.renderVisitors()} />
+                <Route path="/admin/consultations" render={() => this.renderConsultations()} />
                 <Route path="/admin">
                   <Redirect to="/admin/visitors" />
                 </Route>
 
                 <Route
-                  component={index}
+                  render={() => this.renderIndex()}
                 />
               </Switch>
             </Card>

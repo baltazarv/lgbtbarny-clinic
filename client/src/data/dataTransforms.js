@@ -1,6 +1,7 @@
 /** Functions that are specific to the AirTable db schema.
  */
 
+ // the id needs to be removed to update records
 export const recordForUpdate = data => {
 	let fields = objectWithoutProps(data, ['id']);
 	let payload = {};
