@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card } from 'react-bootstrap';
+import { Button } from 'antd';
+import { Card, Row, Col } from 'react-bootstrap';
+
 import VisitorsTable from '../../components/clinics/visitorsTable/VisitorsTable';
 import ToggleButtons from '../../components/ToggleButtons';
 // data
@@ -23,11 +25,13 @@ class Visitors extends Component {
 			filteredValues = {
         [peopleFields.CLINIC_NAME]: [peopleFields.CLINIC_NJ],
       }
-		}
-		this.state = {
-			adminTitle: adminPageTitles['nj'],
-			filteredValues,
-		}
+    }
+    this.state = {
+      adminTitle: adminPageTitles['nj'],
+      filteredValues,
+      isLoading: true,
+    }
+    this.refreshTable = this.refreshTable.bind(this);
   }
 
   getPageTitle = () => {
@@ -75,6 +79,16 @@ class Visitors extends Component {
     })
   }
 
+  async refreshTable() {
+    console.log('refreshTable')
+    await this.props.getInquirers();
+    this.setState({ isLoading: true });
+  }
+
+  loadingDone = () => {
+    this.setState({ isLoading: false });
+  }
+
   render() {
     // from parent
     const {
@@ -101,7 +115,24 @@ class Visitors extends Component {
       <>
         {toggleButtons}
         <Card.Body>
-          <h1 className="h2">{this.getPageTitle()}</h1>
+          <h1 className="h2">
+            <Row>
+              <Col className="col-8">
+                {this.getPageTitle()}
+              </Col>
+              <Col className="col-4 text-right">
+                <Button
+                  // type="primary"
+                  shape="round"
+                  icon="reload"
+                  size="small"
+                  onClick={this.refreshTable}
+                >
+                  Refresh
+                </Button>
+              </Col>
+            </Row>
+          </h1>
           <VisitorsTable
             clinic={clinic}
             filteredValues={this.state.filteredValues}
@@ -110,6 +141,8 @@ class Visitors extends Component {
             lawTypes={this.props.lawTypes}
             consultations={this.props.consultations} // object
             lawyers={this.props.lawyers}
+            isLoading={this.state.isLoading}
+            loadingDone={this.loadingDone}
           />
         </Card.Body>
       </>
@@ -129,6 +162,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
+    getInquirers: () => dispatch(actions.getInquirers()),
   }
 }
 

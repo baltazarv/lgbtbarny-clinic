@@ -31,12 +31,12 @@ export const getConsultations = () => {
 					console.error('Airtable Error: ', err);
 					return reject('Airtable erroror: ', err);
 				}
-			});
-			dispatch(initConsultations(consultations));
-			return resolve({
-				status: 'success',
-				type: 'getConsultations',
-				payload: consultations,
+				dispatch(initConsultations(consultations));
+				return resolve({
+					status: 'success',
+					type: 'getConsultations',
+					payload: consultations,
+				});
 			});
 		})
 	}

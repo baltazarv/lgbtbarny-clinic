@@ -1,9 +1,6 @@
 export const objectIsEmpty = (obj) => {
-	for(var key in obj) {
-			if(obj.hasOwnProperty(key))
-					return false;
-	}
-	return true;
+	// E6 way
+	return Object.keys(obj).length === 0 && obj.constructor === Object;
 }
 
 export const isoToStandardDate = isoDate => {

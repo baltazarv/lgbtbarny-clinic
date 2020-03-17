@@ -12,7 +12,6 @@ import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 
 const VisitorsTable = props => {
 
-	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
 
 	// props from parent
@@ -24,6 +23,8 @@ const VisitorsTable = props => {
 		lawTypes, // lawTypesObject
 		consultations,
 		lawyers, // lawyersObject
+		isLoading,
+		loadingDone,
 	} = props;
 
 	let columns = [];
@@ -108,14 +109,14 @@ const VisitorsTable = props => {
 					data.push(object)
 				}
 			}
+			loadingDone();
 			return data;
 		}
 
 		if (isLoading && !objectIsEmpty(inquirers)) {
 			setDataSource(setTableData());
-			setIsLoading(false);
 		}
-	}, [isLoading, inquirers, lawTypes, clinic])
+	}, [isLoading, inquirers, lawTypes, clinic, loadingDone])
 
 	const visitorListItems = {
 		fields: [

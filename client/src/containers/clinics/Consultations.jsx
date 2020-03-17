@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card } from 'react-bootstrap';
+import { Button } from 'antd';
+import { Card, Row, Col } from 'react-bootstrap';
 // components
 import ConsultationsTable from '../../components/clinics/consultationsTable/ConsultationsTable';
 import ToggleButtons from '../../components/ToggleButtons';
@@ -32,7 +33,9 @@ class Consultations extends Component {
 		this.state = {
 			adminTitle: adminPageTitles['action'],
 			filteredValues,
+      isLoading: true,
 		}
+    this.refreshTable = this.refreshTable.bind(this);
 	}
 
 	handleFilterBtnClick = val => {
@@ -95,8 +98,17 @@ class Consultations extends Component {
 		})
 	}
 
-	render() {
+  async refreshTable() {
+		await this.props.getConsultations();
+		// isLoading is VisitorTable useEffect dep
+    this.setState({ isLoading: true });
+  }
 
+  loadingDone = () => {
+    this.setState({ isLoading: false });
+  }
+
+	render() {
 		// from parent
 		const {
 			clinic
@@ -125,7 +137,23 @@ class Consultations extends Component {
 			<>
 				{toggleButtons}
 				<Card.Body>
-					<h1 className="h2">{this.props.clinic === 'admin' ? this.state.adminTitle : 'Consultations Completed'}</h1>
+					<h1 className="h2">
+						<Row>
+							<Col className="col-8">
+								{this.props.clinic === 'admin' ? this.state.adminTitle : 'Consultations Completed'}
+							</Col>
+							<Col className="col-4 text-right">
+								<Button
+									shape="round"
+									icon="reload"
+									size="small"
+									onClick={this.refreshTable}
+								>
+									Refresh
+                </Button>
+							</Col>
+						</Row>
+					</h1>
 					<ConsultationsTable
 						clinic={clinic}
 						filteredValues={this.state.filteredValues}
@@ -135,6 +163,8 @@ class Consultations extends Component {
 						lawTypes={this.props.lawTypes}
 						consultations={this.props.consultations} // object
 						updateConsultation={this.props.updateConsultation}
+            isLoading={this.state.isLoading}
+            loadingDone={this.loadingDone}
 					/>
 				</Card.Body>
 			</>
@@ -154,6 +184,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
 	return {
 		updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
+		getConsultations: () => dispatch(actions.getConsultations()),
 	}
 }
 

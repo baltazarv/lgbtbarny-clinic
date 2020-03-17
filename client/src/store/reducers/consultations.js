@@ -9,7 +9,7 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.INIT_CONSULTATIONS:
 			return {
 				...state,
-				consultations: action.consultations,
+				consultations: {...action.consultations},
 			}
 		case actionTypes.CONSULTATION_UPDATED:
 			let consultations = {};

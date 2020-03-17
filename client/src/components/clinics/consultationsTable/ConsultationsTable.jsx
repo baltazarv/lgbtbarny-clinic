@@ -45,9 +45,10 @@ const ConsultationsTable = props => {
 		lawTypes, // lawTypesObject
 		consultations,
 		updateConsultation, // redux function
+		isLoading,
+		loadingDone,
 	} = props;
 
-	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
 	const [visitorModalShown, setVisitorModalShown] = useState(false);
 	const [inquirerSelected, setInquirerSelected] = useState({});
@@ -182,14 +183,14 @@ const ConsultationsTable = props => {
 					data.push(object)
 				}
 			}
+			loadingDone();
 			return data;
 		}
 
 		if (isLoading && !objectIsEmpty(consultations) && !objectIsEmpty(inquirers) && !objectIsEmpty(lawyers) && !objectIsEmpty(lawTypes)) {
 			setDataSource(setTableData());
-			setIsLoading(false);
 		}
-	}, [isLoading, consultations, inquirers, lawTypes, lawyers, clinic])
+	}, [isLoading, consultations, inquirers, lawyers, lawTypes, clinic, loadingDone])
 
 	const handleChange = (pagination, filters) => {
 		changeFilters(filters);

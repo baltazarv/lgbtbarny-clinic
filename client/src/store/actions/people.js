@@ -17,14 +17,8 @@ export const getLawyers = () => {
 		return new Promise((resolve, reject) => {
 			// TO DO: remove array
 			let lawyersArray = [];
-			let lawyersObject = [];
+			let lawyersObject = {};
 			airtableBase(PEOPLE_TABLE).select({
-				fields: [
-					peopleFields.FIRST_NAME,
-					peopleFields.MIDDLE_NAME,
-					peopleFields.LAST_NAME,
-					peopleFields.OTHER_NAMES,
-				],
 				view: LAWYERS_VIEW,
 				// filterByFormula: 'Type = ...', // array
 			}).eachPage(function page(records, fetchNextPage) {
@@ -33,6 +27,7 @@ export const getLawyers = () => {
 					const _record = record.fields;
 					_record.id = record.id;
 					lawyersArray.push(_record);
+
 					// object
 					lawyersObject[record.id] = record.fields;
 				});
@@ -97,28 +92,6 @@ export const getInquirers = () => {
 			let inquirersObject = {};
 			airtableBase(PEOPLE_TABLE).select({
 				view: INQUIRERS_VIEW,
-				fields: [
-					peopleFields.CLINIC_NAME,
-					peopleFields.DATE_MODIFIED,
-					peopleFields.DATETIME,
-					peopleFields.REPEAT_VISIT,
-					peopleFields.FIRST_NAME,
-					peopleFields.MIDDLE_NAME,
-					peopleFields.LAST_NAME,
-					peopleFields.OTHER_NAMES,
-					peopleFields.LAW_TYPES,
-					peopleFields.EMAIL,
-					peopleFields.PHONE,
-					peopleFields.ADDRESS,
-					peopleFields.GENDER,
-					peopleFields.PRONOUNS,
-					peopleFields.INCOME,
-					peopleFields.INTAKE_NOTES,
-					peopleFields.TERMS,
-					peopleFields.SIGNATURE,
-					peopleFields.DISPOSITION,
-					peopleFields.CONSULTATIONS,
-				],
 				// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
 				// filterByFormula: 'Type = "Inquirer"'
 			}).eachPage(function page(records, fetchNextPage) {

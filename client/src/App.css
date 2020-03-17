@@ -24,3 +24,8 @@ code {
 .referrals-status-col .ant-select-selection {
   width: 120px;
 }
+
+/* fix for antd icon on Visitors and Completed Consultations tables' refresh buttons */
+.anticon {
+  vertical-align: 0.175em;
+}
