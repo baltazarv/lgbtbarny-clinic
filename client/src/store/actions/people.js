@@ -37,14 +37,22 @@ export const getLawyers = () => {
 					lawyersObject[record.id] = record.fields;
 				});
 				fetchNextPage(); // next 100
-			}, function done(err) {
-				if (err) {
-					console.error('Airtable Error: ', err);
-					return reject('Airtable Error: ', err);
+			}, function done(error) {
+				if (error) {
+					console.error('Airtable Error: ', error);
+					return reject({
+						status: 'failed',
+						error,
+					});
+
 				}
 				const lawyers = [lawyersArray, lawyersObject];
 				dispatch(initLawyers(lawyers));
-				return resolve(lawyers);
+				return resolve({
+					status: 'success',
+					type: 'getLawyers',
+					payload: lawyers,
+				});
 			});
 		})
 	}
@@ -84,52 +92,61 @@ export const createLawyer = lawyer => {
 
 export const getInquirers = () => {
 	return dispatch => {
-		let inquirersArray = [];
-		let inquirersObject = {};
-		airtableBase(PEOPLE_TABLE).select({
-			view: INQUIRERS_VIEW,
-			fields: [
-				peopleFields.CLINIC_NAME,
-				peopleFields.DATE_MODIFIED,
-				peopleFields.DATETIME,
-				peopleFields.REPEAT_VISIT,
-				peopleFields.FIRST_NAME,
-				peopleFields.MIDDLE_NAME,
-				peopleFields.LAST_NAME,
-				peopleFields.OTHER_NAMES,
-				peopleFields.LAW_TYPES,
-				peopleFields.EMAIL,
-				peopleFields.PHONE,
-				peopleFields.ADDRESS,
-				peopleFields.GENDER,
-				peopleFields.PRONOUNS,
-				peopleFields.INCOME,
-				peopleFields.INTAKE_NOTES,
-				peopleFields.TERMS,
-				peopleFields.SIGNATURE,
-				peopleFields.DISPOSITION,
-				peopleFields.CONSULTATIONS,
-			],
-			// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
-			// filterByFormula: 'Type = "Inquirer"'
-		}).eachPage(function page(records, fetchNextPage) {
-			records.forEach(function (record) {
-				// array
-				const _record = record.fields;
-				_record.id = record.id;
-				inquirersArray.push(_record);
-				// object
-				inquirersObject[record.id] = record.fields;
+		return new Promise((resolve, reject) => {
+			let inquirersArray = [];
+			let inquirersObject = {};
+			airtableBase(PEOPLE_TABLE).select({
+				view: INQUIRERS_VIEW,
+				fields: [
+					peopleFields.CLINIC_NAME,
+					peopleFields.DATE_MODIFIED,
+					peopleFields.DATETIME,
+					peopleFields.REPEAT_VISIT,
+					peopleFields.FIRST_NAME,
+					peopleFields.MIDDLE_NAME,
+					peopleFields.LAST_NAME,
+					peopleFields.OTHER_NAMES,
+					peopleFields.LAW_TYPES,
+					peopleFields.EMAIL,
+					peopleFields.PHONE,
+					peopleFields.ADDRESS,
+					peopleFields.GENDER,
+					peopleFields.PRONOUNS,
+					peopleFields.INCOME,
+					peopleFields.INTAKE_NOTES,
+					peopleFields.TERMS,
+					peopleFields.SIGNATURE,
+					peopleFields.DISPOSITION,
+					peopleFields.CONSULTATIONS,
+				],
+				// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
+				// filterByFormula: 'Type = "Inquirer"'
+			}).eachPage(function page(records, fetchNextPage) {
+				records.forEach(function (record) {
+					// array
+					const _record = record.fields;
+					_record.id = record.id;
+					inquirersArray.push(_record);
+					// object
+					inquirersObject[record.id] = record.fields;
+				});
+				fetchNextPage(); // next 100
+			}, function done(error, records) {
+				if (error) {
+					console.error('Airtable Error: ', error);
+					return reject({
+						status: 'failed',
+						error,
+					});
+				}
+				const inquirers = [inquirersArray, inquirersObject]
+				dispatch(initInquirers(inquirers));
+				return resolve({
+					status: 'success',
+					type: 'getInquirers',
+					payload: inquirers,
+				});
 			});
-			fetchNextPage(); // next 100
-		}, function done(err, records) {
-			if (err) {
-				console.log('Airtable Error: ', err);
-				// dispatch(fetchInquirersFailed())
-				return;
-			}
-			const inquirers = [inquirersArray, inquirersObject]
-			dispatch(initInquirers(inquirers));
 		});
 	}
 }

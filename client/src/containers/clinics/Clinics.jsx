@@ -97,6 +97,7 @@ class Clinics extends Component {
       lawyers={this.props.lawyers}
       inquirers={this.props.inquirers}
       lawTypes={this.props.lawTypes}
+      refreshLawyers={this.props.getLawyers}
       refreshInquirers={this.props.getInquirers}
     />
   </Card.Body>;

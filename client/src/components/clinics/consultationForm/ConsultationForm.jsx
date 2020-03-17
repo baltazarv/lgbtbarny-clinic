@@ -71,7 +71,15 @@ class ConsultationForm extends Component {
 			lawyerAddModalShown: false,
 			visitorAddModalShown: false,
 			submitButtonLabel: 'Submit & Send Email to Visitor',
+			visitorSelectIsRefreshing: false,
+			visitorSelectPlaceholder: 'Select...',
+			lawyerSelectIsRefreshing: false,
+			lawyerSelectPlaceholder: 'Select...',
 		}
+		this.refreshInquirers = this.refreshInquirers.bind(this);
+		this.handleAddVisitor = this.handleAddVisitor.bind(this);
+		this.refreshLawyers = this.refreshLawyers.bind(this);
+		this.handleAddLawyer = this.handleAddLawyer.bind(this);
 	}
 
 	// form control event handlers
@@ -81,12 +89,61 @@ class ConsultationForm extends Component {
 		this.props.handleInquirerSelectChange(options);
 	}
 
-	/** Forward to parent container Consultation:
-	 *  * new lawyer value from LawyerAddForm modal to create new lawyer
-	 *  * & setFieldValue from this class to add selection to Lawyer pulldown when adding lawyer is successful
-	 **/
-	submitAddLawyer = (value) => {
-		this.props.submitAddLawyer(value, this.props.setFieldValue);
+	async refreshInquirers() {
+		this.setState({
+			visitorSelectIsRefreshing: true,
+			visitorSelectPlaceholder: 'Loading...',
+		});
+		const serverResponse = await this.props.refreshInquirers();
+		this.setState({
+			visitorSelectIsRefreshing: false,
+			visitorSelectPlaceholder: 'Select...',
+		});
+		return serverResponse;
+	}
+
+	async handleAddVisitor(newInquirer) {
+		const serverResponse = await this.refreshInquirers();
+		if (serverResponse && serverResponse.payload && serverResponse.status === 'success') {
+			this.hideVisitorAddModal();
+			this.handleInquirerSelectChange([...this.props.values[consultFields.INQUIRERS], newInquirer.id]);
+		};
+	}
+
+	async refreshLawyers() {
+		this.setState({
+			lawyerSelectIsRefreshing: true,
+			lawyerSelectPlaceholder: 'Loading...',
+		});
+		const serverResponse = await this.props.refreshLawyers();
+		if (serverResponse.status === 'success' && serverResponse.type === 'getLawyers') {
+			this.setState({
+				lawyerSelectIsRefreshing: false,
+				lawyerSelectPlaceholder: 'Select...',
+			});
+		}
+		return serverResponse;
+	}
+
+	async handleAddLawyer(value) {
+		// this.props.handleAddLawyer(value, this.props.setFieldValue);
+		try {
+			const createServerResponse = await this.props.createLawyer(value);
+			this.setState({
+				serverResponse: createServerResponse,
+			});
+			if (createServerResponse.status === 'success' && createServerResponse.type === 'createLawyer') {
+				const refreshServerResponse = await this.refreshLawyers();
+				if (refreshServerResponse.status === 'success' && refreshServerResponse.type === 'getLawyers') {
+					this.props.setFieldValue(consultFields.LAWYERS, [...this.props.values[consultFields.LAWYERS], createServerResponse.payload.id]);
+					this.hideLawyerAddModal();
+
+					// resetForm();
+				}
+			}
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	// modals
@@ -272,6 +329,8 @@ class ConsultationForm extends Component {
 										onBlur={() => setFieldTouched(consultFields.LAWYERS, true)}
 										touched={touched[consultFields.LAWYERS]}
 										error={errors[consultFields.LAWYERS]}
+										loading={this.state.lawyerSelectIsRefreshing}
+										placeholder={this.state.lawyerSelectPlaceholder}
 									/>
 								</Col>
 								<Col xs={2} className="justify-content-left">
@@ -312,7 +371,7 @@ class ConsultationForm extends Component {
 										<AntButton
 											type="primary"
 											shape="circle"
-											onClick={() => this.props.refreshInquirers()}
+											onClick={this.refreshInquirers}
 											className="mr-3 pb-1"
 											icon="reload" />
 									</Tooltip>
@@ -470,7 +529,7 @@ class ConsultationForm extends Component {
 					header="Add Lawyer"
 					body={<LawyerAddForm
 						onHide={this.hideLawyerAddModal}
-						submitForm={this.submitAddLawyer}
+						submitForm={this.handleAddLawyer}
 					/>}
 				/>
 
@@ -481,6 +540,7 @@ class ConsultationForm extends Component {
 					header="Add/Update Visitor"
 					body={<NewAndRepeatVisitor
 						clinic={this.props.clinic}
+						onSubmit={this.handleAddVisitor}
 					/>}
 					size="lg"
 				/>

@@ -40,7 +40,6 @@ class Consultation extends Component {
 			timeSpent: 0,
 		}
 		this.submitConsultation = this.submitConsultation.bind(this);
-		this.submitAddLawyer = this.submitAddLawyer.bind(this);
 	}
 
 	handleInquirerSelectChange = (options) => {
@@ -137,23 +136,6 @@ class Consultation extends Component {
 		// .then(() => {});
 	}
 
-	async submitAddLawyer(values, setFieldValue) {
-		try {
-			const serverResponse = await this.props.createLawyer(values);
-			if (serverResponse.status === 'success' && serverResponse.type === 'createLawyer') {
-				this.setState({
-					serverResponse
-				});
-				console.log('update lawyer select options and set field value!')
-				// const selectedLawyers = [serverResponse.payload.id];
-				// setFieldValue(consultFields.LAWYERS, selectedLawyers);
-				// resetForm();
-			}
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
 	// email
 
 	// link to open modal window to edit email
@@ -246,14 +228,12 @@ class Consultation extends Component {
 					lawyersObject={this.props.lawyersObject}
 					lawTypes={this.props.lawTypes}
 					lawTypesObject={this.props.lawTypesObject}
-					// container will handle state
 					handleInquirerSelectChange={this.handleInquirerSelectChange}
 					submitForm={this.submitConsultation}
-					// modal > ConsultationForm > Consultation
-					submitAddLawyer={this.submitAddLawyer}
+					createLawyer={this.props.createLawyer}
 					// hide visitor info list when `success`
 					serverResponse={this.state.serverResponse}
-					// when add new inquirers reload from db
+					refreshLawyers={this.props.refreshLawyers}
 					refreshInquirers={this.props.refreshInquirers}
 					// needed for (1) visitor info table & (2) for link to custom email editing modal
 					inquirersSelected={this.state.inquirersSelected}

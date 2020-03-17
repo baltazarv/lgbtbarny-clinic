@@ -27,6 +27,8 @@ const Select = ({
 	// for asterisk
 	required,
 	mode = '', // multiple, tags
+	placeholder = 'Select...',
+	loading = false,
 	isDisabled,
 	info,
 }) => {
@@ -62,8 +64,9 @@ const Select = ({
 						// key={new Date()}
 						mode={mode}
 						showSearch={mode === 'multiple' ? true : false}
+						loading={loading}
 						style={{ width: '100%' }}
-						placeholder="Select..."
+						placeholder={placeholder}
 						// defaultValue=""
 						value={value}
 						onChange={onChange}

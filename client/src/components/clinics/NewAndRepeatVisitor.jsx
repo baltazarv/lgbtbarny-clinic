@@ -22,6 +22,7 @@ const NewAndRepeatVisitor = (props) => {
 	// from parent
 	const {
 		clinic,
+		onSubmit,
 	} = props;
 
 	// shows or hides repeatVisitorSelect
@@ -50,6 +51,7 @@ const NewAndRepeatVisitor = (props) => {
 		setServerResponse(_serverResponse);
 		if (_serverResponse.status === 'success' && (_serverResponse.type === 'createInquirer')) {
 			resetForm();
+			if (onSubmit) onSubmit(_serverResponse.payload);
 		}
 	}
 
