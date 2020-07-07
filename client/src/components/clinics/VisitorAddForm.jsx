@@ -133,7 +133,7 @@ const VisitorAddForm = props => {
 				<CheckboxGroup
 					id={peopleFields.TERMS}
 					label={peopleFields.TERMS}
-					description="I understand that LeGaL does not provide representation, nor will LeGaL or the volunteer attorney become my legal representative by virtue of the Clinic consultation. I understand that the assistance provided by the volunteer attorney is limited to the Clinic session. I understand that the volunteer attorney is not obligated to provide information or referrals outside the Clinic. I understand that abusive behavior towards any of the Clinic staff or others waiting for the Clinic may result in my being barred from the Clinic."
+					description="You understand that LeGaL's Clinic does not provide representation, nor will LeGaL or the volunteer attorney become your legal representative by virtue of the Clinic consultation, as the assistance provided is limited to the Clinic session only. You also understand that, though the volunteer attorney may provide referrals or information for other services, there is no obligation to do so. You also understand that the Clinic is virtual and online; that technical difficulties may occasionally arise; that recording of the session is not permitted and is subject to any applicable legal liability; and that abusive or otherwise inappropriate behavior towards any of the Clinic staff or other Clinic visitors may result in being barred from this and future Clinics."
 					value={values[peopleFields.TERMS]}
 					error={errors[peopleFields.TERMS]}
 					touched={touched[peopleFields.TERMS]}
@@ -155,7 +155,7 @@ const VisitorAddForm = props => {
 						name={peopleFields.SIGNATURE}
 						type="text"
 						label={peopleFields.SIGNATURE}
-						info="Please write your name below, serving as your digital signature."
+						info="Please write the name of the visitor below, serving as their digital signature."
 						placeholder="Full Name"
 						required={true}
 						style={{

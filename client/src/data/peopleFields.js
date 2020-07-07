@@ -41,7 +41,7 @@ export const INCOME_NO_ANSWER = 'Decline To Answer';
 export const INTAKE_NOTES = 'Intake Notes';
 //terms
 export const TERMS = 'Acknowledgment';
-export const TERMS_AGREE = 'I understand and agree to the terms and conditions of the clinic.';
+export const TERMS_AGREE = 'You understand and agree to the terms and conditions of the clinic.';
 export const SIGNATURE = 'Digital Signature';
 export const CONSULTATIONS = 'Consultations (Visitor)';
 
