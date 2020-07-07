@@ -27,12 +27,10 @@ const NewAndRepeatVisitor = (props) => {
 
 	// shows or hides repeatVisitorSelect
 	const [isRepeat, setIsRepeat] = useState(false);
-	// select pulldown format
 	const [repeatVisitorId, setRepeatVisitorId] = useState('');
-	// set to true to show success message when visitor is submitted
-	// const [visitorWasUpdated, setVisitorWasUpdated] = useState(false);
-	// prop sent to VisitorAddForm & arg sent to visitorUpdatedMessage
 	const [serverResponse, setServerResponse] = useState({ status: 'pending' });
+	const [repeatSelectIsRefreshing, setRepeatSelectIsRefreshing] = useState(false);
+	const [repeatSelectPlaceholder, setRepeatSelectPlaceholder] = useState('Select...');
 
 	const handleRepeatSwitch = () => {
 		// setVisitorWasUpdated(false);
@@ -64,6 +62,15 @@ const NewAndRepeatVisitor = (props) => {
 			setRepeatVisitorId('');
 			// resetForm();
 		}
+	}
+
+	const handleRefresh = async () => {
+		setRepeatVisitorId('');
+		setRepeatSelectIsRefreshing(true);
+		setRepeatSelectPlaceholder('Loading...');
+		await props.refreshInquirers();
+		setRepeatSelectIsRefreshing(false);
+		setRepeatSelectPlaceholder('Select...');
 	}
 
 	const getRepeatVisitor = () => {
@@ -104,6 +111,9 @@ const NewAndRepeatVisitor = (props) => {
 								onChange={handleVisitorSelect}
 								required={true}
 								isDisabled={!repeatVisitorId}
+								onRefresh={handleRefresh}
+								placeholder={repeatSelectPlaceholder}
+								loading={repeatSelectIsRefreshing}
 							/>
 						</Card.Body>
 					</Card>
@@ -221,6 +231,7 @@ const mapDispatchToProps = dispatch => {
 		createInquirer: inq => dispatch(actions.createInquirer(inq)),
 		updateInquirer: inqValues => dispatch(actions.updateInquirer(inqValues)),
 		updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
+    refreshInquirers: () => dispatch(actions.getInquirers()),
 	}
 }
 

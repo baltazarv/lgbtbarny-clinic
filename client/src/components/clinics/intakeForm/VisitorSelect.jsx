@@ -13,7 +13,7 @@
  *  *
  */
 import React, { useState } from 'react';
-import { Select } from 'antd';
+import { Select, Button, Tooltip } from 'antd';
 import { Form, Row, Col } from 'react-bootstrap';
 import { reqAsterisk } from '../../forms/formElements';
 import classNames from 'classnames';
@@ -28,6 +28,11 @@ const VisitorSelect = ({
 	required,
 	isDisabled,
 	info,
+
+	// refresh
+	onRefresh,
+	placeholder,
+	loading = false,
 }) => {
 	let [touched, setTouched] = useState(false);
 	let [error, setError] = useState(null);
@@ -58,32 +63,23 @@ const VisitorSelect = ({
 		'text-muted': isDisabled,
 	})
 
-	let formLabel = null;
-	let inputCols = 12;
-	if (label) {
-		formLabel = (<Form.Label column sm={4} className="text-md-right">
-			{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
-		</Form.Label>);
-		inputCols = 8;
-	}
-
-	let infoTxt = null;
-	if (info) infoTxt = <Form.Text className="text-muted mt-0 mb-1">{info}</Form.Text>
-
 	let selectErrorClass = '';
 	if (touched && error) selectErrorClass = 'has-error';
 
 	return (
 		<>
 			<Form.Group as={Row} controlId={name} className="mb-0">
-				{formLabel}
-				<Col sm={inputCols}>
-					{infoTxt}
+				<Form.Label column xs="12" sm="3" md="4" className="text-sm-right">
+					{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
+				</Form.Label>
+				<Col xs="9" sm="7" md="6">
+					<Form.Text className="text-muted mt-0 mb-1">{info}</Form.Text>
 					<div className={selectErrorClass}>
 						<Select
 							showSearch
 							style={{ width: '100%' }}
-							placeholder="Select..."
+							placeholder={placeholder}
+							loading={loading}
 							value={value}
 							onChange={handleChange}
 							onBlur={handleBlur}
@@ -94,6 +90,16 @@ const VisitorSelect = ({
 							{options}
 						</Select>
 					</div>
+				</Col>
+				<Col xs="3" sm="2" className="justify-content-left">
+					<Tooltip title="refresh visitor options">
+						<Button
+							shape="circle"
+							onClick={onRefresh}
+							className="mr-3 pb-1"
+							icon="reload"
+						/>
+					</Tooltip>
 				</Col>
 			</Form.Group>
 			<Row>
