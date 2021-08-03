@@ -3,6 +3,10 @@
 ## Installation
 * `npm install` at root at in `/client`.
 
+### Install global libraries
+* node & npm
+* nodemon: `npm install -g nodemon`
+
 #### Get files not checked into Git
 * `/config/dev.js`
 * `/client/.env.development`
