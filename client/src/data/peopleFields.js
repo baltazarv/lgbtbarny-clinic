@@ -3,6 +3,14 @@
 export const REPEAT_VISIT = 'Repeat Visit?';
 export const TYPE = 'Type';
 // export const HOW_FOUND = 'How Found Clinic';
+export const DATETIME = 'Inquirer DateTime';
+
+// clinic name
+export const CLINIC_NAME = 'Clinic Name';
+export const CLINIC_TNC = 'Tuesday Night Clinic';
+export const CLINIC_NJ = 'New Jersey Clinic';
+export const CLINIC_YOUTH = 'Youth Qlinic';
+
 // name
 export const FIRST_NAME = 'First Name';
 export const MIDDLE_NAME = 'Middle Name';
@@ -33,25 +41,12 @@ export const INCOME_NO_ANSWER = 'Decline To Answer';
 export const INTAKE_NOTES = 'Intake Notes';
 //terms
 export const TERMS = 'Acknowledgment';
-export const TERMS_AGREE = 'I understand and agree to the terms and conditions of the clinic.';
+export const TERMS_AGREE = 'You understand and agree to the terms and conditions of the clinic.';
 export const SIGNATURE = 'Digital Signature';
-export const CONSULTATIONS = 'Consultations';
+export const CONSULTATIONS = 'Consultations (Visitor)';
 
-// TEMP - delete soon
-export const local = {
-	REPEAT_VISIT: 'repeat',
-	FIRST_NAME: 'firstName',
-	MIDDLE_NAME: 'middleName',
-	LAST_NAME: 'lastName',
-	OTHER_NAMES: 'otherNames',
-	EMAIL: 'email',
-	PHONE: 'phone',
-	ADDRESS: 'address',
-	GENDER: 'gender',
-	PRONOUNS: 'pronouns',
-	INCOME: 'income',
-	INTAKE_NOTES: 'notes',
-	TERMS: 'terms',
-	SIGNATURE: 'signature',
-	CONSULTATIONS: 'consultations',
-}
+export const DATE_MODIFIED = 'Last Modified Date';
+//nj clinic
+export const DISPOSITION = 'Disposition';
+export const DISPOSITION_INFO = 'General info given';
+export const DISPOSITION_REVIEW = 'Review by LeGaL';

@@ -1,1 +1,31 @@
 @import '~antd/dist/antd.css';
+
+code {
+	color: #262626 !important;
+}
+
+.editable-cell {
+  position: relative;
+}
+
+.editable-cell-value-wrap {
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 4px 11px;
+}
+
+/* Consultations section editable Status selection */
+
+.referrals-status-col .ant-select-selection {
+  width: 120px;
+}
+
+/* fix for antd icon on Visitors and Completed Consultations tables' refresh buttons */
+.anticon {
+  vertical-align: 0.175em;
+}

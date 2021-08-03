@@ -1,38 +1,53 @@
 import * as actionTypes from './actionTypes';
 import airtableBase from '../../airtableBase';
 import * as peopleFields from '../../data/peopleFields'; //
-import { PEOPLE_TABLE, INQUIRERS_VIEW, LAWYERS_VIEW } from '../../data/peopleData';
-import { recordForUpdate } from '../../data/dataTransforms';
+import {
+	PEOPLE_TABLE,
+	INQUIRERS_VIEW,
+	LAWYERS_VIEW
+} from '../../data/peopleData';
+import {
+	recordForUpdate
+} from '../../data/dataTransforms';
 
 // async action creators
 
 export const getLawyers = () => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
-			let lawyers = [];
+			// TO DO: remove array
+			let lawyersArray = [];
+			let lawyersObject = {};
 			airtableBase(PEOPLE_TABLE).select({
-				fields: [
-					peopleFields.FIRST_NAME,
-					peopleFields.MIDDLE_NAME,
-					peopleFields.LAST_NAME,
-					peopleFields.OTHER_NAMES,
-				],
-				view: LAWYERS_VIEW
-				// filterByFormula: 'Type = "Lawyer"'
+				view: LAWYERS_VIEW,
+				// filterByFormula: 'Type = ...', // array
 			}).eachPage(function page(records, fetchNextPage) {
 				records.forEach(record => {
+					// array
 					const _record = record.fields;
 					_record.id = record.id;
-					lawyers.push(_record);
+					lawyersArray.push(_record);
+
+					// object
+					lawyersObject[record.id] = record.fields;
 				});
 				fetchNextPage(); // next 100
-			}, function done(err, records) {
-				if (err) {
-					console.error('Airtable Error: ', err);
-					return reject('Airtable Error: ', err);
+			}, function done(error) {
+				if (error) {
+					console.error('Airtable Error: ', error);
+					return reject({
+						status: 'failed',
+						error,
+					});
+
 				}
+				const lawyers = [lawyersArray, lawyersObject];
 				dispatch(initLawyers(lawyers));
-				return resolve(lawyers);
+				return resolve({
+					status: 'success',
+					type: 'getLawyers',
+					payload: lawyers,
+				});
 			});
 		})
 	}
@@ -46,7 +61,6 @@ export const createLawyer = lawyer => {
 				[peopleFields.TYPE]: [
 					"Lawyer"
 				],
-				[peopleFields.REPEAT_VISIT]: 'Yes',
 			};
 			airtableBase(PEOPLE_TABLE).create(payload, function (error, record) {
 				if (error) {
@@ -56,7 +70,10 @@ export const createLawyer = lawyer => {
 						error,
 					});
 				}
-				let lawyer = {...record.fields, id: record.id};
+				const lawyer = {
+					...record.fields,
+					id: record.id
+				};
 				dispatch(addLawyer(lawyer));
 				return resolve({
 					status: 'success',
@@ -70,43 +87,39 @@ export const createLawyer = lawyer => {
 
 export const getInquirers = () => {
 	return dispatch => {
-		let inquirers = [];
-		airtableBase(PEOPLE_TABLE).select({
-			view: INQUIRERS_VIEW,
-			fields: [
-				peopleFields.REPEAT_VISIT,
-				peopleFields.FIRST_NAME,
-				peopleFields.MIDDLE_NAME,
-				peopleFields.LAST_NAME,
-				peopleFields.OTHER_NAMES,
-				peopleFields.LAW_TYPES,
-				peopleFields.EMAIL,
-				peopleFields.PHONE,
-				peopleFields.ADDRESS,
-				peopleFields.GENDER,
-				peopleFields.PRONOUNS,
-				peopleFields.INCOME,
-				peopleFields.INTAKE_NOTES,
-				peopleFields.TERMS,
-				peopleFields.SIGNATURE,
-				peopleFields.CONSULTATIONS
-			],
-			// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
-			// filterByFormula: 'Type = "Inquirer"'
-		}).eachPage(function page(records, fetchNextPage) {
-			records.forEach(function (record) {
-				const _record = record.fields;
-				_record.id = record.id;
-				inquirers.push(_record);
+		return new Promise((resolve, reject) => {
+			let inquirersArray = [];
+			let inquirersObject = {};
+			airtableBase(PEOPLE_TABLE).select({
+				view: INQUIRERS_VIEW,
+				// filterByFormula: 'OR(NOT({First Name} = ""), NOT({Last Name} = ""))'
+				// filterByFormula: 'Type = "Inquirer"'
+			}).eachPage(function page(records, fetchNextPage) {
+				records.forEach(function (record) {
+					// array
+					const _record = record.fields;
+					_record.id = record.id;
+					inquirersArray.push(_record);
+					// object
+					inquirersObject[record.id] = record.fields;
+				});
+				fetchNextPage(); // next 100
+			}, function done(error, records) {
+				if (error) {
+					console.error('Airtable Error: ', error);
+					return reject({
+						status: 'failed',
+						error,
+					});
+				}
+				const inquirers = [inquirersArray, inquirersObject]
+				dispatch(initInquirers(inquirers));
+				return resolve({
+					status: 'success',
+					type: 'getInquirers',
+					payload: inquirers,
+				});
 			});
-			fetchNextPage(); // next 100
-		}, function done(err, records) {
-			if (err) {
-				console.log('Airtable Error: ', err);
-				// dispatch(fetchInquirersFailed())
-				return;
-			}
-			dispatch(initInquirers(inquirers));
 		});
 	}
 }
@@ -119,7 +132,7 @@ export const createInquirer = inquirer => {
 				[peopleFields.TYPE]: [
 					"Inquirer"
 				],
-				[peopleFields.REPEAT_VISIT]: 'Yes',
+				[peopleFields.REPEAT_VISIT]: 'No',
 			};
 			airtableBase(PEOPLE_TABLE).create(payload, function (error, record) {
 				if (error) {
@@ -129,12 +142,15 @@ export const createInquirer = inquirer => {
 						error,
 					});
 				}
-				// payload is one inquirer object with `id` and `fields` props
+				const inquirer = {
+					...record.fields,
+					id: record.id
+				};
 				dispatch(addInquirer(inquirer));
 				return resolve({
 					status: 'success',
 					type: 'createInquirer',
-					payload: record,
+					payload: inquirer,
 				});
 			});
 		})
@@ -154,26 +170,28 @@ export const updateInquirer = info => {
 						error,
 					});
 				}
-				// could getInquirers(), but expensive
-				const _record = record[0].fields;
-				_record.id = record[0].id;
-				dispatch(updateInquirers(_record)); // _record
+				// record is array
+				const inquirer = {
+					...record[0].fields,
+					id: record[0].id
+				};
+				dispatch(updateInquirers(inquirer));
 				return resolve({
 					status: 'success',
 					type: 'updateInquirer',
-					payload: record, // record
+					payload: inquirer,
 				})
 			});
 		});
 	}
 }
 
-
 // sync action creators
 
 export const initLawyers = lawyers => {
 	return {
 		type: actionTypes.INIT_LAWYERS,
+		// array with array & object
 		lawyers
 	}
 }
@@ -185,10 +203,11 @@ export const addLawyer = lawyer => {
 	}
 }
 
-export const initInquirers = inquirers => {
+// TO DO: inquirers object only
+export const initInquirers = (inquirers) => {
 	return {
 		type: actionTypes.INIT_INQUIRERS,
-		inquirers
+		inquirers,
 	}
 }
 

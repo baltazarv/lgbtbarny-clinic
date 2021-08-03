@@ -1,7 +1,8 @@
 import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-	lawTypes: []
+	lawTypes: [],
+	lawTypesObject: {},
 }
 
 const reducer = (state = initialState, action) => {
@@ -9,7 +10,8 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.INIT_LAW_TYPES:
 			return {
 				...state,
-				lawTypes: action.lawTypes
+				lawTypes: action.lawTypes[0],
+				lawTypesObject: action.lawTypes[1],
 			}
 			default:
 				return state;

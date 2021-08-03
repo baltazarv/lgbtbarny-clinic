@@ -6,13 +6,17 @@ import { LAW_TYPES_TABLE, NAME } from '../../data/lawTypeData';
 
 export const getLawTypes = () => {
 	return dispatch => {
-		let lawTypes = [];
+		let lawTypesArray = [];
+		let lawTypesObject = {};
 		airtableBase(LAW_TYPES_TABLE).select().eachPage(function page(records, fetchNextPage) {
 			records.forEach(record => {
+				// array
 				const _record = {}
 				_record[NAME] = record.fields[NAME];
 				_record.id = record.id;
-				lawTypes.push(_record);
+				lawTypesArray.push(_record);
+				// object
+				lawTypesObject[record.id] = record.fields;
 			});
 			fetchNextPage();
 		}, function done(err) {
@@ -21,6 +25,7 @@ export const getLawTypes = () => {
 				// dispatch(fetchInquirersFailed())
 				return;
 			}
+			const lawTypes = [lawTypesArray, lawTypesObject]
 			dispatch(initLawTypes(lawTypes));
 		});
 	}

@@ -2,10 +2,45 @@ import * as actionTypes from './actionTypes';
 import airtableBase from '../../airtableBase';
 // db item names
 import { TABLE } from '../../data/consultationData';
-// fetch function that does not save to redux state
-export { readConsultationsByIds } from '../../data/consultationData';
 
 // async action creators
+
+export const getConsultations = () => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			// let consultations = [];
+			let consultations = {}
+			airtableBase(TABLE).select({
+				view: "_Consultations"
+			}).eachPage(function page(records, fetchNextPage) {
+				records.forEach(function (record) {
+					// option 1
+					// const _record = record.fields;
+					// _record.id = record.id;
+					// consultations.push(_record);
+
+					// option 2
+					// consultations.push(records);
+
+					// option 3
+					consultations[record.id] = record.fields;
+				});
+				fetchNextPage();
+			}, function done(err) {
+				if (err) {
+					console.error('Airtable Error: ', err);
+					return reject('Airtable erroror: ', err);
+				}
+				dispatch(initConsultations(consultations));
+				return resolve({
+					status: 'success',
+					type: 'getConsultations',
+					payload: consultations,
+				});
+			});
+		})
+	}
+}
 
 export const createConsultation = submitFields => {
 	return dispatch => {
@@ -34,12 +69,45 @@ export const createConsultation = submitFields => {
 	}
 }
 
+// takes an oject: { key, fields }
+export const updateConsultation = updateObject => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			let newConsultation = {};
+			airtableBase(TABLE).update(updateObject.id,
+				updateObject.fields,
+				function (error, record) {
+					if (error) {
+						console.log('Airtable Error:', error);
+						return reject({
+							status: 'failed',
+							error,
+						});
+					}
+					newConsultation[record.id] = record.fields;
+					dispatch(consultationUpdated(newConsultation));
+					return resolve({
+						status: 'success',
+						type: 'updateConsultation',
+						payload: newConsultation,
+					})
+				})
+		});
+	}
+}
+
 // sync action creators
 
-// maybe use for later // is there a need to get all consultations?
 export const initConsultations = consultations => {
 	return {
 		type: actionTypes.INIT_CONSULTATIONS,
 		consultations
+	}
+}
+
+export const consultationUpdated = consultation => {
+	return {
+		type: actionTypes.CONSULTATION_UPDATED,
+		consultation
 	}
 }

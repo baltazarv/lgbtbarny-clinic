@@ -1,32 +1,29 @@
-// import * as actionTypes from '../actions/actionTypes';
+import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-	// maybe rename `createConsultationStatus`
-	// consultSubmitStatus: {
-	// 	status: 'in-progress',
-	// 	payload: null,
-	// },
+	consultations: {},
 }
 
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
-		// case actionTypes.CONSULTATION_CREATED:
-		// 	return {
-		// 		...state,
-		// 		consultSubmitStatus: {
-		// 			status: 'success',
-		// 			payload: action.newConsultation,
-		// 		},
-		// 		// consultsCreated: [...state.consultsCreated, action.newConsultation]
-		// 	}
-		// case actionTypes.CONSULTATION_IN_PROGRESS:
-		// 	return {
-		// 		...state,
-		// 		consultSubmitStatus: {
-		// 			status: 'in-progress',
-		// 			payload: null
-		// 		}
-		// 	}
+		case actionTypes.INIT_CONSULTATIONS:
+			return {
+				...state,
+				consultations: {...action.consultations},
+			}
+		case actionTypes.CONSULTATION_UPDATED:
+			let consultations = {};
+			for (var key in state.consultations) {
+				if (key !== Object.keys(action.consultation)[0]) {
+					consultations[key] = state.consultations[key];
+				} else {
+					consultations[key] = action.consultation[key];
+				}
+			}
+			return {
+				...state,
+				consultations,
+			}
 		default:
 			return state;
 	}

@@ -33,9 +33,19 @@ $list-group-item-padding-y: 0.35rem;
 
 // bootstrap/scss/_navbar.scss
 
-.nav-link {
-	// color: #fff; // .navbar-dark
+.navbar-nav {
+	margin-top: 0.9rem;
+}
+
+.navbar-nav .nav-link {
 	margin-left: 0.8em;
+	padding: 0.3rem 1rem;
+}
+
+@include media-breakpoint-up(sm) {
+	.navbar-nav {
+		margin-top: 0;
+	}
 }
 
 .navbar-nav .nav-link.active {
@@ -49,10 +59,6 @@ $list-group-item-padding-y: 0.35rem;
 }
 
 // bootstrap/scss/_type.scss
-
-.card {
-	border: 0;
-}
 
 .card-header {
 	padding: 0;

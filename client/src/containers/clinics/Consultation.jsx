@@ -2,27 +2,19 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 // components
-import { Row, Col, Button } from 'react-bootstrap';
-import ConsultationForm from '../../../components/forms/ConsultationForm';
-import EditEmailModal from '../../../components/modals/EditEmailModal';
-import TimerCounter from '../../../components/TimerCountdown/index';
+import { Row, Col } from 'react-bootstrap';
+import { Button } from 'antd';
+import ConsultationForm from '../../components/clinics/consultationForm/ConsultationForm';
+import EditEmailModal from '../../components/clinics/consultationForm/EditEmailModal';
+import TimerCounter from '../../components/TimerCountdown/index';
 // data
-import * as actions from '../../../store/actions/index';
-import * as consultFields from '../../../data/consultionFields';
-import * as peopleFields from '../../../data/peopleFields';
-import { getRecordsFromSelection, getPeopleIntoSelectOptions, formatName } from '../../../data/dataTransforms';
-import { getInquirerConsultations } from '../../../data/consultationData';
-import { EMAIL_OPTIONS, mergeCustomAndDefaultHtml } from '../../../emails/visitorPostConsultation';
-// utils
-
-const TYPE_CLINIC = 'Clinic';
-
-// AirTable fields in peopleFields and consultFields
-const SUBMIT_FIELDS_DEFAULT = {
-	[consultFields.TYPE]: TYPE_CLINIC,
-	// TO-DO: check to see if entry date is correct. Need toLocaleTimeString?
-	[consultFields.DATE]: new Date().toISOString().substr(0, 10),
-};
+import * as actions from '../../store/actions/index';
+import * as consultFields from '../../data/consultionFields';
+import * as peopleFields from '../../data/peopleFields';
+import { formatName } from '../../data/peopleData';
+// import { getInquirerConsultations } from '../../../data/consultationData';
+import { EMAIL_OPTIONS, mergeCustomAndDefaultHtml } from '../../emails/visitorPostConsultation';
+import { objectIsEmpty } from '../../utils';
 
 // make into a stateless component?
 class Consultation extends Component {
@@ -33,10 +25,7 @@ class Consultation extends Component {
 		super(props);
 		this.state = {
 			// populates inquirer info list for current:
-			inquirersSelected: [],
-			// all consultations for selected inquirers
-			// fetched from this class and pushed to <ConsultationsList />
-			inqSelectedConsultations: [],
+			inquirersSelected: {},
 
 			// prop sent to ConsultationForm (arg sent to a custom message?)
 			serverResponse: null,
@@ -51,22 +40,17 @@ class Consultation extends Component {
 			timeSpent: 0,
 		}
 		this.submitConsultation = this.submitConsultation.bind(this);
-		this.handleInquirerSelectChange = this.handleInquirerSelectChange.bind(this);
-		this.submitAddLawyer = this.submitAddLawyer.bind(this);
-		this.submitAddInquirer = this.submitAddInquirer.bind(this);
 	}
 
-	async handleInquirerSelectChange(options) {
-		if (this.props.inquirers) {
-			let inquirersSelected = getRecordsFromSelection(options, this.props.inquirers);
-			let inqSelectedConsultations = await getInquirerConsultations(inquirersSelected);
-			this.setState({
-				inquirersSelected,
-				inqSelectedConsultations,
-			})
-		} else {
-			console.log('haven\'t pulled inquirers from db yet');
-		}
+	handleInquirerSelectChange = (options) => {
+		// array to object
+		const inquirersSelected = {};
+		options.forEach(option => {
+			inquirersSelected[option] = this.props.inquirersObject[option];
+		});
+		this.setState({
+			inquirersSelected,
+		})
 	}
 
 	async submitConsultation(values, setFieldValue, resetForm) {
@@ -81,7 +65,7 @@ class Consultation extends Component {
 				if (Array.isArray(value)) {
 					// convert objects array into array id strings
 					payload[key] = value.map(item => {
-						return item.value;
+						return item;
 					});
 				} else if (key === consultFields.DISPOSITIONS) {
 					// radio buttons on UI, but multiple select on AirTable -- may make match
@@ -90,10 +74,25 @@ class Consultation extends Component {
 					payload[key] = value;
 				}
 			})
-			payload = { ...payload, ...SUBMIT_FIELDS_DEFAULT };
-			// add custom text
+
+			// set as type 'Clinic'
+			payload[consultFields.TYPE] = consultFields.TYPE_CLINIC;
+
+			// // set old date field -
+			// payload[consultFields.DATE] = new Date().toISOString().substr(0, 10);
+			// set new datetime stamp
+			payload[consultFields.DATETIME] = new Date();
+
+			// set clinic
+			let clinicValue = consultFields.CLINIC_TNC;
+			if (this.props.clinic === 'nj') clinicValue = consultFields.CLINIC_NJ;
+			if (this.props.clinic === 'youth') clinicValue = consultFields.CLINIC_YOUTH;
+			payload[consultFields.CLINIC_NAME] = clinicValue;
+
+			// add custom email text
 			payload[consultFields.EMAIL_TEXT_SENT] = this.state.customEmailText;
 
+			// reset same lawyer after submission
 			const selectedLawyers = values[consultFields.LAWYERS];
 
 			const serverResponse = await this.props.createConsultation(payload);
@@ -108,8 +107,7 @@ class Consultation extends Component {
 
 				this.setState({
 					serverResponse,
-					inquirersSelected: [], // hide <InquirerInfo />
-					inqSelectedConsultations: [],
+					inquirersSelected: {}, // hide <InquirerInfo />
 				})
 			}
 
@@ -127,9 +125,10 @@ class Consultation extends Component {
 			bodyText = this.state.customEmailText.replace(/(\r\n|\n|\r)/g, '<br />');
 		}
 
+		const firstCurrInquirer = this.state.inquirersSelected[[Object.keys(this.state.inquirersSelected)[0]]];
 		const payload = {
 			from: EMAIL_OPTIONS.from,
-			to: this.state.inquirersSelected[0][peopleFields.EMAIL],
+			to: firstCurrInquirer[peopleFields.EMAIL],
 			subject: EMAIL_OPTIONS.subject,
 			bodyText,
 		};
@@ -137,63 +136,29 @@ class Consultation extends Component {
 		// .then(() => {});
 	}
 
-	async submitAddLawyer(values, setFieldValue) {
-		try {
-			const serverResponse = await this.props.createLawyer(values);
-			if (serverResponse.status === 'success' && serverResponse.type === 'createLawyer') {
-				this.setState({
-					serverResponse
-				});
-				const selectedLawyers = getPeopleIntoSelectOptions([serverResponse.payload]);
-				setFieldValue(consultFields.LAWYERS, selectedLawyers);
-
-				// resetForm(); // `Warning: Can't perform a React state update on an unmounted component.`
-			}
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	async submitAddInquirer(values, setFieldValue) {
-		try {
-			const serverResponse = await this.props.createInquirer(values);
-			// console.log('submitAddInquirer', serverResponse);
-			if (serverResponse.status === 'success' && serverResponse.type === 'createInquirer') {
-				this.setState({
-					serverResponse
-				});
-				let inquirer = serverResponse.payload.fields;
-				inquirer.id = serverResponse.payload.id;
-				const selectedInquirer = getPeopleIntoSelectOptions([inquirer]);
-				setFieldValue(consultFields.INQUIRERS, selectedInquirer);
-
-				// resetForm(); // `Warning: Can't perform a React state update on an unmounted component.`
-			}
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
 	// email
 
 	// link to open modal window to edit email
-	linkToEditCustomEmail = () => {
+	editCustomEmailButton = () => {
 		let linkToEmailEditModal = null;
-		if (this.state.inquirersSelected.length > 0) {
-			const firstCurrInquirer = this.state.inquirersSelected[0];
+		if (!objectIsEmpty(this.state.inquirersSelected)) {
+			const firstCurrInquirer = this.state.inquirersSelected[[Object.keys(this.state.inquirersSelected)[0]]];
 			const firstCurrInqName = formatName(firstCurrInquirer);
 			if (firstCurrInquirer[peopleFields.EMAIL]) {
-				let customEmailBtnLabel = <>Add custom message to email for <strong>{firstCurrInqName}</strong>.</>
+				let customEmailBtnLabel = <>Customize email to <strong>{firstCurrInqName}</strong></>
 				if (this.state.emailMessage) {
 					customEmailBtnLabel = `Custom Message to Email ${firstCurrInqName} Added`;
 				}
 				linkToEmailEditModal = <Row>
 					<Col>
 						<Button
+							icon="mail"
 							onClick={() => this.showEmailEditModal()}
-							variant="link" size="md" className="mb-3">
-							{customEmailBtnLabel}
+							type="primary"
+						>
+							&nbsp;{customEmailBtnLabel}
 						</Button>
+						<div className="mb-3"><small>Emails sent on submission.</small></div>
 					</Col>
 				</Row>;
 			} else {
@@ -248,32 +213,32 @@ class Consultation extends Component {
 		}
 
 		let timerCounter = null;
-		if (this.state.inquirersSelected.length > 0) {
+		if (!objectIsEmpty(this.state.inquirersSelected)) {
 			timerCounter = <TimerCounter getTimeSpent={this.getTimeSpent} />
 		}
 
 		return (
 			<>
 				<ConsultationForm
-					clinicTitle={this.props.clinicTitle}
+					clinic={this.props.clinic}
+					consultations={this.props.consultations}
 					inquirers={this.props.inquirers}
+					inquirersObject={this.props.inquirersObject}
 					lawyers={this.props.lawyers}
+					lawyersObject={this.props.lawyersObject}
 					lawTypes={this.props.lawTypes}
-					// container will handle state
+					lawTypesObject={this.props.lawTypesObject}
 					handleInquirerSelectChange={this.handleInquirerSelectChange}
 					submitForm={this.submitConsultation}
-					// modal > ConsultationForm > Consultation
-					submitAddLawyer={this.submitAddLawyer}
-					submitAddInquirer={this.submitAddInquirer}
+					createLawyer={this.props.createLawyer}
 					// hide visitor info list when `success`
 					serverResponse={this.state.serverResponse}
-					// when add new inquirers reload from db
+					refreshLawyers={this.props.refreshLawyers}
 					refreshInquirers={this.props.refreshInquirers}
 					// needed for (1) visitor info table & (2) for link to custom email editing modal
 					inquirersSelected={this.state.inquirersSelected}
-					inqSelectedConsultations={this.state.inqSelectedConsultations}
 
-					linkToEditCustomEmail={this.linkToEditCustomEmail}
+					editCustomEmailButton={this.editCustomEmailButton}
 				/>
 
 				{/* edit custom email modal */}
@@ -298,6 +263,12 @@ class Consultation extends Component {
 
 const mapStateToProps = state => {
 	return {
+		consultations: state.consultations.consultations,
+		inquirersObject: state.people.inquirersObject,
+		lawyers: state.people.lawyers,
+		lawyersObject: state.people.lawyersObject,
+		lawTypes: state.lawTypes.lawTypes,
+		lawTypesObject: state.lawTypes.lawTypesObject,
 		currentLawyers: state.people.currentLawyers, // REMOVE?
 	}
 }
@@ -306,7 +277,6 @@ const mapDispatchToProps = dispatch => {
 	return {
 		createConsultation: consult => dispatch(actions.createConsultation(consult)),
 		createLawyer: lawyer => dispatch(actions.createLawyer(lawyer)),
-		createInquirer: inquirer => dispatch(actions.createInquirer(inquirer)),
 	}
 }
 

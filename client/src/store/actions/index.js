@@ -11,10 +11,7 @@ export {
 } from './lawtypes';
 
 export {
+	getConsultations,
 	createConsultation,
+	updateConsultation,
 } from './consultations';
-
-export {
-	getClinicSettings,
-	setCurrentClinic,
-} from './clinic';

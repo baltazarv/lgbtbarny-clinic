@@ -3,13 +3,11 @@ import thunk from 'redux-thunk';
 import peopleReducer from './reducers/people';
 import consultReducer from './reducers/consultations';
 import lawTypeReducer from './reducers/lawtypes';
-import clinicsReducer from './reducers/clinics';
 
 const rootReducer = combineReducers({
 	people: peopleReducer,
 	consultations: consultReducer,
 	lawTypes: lawTypeReducer,
-	clinics: clinicsReducer,
 })
 
 // Chrome Redux DevTools store setup
