@@ -10,7 +10,7 @@
     "@ant-design/icons": "^4.7.0",
     "airtable": "^0.11.1",
     "antd": "^4.17.2",
-    "axios": "^0.24.0",
+    "axios": "^0.21.2",
     "bootstrap": "^4.3.1",
     "classnames": "^2.2.6",
     "formik": "^2.1.1",
