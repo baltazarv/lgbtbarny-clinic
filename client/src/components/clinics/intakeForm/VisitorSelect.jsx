@@ -72,7 +72,7 @@ const VisitorSelect = ({
 				<Form.Label column xs="12" sm="3" md="4" className="text-sm-right">
 					{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
 				</Form.Label>
-				<Col xs="9" sm="7" md="6">
+				<Col xs="9" sm="7" md="6" className="align-self-center">
 					<Form.Text className="text-muted mt-0 mb-1">{info}</Form.Text>
 					<div className={selectErrorClass}>
 						<Select
@@ -91,7 +91,7 @@ const VisitorSelect = ({
 						</Select>
 					</div>
 				</Col>
-				<Col xs="3" sm="2" className="justify-content-left">
+				<Col xs="3" sm="2" className="justify-content-left align-self-center">
 					<Tooltip title="refresh visitor options">
 						<Button
 							shape="circle"
@@ -103,7 +103,11 @@ const VisitorSelect = ({
 				</Col>
 			</Form.Group>
 			<Row>
-				<Col>
+				<Col
+					sm={{ span: 10, offset: 1 }}
+					lg={{ span: 14, offset: 3 }}
+					xl={{ span: 16, offset: 4 }}
+				>
 					{error &&
 						touched && (
 							<div className="text-danger small">{error}</div>

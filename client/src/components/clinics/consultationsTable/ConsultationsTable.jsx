@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Icon, Modal, Button, Avatar } from 'antd';
+import { Modal, Button, Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons'
 // components
 import EditableTable from '../../table/EditableTable';
 import ConsultationList from '../ConsultationList';
@@ -114,8 +115,10 @@ const ConsultationsTable = props => {
 		key: 'visitor',
 		render: (visitors, row) => (
 			<span>
-				{visitors} <Icon style={iconStyle} type="user" onClick={() => showVisitorModal(row)} />
-				{/* <Button type="link" onClick={() => showVisitorModal(row)}>{visitors} <Icon style={iconStyle} type="user" /></Button> */}
+				{visitors} <UserOutlined
+					onClick={() => showVisitorModal(row)}
+					style={iconStyle}
+				/>
 			</span>
 		),
 	});

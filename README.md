@@ -17,10 +17,6 @@
 Forms use React Select pull-down component:
 https://alligator.io/react/react-select/
 
-## Data
-
-Data files contain the AirTable field names.
-
 ## Local development
 
 ### Install packages
@@ -39,7 +35,17 @@ Or
 	* SENDGRID_USERNAME?
 	* SENDGRID_PASSWORD?
 
-# Create React App
+## Styles
+
+### Native to Create React App:
+* [CSS component companion file](https://create-react-app.dev/docs/adding-a-stylesheet)
+* [CSS Modules](https://create-react-app.dev/docs/adding-a-css-modules-stylesheet)
+
+### Added for compatiblility with members website code:
+* styled-components
+* SASS (Using similar LESS on member website)
+
+# Create React App Read-me
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

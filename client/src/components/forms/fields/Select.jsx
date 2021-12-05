@@ -61,7 +61,6 @@ const Select = ({
 				<Col sm={inputCols}>
 					{infoTxt}
 					<AntSelect
-						// key={new Date()}
 						mode={mode}
 						showSearch={mode === 'multiple' ? true : false}
 						loading={loading}

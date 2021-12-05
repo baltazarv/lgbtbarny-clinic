@@ -1,3 +1,5 @@
+// TODO: move to intake/clinic/
+
 import React from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
@@ -14,6 +16,7 @@ import * as peopleFields from '../../data/peopleFields';
 import { getOptionsForLawTypes } from '../../data/lawTypeData';
 // styles
 import classNames from "classnames";
+import styled from 'styled-components'
 import { reqAsterisk } from '../forms/formElements';
 
 const INITIAL_VALUES = {
@@ -49,10 +52,6 @@ const validate = (values, props) => {
 		errors[peopleFields.LAST_NAME] = 'Last name is required.';
 	}
 
-	// if (values[peopleFields.LAW_TYPES].length < 1) {
-	// 	errors[peopleFields.LAW_TYPES] = 'Please enter the type of law.';
-	// }
-
 	if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values[peopleFields.EMAIL]) && values[peopleFields.EMAIL]) {
 		errors[peopleFields.EMAIL] = 'Invalid email address.';
 	}
@@ -86,39 +85,45 @@ const validate = (values, props) => {
 };
 
 const handleSubmit = (values, actions) => {
-	const { props, setSubmitting, resetForm } = actions;
+	const { props: { clinic, submitForm, onHide }, setSubmitting, resetForm
+	} = actions;
 	let payload = { ...values };
 	//set clinic
 	let clinicValue = peopleFields.CLINIC_TNC;
-	if (props.clinic === 'nj') clinicValue = peopleFields.CLINIC_NJ;
-	if (props.clinic === 'youth') clinicValue = peopleFields.CLINIC_YOUTH;
+	if (clinic === 'nj') clinicValue = peopleFields.CLINIC_NJ;
+	if (clinic === 'youth') clinicValue = peopleFields.CLINIC_YOUTH;
 	payload[peopleFields.CLINIC_NAME] = clinicValue;
 	// set datetime stamp
 	payload[peopleFields.DATETIME] = new Date();
 
-	props.submitForm(payload, resetForm);
+	submitForm(payload, resetForm);
 
 	// only if serverResponse.status === 'success'
 	setSubmitting(false);
-	if (props.onHide) props.onHide();
+	if (onHide) onHide();
 }
 
-const VisitorAddForm = props => {
-	const {
-		// formik
-		handleSubmit,
-		values,
-		errors,
-		touched,
-		setFieldValue,
-		setFieldTouched,
-		isSubmitting,
-		dirty,
+const VisitorAddForm = ({
+	// formik
+	handleSubmit,
+	values,
+	errors,
+	touched,
+	setFieldValue,
+	setFieldTouched,
+	isSubmitting,
+	dirty,
 
-		// parent
-		lawTypesObject,
-		clinic,
-	} = props;
+	// from redux:
+	repeatVisitor,
+
+	// from context?
+	serverResponse,
+
+	// parent
+	clinic,
+	lawTypesObject,
+}) => {
 
 	const acknowAndSign = () => {
 		// acknowldegment -- it may move depending on the clinic
@@ -170,10 +175,10 @@ const VisitorAddForm = props => {
 	const submitButton = () => {
 		// submit button & success message
 		let btnLabel = 'Enter Visitor';
-		if (props.serverResponse && props.serverResponse.payload && props.serverResponse.status === 'success') { // && props.serverResponse.type === 'createInquirer'
+		if (serverResponse && serverResponse.payload && serverResponse.status === 'success') { // && serverResponse.type === 'createInquirer'
 			btnLabel = 'Enter Another Visitor';
 		}
-		if (props.repeatVisitor) btnLabel = 'Process Visitor';
+		if (repeatVisitor) btnLabel = 'Process Visitor';
 		// if update form vs create form
 		return <>
 			<Button
@@ -270,7 +275,7 @@ const VisitorAddForm = props => {
 				<Card.Body className="pb-0">
 					<Card.Title className="small text-muted">
 						{reqAsterisk} If no email is provided, a phone number is necessary.
-							</Card.Title>
+					</Card.Title>
 					<Form.Row>
 						<Col md={7}>
 							<InputField
@@ -377,7 +382,7 @@ const VisitorAddForm = props => {
 			>
 				<small className="mb-2 text-muted d-block">
 					This information is necessary to assist us in making appropriate referrals to members of our Lawyer Referral Network and Pro Bono Panel.
-						</small>
+				</small>
 				<Field
 					component={RadioButton}
 					name={peopleFields.INCOME}
@@ -445,8 +450,6 @@ const VisitorAddForm = props => {
 					rows={2}
 				/>
 			</div>
-
-			{/* previous acknowledgement & signature location */}
 
 			{/* NJ disposition */}
 			{clinic === 'nj' &&

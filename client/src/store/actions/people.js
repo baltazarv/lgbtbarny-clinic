@@ -225,11 +225,3 @@ export const updateInquirers = inquirer => {
 		inquirer
 	}
 }
-
-// select an inquirer to send between screens
-// export const setCurrentInquirers = currentInquirers => {
-// 	return {
-// 		type: actionTypes.SET_CURRENT_INQUIRERS,
-// 		currentInquirers
-// 	}
-// }
