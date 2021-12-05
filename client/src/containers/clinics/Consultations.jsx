@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Button } from 'antd';
-import { Card, Row, Col } from 'react-bootstrap';
+import { Card, Row, Col } from 'react-bootstrap'
+import { ReloadOutlined } from '@ant-design/icons'
 // components
 import ConsultationsTable from '../../components/clinics/consultationsTable/ConsultationsTable';
 import ToggleButtons from '../../components/ToggleButtons';
@@ -145,7 +146,7 @@ class Consultations extends Component {
 							<Col className="col-4 text-right">
 								<Button
 									shape="round"
-									icon="reload"
+									icon={<ReloadOutlined />}
 									size="small"
 									onClick={this.refreshTable}
 								>

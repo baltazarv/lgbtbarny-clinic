@@ -1,19 +1,28 @@
-import React from 'react';
-import { Table, Form } from 'antd';
+import React from 'react'
+import { Table, Form } from 'antd'
+import EditableSelectCell from './EditableSelectCell'
 
-import EditableSelectCell from './EditableSelectCell';
+export const EditableContext = React.createContext(null)
 
-export const EditableContext = React.createContext();
-
-const EditableRow = ({ form, index, ...props }) => (
-	<EditableContext.Provider value={form}>
-		<tr {...props} />
-	</EditableContext.Provider>
-);
-
-const EditableFormRow = Form.create()(EditableRow);
+const EditableRow = ({ index, ...props }) => {
+	const [form] = Form.useForm()
+	return (
+		<Form form={form} component={false}>
+			<EditableContext.Provider value={form}>
+				<tr {...props} />
+			</EditableContext.Provider>
+		</Form>
+	)
+}
 
 class EditableTable extends React.Component {
+
+	handleDelete = (key) => {
+		const dataSource = [...this.state.dataSource]
+		this.setState({
+			dataSource: dataSource.filter((item) => item.key !== key),
+		})
+	}
 
 	render() {
 		const {
@@ -25,21 +34,23 @@ class EditableTable extends React.Component {
 			options,
 			expandedRowRender,
 			pagination = false,
-		} = this.props;
+		} = this.props
 
 		const components = {
 			body: {
-				row: EditableFormRow,
+				row: EditableRow,
 				cell: EditableSelectCell,
 			},
-		};
-		const _columns = columns.map(col => {
+		}
+
+		const _columns = columns.map((col) => {
 			if (!col.editable) {
-				return col;
+				return col
 			}
+
 			return {
 				...col,
-				onCell: record => ({
+				onCell: (record) => ({
 					record,
 					editable: col.editable,
 					dataIndex: col.dataIndex,
@@ -47,8 +58,9 @@ class EditableTable extends React.Component {
 					handleSave,
 					options,
 				}),
-			};
-		});
+			}
+		})
+
 		return (
 			<div>
 				<Table
@@ -65,8 +77,8 @@ class EditableTable extends React.Component {
 					scroll={{ x: '100%' }}
 				/>
 			</div>
-		);
+		)
 	}
 }
 
-export default EditableTable;
+export default EditableTable

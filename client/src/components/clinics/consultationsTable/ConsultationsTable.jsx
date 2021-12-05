@@ -199,24 +199,25 @@ const ConsultationsTable = props => {
 		changeFilters(filters);
 	};
 
-	const updateDispoStatus = tableRow => {
+	const updateDispoStatus = (row) => {
+
 		// (1) update table
 		const newData = [...dataSource];
-		const index = newData.findIndex(item => tableRow.key === item.key);
-		const item = newData[index];
+		const index = newData.findIndex(item => row.key === item.key)
+		const item = newData[index]
 		newData.splice(index, 1, {
 			...item,
-			...tableRow,
-		});
+			...row,
+		})
 		setDataSource(newData);
 
 		// (2) update db >> (3) update redux state
 		const updateObject = {
-			id: tableRow.key,
+			id: row.key,
 			fields: {
-				[consultFields.STATUS]: tableRow[consultFields.STATUS],
+				[consultFields.STATUS]: row[consultFields.STATUS],
 			}
-		};
+		}
 		updateConsultation(updateObject);
 	}
 

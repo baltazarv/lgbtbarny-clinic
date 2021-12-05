@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Button } from 'antd';
-import { Card, Row, Col } from 'react-bootstrap';
-
+import { Card, Row, Col } from 'react-bootstrap'
+import { ReloadOutlined } from '@ant-design/icons'
 import VisitorsTable from '../../components/clinics/visitorsTable/VisitorsTable';
 import ToggleButtons from '../../components/ToggleButtons';
 // data
@@ -124,7 +124,7 @@ class Visitors extends Component {
                 <Button
                   // type="primary"
                   shape="round"
-                  icon="reload"
+									icon={<ReloadOutlined />}
                   size="small"
                   onClick={this.refreshTable}
                 >

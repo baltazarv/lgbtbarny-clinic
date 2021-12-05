@@ -14,7 +14,8 @@
  */
 import React, { useState } from 'react';
 import { Select, Button, Tooltip } from 'antd';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col } from 'react-bootstrap'
+import { ReloadOutlined } from '@ant-design/icons'
 import { reqAsterisk } from '../../forms/formElements';
 import classNames from 'classnames';
 
@@ -97,7 +98,7 @@ const VisitorSelect = ({
 							shape="circle"
 							onClick={onRefresh}
 							className="mr-3 pb-1"
-							icon="reload"
+							icon={<ReloadOutlined />}
 						/>
 					</Tooltip>
 				</Col>

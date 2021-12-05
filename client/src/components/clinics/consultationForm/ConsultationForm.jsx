@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Row, Col, Form, Button, Collapse } from 'react-bootstrap';
+import { ReloadOutlined } from '@ant-design/icons'
 import Select from '../../forms/fields/Select';
-import { Button as AntButton, Tooltip } from 'antd'; // { Select }
+import { Button as AntButton, Tooltip } from 'antd'
 import RadioButtonGroup from '../../forms/fields/RadioButtonGroup';
 import RadioButton from '../../forms/fields/RadioButton';
 import TextArea from '../../forms/fields/TextArea';
@@ -372,7 +373,8 @@ class ConsultationForm extends Component {
 											shape="circle"
 											onClick={this.refreshInquirers}
 											className="mr-3 pb-1"
-											icon="reload" />
+											icon={<ReloadOutlined />}
+										/>
 									</Tooltip>
 									<Tooltip title="add new visitor">
 										<Button onClick={() => this.showVisitorAddModal()} size="sm">+</Button>

@@ -1,3 +1,5 @@
+// TODO: move to /intake/PreviousInquiries.jsx?
+
 /** PrevConsultationTable */
 import React, { useState } from 'react';
 import EditableTable from '../../table/EditableTable';
@@ -30,6 +32,7 @@ const columns = [
 		dataIndex: consultFields.STATUS,
 		key: consultFields.STATUS,
 		editable: true,
+		responsive: ['md'],
 	},
 ];
 
