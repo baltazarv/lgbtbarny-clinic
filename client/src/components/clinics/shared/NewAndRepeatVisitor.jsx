@@ -7,19 +7,19 @@
  * NewAndRepeatVisitor
  *  |_ VisitorSelect
  *  |_ PreviousConsultations
- *  |_ VisitorAddForm (clinic) or ContactAddForm (hotline)
+ *  |_ ClinicAddVisitor (clinic) or HotlineAddInquirer (hotline)
  * */
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
-import VisitorSelect from './intakeForm/VisitorSelect';
-import PreviousConsultations from './intakeForm/PreviousConsultations';
-import VisitorAddForm from './VisitorAddForm'
-import ContactAddForm from './ContactAddForm'
+import VisitorSelect from '../intake/VisitorSelect';
+import PreviousConsultations from './PreviousConsultations';
+import ClinicAddVisitor from '../intake/ClinicAddVisitor'
+import HotlineAddInquirer from '../intake/HotlineAddInquirer'
 // data
-import * as peopleFields from '../../data/peopleFields';
-import { getOptionsForPeople, formatName } from '../../data/peopleData';
-import * as actions from '../../store/actions';
+import * as peopleFields from '../../../data/peopleFields';
+import { getOptionsForPeople, formatName } from '../../../data/peopleData';
+import * as actions from '../../../store/actions';
 
 const NewAndRepeatVisitor = ({
 	// from parent
@@ -199,13 +199,13 @@ const NewAndRepeatVisitor = ({
 					) &&
 						(
 							isHotline ?
-								<ContactAddForm
+								<HotlineAddInquirer
 									lawTypesObject={lawTypesObject}
 									submitForm={!isRepeat ? submitCreateInquirer : submitUpdateInquirer}
 									serverResponse={serverResponse}
 									repeatVisitor={isRepeat && repeatVisitorId ? getRepeatVisitor(serverResponse) : null}
 								/> :
-								<VisitorAddForm
+								<ClinicAddVisitor
 									// clinic is added when clinic visit
 									clinic={isRepeat && repeatVisitorId ? clinic : null}
 									lawTypesObject={lawTypesObject}

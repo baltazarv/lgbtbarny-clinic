@@ -1,23 +1,21 @@
-// TODO: move to intake/clinic/
-
 import React from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Form, Row, Col, Button, Card } from 'react-bootstrap';
-import Select from '../forms/fields/Select';
-import RadioButtonGroup from '../forms/fields/RadioButtonGroup'
-import CheckboxGroup from '../forms/fields/CheckboxGroup';
-import Checkbox from '../forms/fields/Checkbox';
-import RadioButton from '../forms/fields/RadioButton';
-import TextArea from '../forms/fields/TextArea';
-import InputField from '../forms/fields/InputField'
+import Select from '../../forms/fields/Select';
+import RadioButtonGroup from '../../forms/fields/RadioButtonGroup'
+import CheckboxGroup from '../../forms/fields/CheckboxGroup';
+import Checkbox from '../../forms/fields/Checkbox';
+import RadioButton from '../../forms/fields/RadioButton';
+import TextArea from '../../forms/fields/TextArea';
+import InputField from '../../forms/fields/InputField'
 // data
-import * as peopleFields from '../../data/peopleFields';
-import { getOptionsForLawTypes } from '../../data/lawTypeData';
+import * as peopleFields from '../../../data/peopleFields';
+import { getOptionsForLawTypes } from '../../../data/lawTypeData';
 // styles
 import classNames from "classnames";
 import styled from 'styled-components'
-import { reqAsterisk } from '../forms/formElements';
+import { reqAsterisk } from '../../forms/formElements';
 
 const INITIAL_VALUES = {
 	[peopleFields.LAST_NAME]: '',
@@ -103,7 +101,7 @@ const handleSubmit = (values, actions) => {
 	if (onHide) onHide();
 }
 
-const VisitorAddForm = ({
+const ClinicAddVisitor = ({
 	// formik
 	handleSubmit,
 	values,
@@ -523,4 +521,4 @@ export default withFormik({
 	handleSubmit,
 	enableReinitialize: true,
 	displayName: 'visitorForm',
-})(VisitorAddForm);
+})(ClinicAddVisitor);

@@ -1,4 +1,4 @@
-// TODO: move to /intake/PreviousInquiries.jsx?
+// TODO: rename PreviousInquiries.jsx?
 
 /** PrevConsultationTable */
 import React, { useState } from 'react';

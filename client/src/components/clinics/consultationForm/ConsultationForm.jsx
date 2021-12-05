@@ -10,7 +10,7 @@ import RadioButton from '../../forms/fields/RadioButton';
 import TextArea from '../../forms/fields/TextArea';
 import VisitorList from '../VisitorList';
 import FormModal from '../../modals/FormModal';
-import NewAndRepeatVisitor from '../NewAndRepeatVisitor';
+import NewAndRepeatVisitor from '../shared/NewAndRepeatVisitor';
 import LawyerAddForm from './LawyerAddForm';
 // data
 import * as consultFields from '../../../data/consultionFields';

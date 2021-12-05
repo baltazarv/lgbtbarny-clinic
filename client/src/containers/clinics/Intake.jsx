@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import NewAndRepeatVisitor from '../../components/clinics/NewAndRepeatVisitor'
+import NewAndRepeatVisitor from '../../components/clinics/shared/NewAndRepeatVisitor'
 import { Button } from 'antd'
 
 const Intake = ({

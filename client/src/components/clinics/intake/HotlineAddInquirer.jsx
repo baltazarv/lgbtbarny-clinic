@@ -1,16 +1,14 @@
-// TODO: move to intake/hotline-contact/
-
 import React from 'react';
 import { withFormik, Form as FormikForm, Field } from 'formik';
 // components
 import { Form, Row, Col, Button, Card } from 'react-bootstrap';
 import { Select as AntSelect } from 'antd';
-import Select from '../forms/fields/Select';
-import TextArea from '../forms/fields/TextArea';
-import InputField from '../forms/fields/InputField'
+import Select from '../../forms/fields/Select';
+import TextArea from '../../forms/fields/TextArea';
+import InputField from '../../forms/fields/InputField'
 // data
-import * as peopleFields from '../../data/peopleFields';
-import { getOptionsForLawTypes } from '../../data/lawTypeData';
+import * as peopleFields from '../../../data/peopleFields';
+import { getOptionsForLawTypes } from '../../../data/lawTypeData';
 // styles
 import styled from 'styled-components'
 
