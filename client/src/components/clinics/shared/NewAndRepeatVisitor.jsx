@@ -13,11 +13,13 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
 import VisitorSelect from '../intake/VisitorSelect';
-import PreviousConsultations from './PreviousConsultations';
+import PreviousConsultations from './PreviousConsultations'
+import PreviousInquiries from './PreviousInquiries'
 import ClinicAddVisitor from '../intake/ClinicAddVisitor'
 import HotlineAddInquirer from '../intake/HotlineAddInquirer'
 // data
-import * as peopleFields from '../../../data/peopleFields';
+import * as peopleFields from '../../../data/peopleFields'
+import * as consultFields from '../../../data/consultFields'
 import { getOptionsForPeople, formatName } from '../../../data/peopleData';
 import * as actions from '../../../store/actions';
 
@@ -87,8 +89,10 @@ const NewAndRepeatVisitor = ({
 	}
 
 	const getRepeatVisitor = () => {
-		return inquirersObject[repeatVisitorId];
+		return inquirersObject[repeatVisitorId]
 	}
+
+	/** RENDER FUNCTIONS */
 
 	const renderSuccessMessage = () => {
 		let renderMessage = null;
@@ -126,15 +130,49 @@ const NewAndRepeatVisitor = ({
 		)
 	}
 
-	const renderPreviousConsultations = () => {
-		const consultIds = inquirersObject[repeatVisitorId][peopleFields.CONSULTATIONS];
-		if (consultIds) {
-			const visitorConsultations = consultIds.map(id => {
-				return {
+	const renderPrevInquiries = () => {
+		const consultIds = getRepeatVisitor()[peopleFields.CONSULTATIONS]
+		const inquiries = consultIds.reduce((acc, id) => {
+			const consultation = consultations[id]
+			if (consultation?.[consultFields.TYPE] !== consultFields.TYPE_CLINIC) {
+				acc.push({
 					key: id,
-					...consultations[id],
-				}
-			});
+					...consultation,
+				})
+			}
+			return acc
+		}, [])
+		if (inquiries?.length > 0) {
+			return <PreviousInquiries
+				inquiries={inquiries}
+				inquirers={inquirersObject}
+				consultations={consultations}
+				updateConsultation={updateConsultation}
+				lawyers={lawyersObject}
+				lawTypes={lawTypesObject}
+			/>
+		} else {
+			return <Card className="mb-3 text-center">
+				<Card.Body>
+					<span className="text-muted">No contacts from the inquirer have been saved.</span>
+				</Card.Body>
+			</Card>
+		}
+	}
+
+	const renderPreviousConsultations = () => {
+		const consultIds = getRepeatVisitor()[peopleFields.CONSULTATIONS]
+		const visitorConsultations = consultIds.reduce((acc, id) => {
+			const consultation = consultations[id]
+			if (consultation?.[consultFields.TYPE] === consultFields.TYPE_CLINIC) {
+				acc.push({
+					key: id,
+					...consultation,
+				})
+			}
+			return acc
+		}, [])
+		if (visitorConsultations) {
 			return <PreviousConsultations
 				selectedConsultations={visitorConsultations}
 				inquirers={inquirersObject}
@@ -149,7 +187,6 @@ const NewAndRepeatVisitor = ({
 					<span className="text-muted">No consultations have been saved for the visitor.</span>
 				</Card.Body>
 			</Card>
-				;
 		}
 	}
 
@@ -184,12 +221,15 @@ const NewAndRepeatVisitor = ({
 
 			<Card>
 				<Card.Body>
-
 					{isRepeat && // switch to contact exists
 						<>
 							{renderRepeatVisitorSelect()}
+							{isHotline && repeatVisitorId &&
+								renderPrevInquiries()
+							}
 							{repeatVisitorId &&
-								renderPreviousConsultations()}
+								renderPreviousConsultations()
+							}
 						</>
 					}
 

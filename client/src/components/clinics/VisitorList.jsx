@@ -9,7 +9,7 @@ import ConsultationList from './ConsultationList';
 import * as peopleFields from '../../data/peopleFields';
 import { formatNameNoNick } from '../../data/peopleData';
 import { getLawTypes } from '../../data/lawTypeData';
-import * as consultFields from '../../data/consultionFields';
+import * as consultFields from '../../data/consultFields';
 import { getDispoTags, getStatusForEmptyShortName } from '../../data/consultationData';
 // utils
 import { objectIsEmpty, isoToStandardDate } from '../../utils';
@@ -71,10 +71,7 @@ const VisitorList = ({
   const [consultListItems, setConsultListItems] = useState({});
 
   const showConsultModal = (id, consultation) => {
-    const selectedConsult = {
-      [id]: { ...consultation },
-    };
-    setConsultSelected(selectedConsult);
+    setConsultSelected({ ...consultation });
     setConsultModalShown(true);
   }
 
@@ -202,7 +199,7 @@ const VisitorList = ({
         ]}
       >
         <ConsultationList
-          consultSelected={consultSelected}
+          consultation={consultSelected}
           lawyers={lawyers}
           lawTypes={lawTypes}
         />

@@ -5,7 +5,7 @@
 import React from 'react';
 import { List, Typography } from 'antd';
 // data
-import * as consultFields from '../../data/consultionFields';
+import * as consultFields from '../../data/consultFields';
 import { getDispoTags, getStatusForEmptyShortName } from '../../data/consultationData';
 import { getPeopleByIds } from '../../data/peopleData';
 import { getLawTypes } from '../../data/lawTypeData';
@@ -14,17 +14,16 @@ const DISPOSTION_DEFAULT_VALUE = 'Dispostion was not specified.';
 
 const ConsultationList = props => {
 	const {
-		consultSelected,
+		consultation,
 		lawyers,
 		lawTypes,
 	} = props;
 
-	const key = Object.keys(consultSelected)[0];
-	const fields = consultSelected[key];
+	const key = consultation.key;
 
 	let consultLawyers = 'Consulting lawyer not specified.';
-	if (fields[consultFields.LAWYERS]) {
-		consultLawyers = getPeopleByIds(fields[consultFields.LAWYERS], lawyers);
+	if (consultation[consultFields.LAWYERS]) {
+		consultLawyers = getPeopleByIds(consultation[consultFields.LAWYERS], lawyers);
 	}
 	let dataSource = [
 		{
@@ -33,27 +32,27 @@ const ConsultationList = props => {
 		},
 		{
 			title: "Consultation Notes",
-			value: fields[consultFields.SITUATION] ? fields[consultFields.SITUATION] : "No notes taken.",
+			value: consultation[consultFields.SITUATION] ? consultation[consultFields.SITUATION] : "No notes taken.",
 		},
 		{
 			title: consultFields.DISPOSITIONS,
 			key: consultFields.DISPOSITIONS,
-			value: fields[consultFields.DISPOSITIONS] ? fields[consultFields.DISPOSITIONS] : DISPOSTION_DEFAULT_VALUE,
+			value: consultation[consultFields.DISPOSITIONS] ? consultation[consultFields.DISPOSITIONS] : DISPOSTION_DEFAULT_VALUE,
 		},
 	]
 
 	let referralData = [
 		{
 			title: "Type(s) of Law",
-			value: getLawTypes(fields[consultFields.LAW_TYPES], lawTypes),
+			value: getLawTypes(consultation[consultFields.LAW_TYPES], lawTypes),
 		},
 		{
 			title: consultFields.REF_SUMMARY,
-			value: fields[consultFields.REF_SUMMARY] ? fields[consultFields.REF_SUMMARY] : 'No summary written.',
+			value: consultation[consultFields.REF_SUMMARY] ? consultation[consultFields.REF_SUMMARY] : 'No summary written.',
 		},
 	];
 
-	if (fields[consultFields.DISPOSITIONS]) {
+	if (consultation[consultFields.DISPOSITIONS]) {
 		// old consultations were not marked with dispositions
 		const hasEligible = _dispos => {
 			return _dispos.some(dispo => {
@@ -64,34 +63,34 @@ const ConsultationList = props => {
 			})
 		}
 
-		if (hasEligible(fields[consultFields.DISPOSITIONS])) {
+		if (hasEligible(consultation[consultFields.DISPOSITIONS])) {
 			dataSource = [...dataSource, ...referralData];
 		}
 	}
 
-	if (fields[consultFields.EMAIL_TEXT_SENT]) {
+	if (consultation[consultFields.EMAIL_TEXT_SENT]) {
 		dataSource.push({
 			title: consultFields.EMAIL_TEXT_SENT,
-			value: fields[consultFields.EMAIL_TEXT_SENT],
+			value: consultation[consultFields.EMAIL_TEXT_SENT],
 		})
 	}
 
 	dataSource.push({
 		title: "Referral Status",
-		value: getStatusForEmptyShortName(fields),
+		value: getStatusForEmptyShortName(consultation),
 	});
 
 	return (
 		<>
 			<List
-				bordered
+				bordered={false}
 				itemLayout="horizontal"
 				dataSource={dataSource}
 				size="small"
 				renderItem={item => {
 					if (item.key && item.key === consultFields.DISPOSITIONS && item.value !== DISPOSTION_DEFAULT_VALUE) {
 						return (
-							<List.Item key={key}>
+							<List.Item key={`${key}_${item.title}`}>
 								<ul style={{
 									listStyleType: 'none',
 									paddingInlineStart: 'unset'
@@ -102,7 +101,7 @@ const ConsultationList = props => {
 						)
 					}
 					return (
-						<List.Item key={key}>
+						<List.Item key={`${key}_${item.title}`}>
 							<Typography.Text code>{item.title}</Typography.Text> {item.value}
 						</List.Item>
 					)

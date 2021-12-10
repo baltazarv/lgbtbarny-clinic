@@ -13,7 +13,7 @@ import FormModal from '../../modals/FormModal';
 import NewAndRepeatVisitor from '../shared/NewAndRepeatVisitor';
 import LawyerAddForm from './LawyerAddForm';
 // data
-import * as consultFields from '../../../data/consultionFields';
+import * as consultFields from '../../../data/consultFields';
 import * as peopleFields from '../../../data/peopleFields';
 import { getOptionsForPeople, getPeopleByIds, formatName } from '../../../data/peopleData';
 import { getOptionsForLawTypes } from '../../../data/lawTypeData';

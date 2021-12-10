@@ -5,14 +5,21 @@ import { EditableContext } from './EditableTable'
 const { Option, OptGroup } = Select
 
 const getOptions = (arr) => {
-  const groupsObject = arr.reduce((acc, cur) => {
-    if (!acc[cur.group]) acc[cur.group] = []
-    acc[cur.group].push(<Option value={cur.value} key={cur.value}>{cur.text}</Option>)
-    return acc;
-  }, {})
   let _options = []
-  for (var key in groupsObject) {
-    _options.push(<OptGroup label={key} key={key}>{groupsObject[key].map(option => option)}</OptGroup>)
+  // check if there are groups in the array
+  if (arr[0].hasOwnProperty('group')) {
+    const groupsObject = arr.reduce((acc, cur) => {
+      if (!acc[cur.group]) acc[cur.group] = []
+      acc[cur.group].push(<Option value={cur.value} key={cur.value}>{cur.text}</Option>)
+      return acc
+    }, {})
+    for (var key in groupsObject) {
+      _options.push(<OptGroup label={key} key={key}>{groupsObject[key].map(option => option)}</OptGroup>)
+    }
+  } else {
+    arr.forEach((opt) => {
+      _options.push(<Option value={opt.value} key={opt.value}>{opt.text}</Option>)
+    })
   }
   return _options
 }

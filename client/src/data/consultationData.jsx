@@ -1,25 +1,25 @@
 import React from 'react';
 import { Tag } from 'antd';
-import * as consultFields from './consultionFields';
+import * as consultFields from './consultFields';
 
-export const TABLE = 'Consultations';
+const TABLE = 'Consultations';
 
 const DISPO_FEE_BASED_COLOR = 'cyan';
 const DISPO_PRO_BONO_COLOR = 'blue';
 const DISPO_COMPELLING_COLOR = 'magenta';
 const DISPO_IMMIGRATION_COLOR = 'volcano';
 
-export const statuses = [
+const statuses = [
 	{ group: 'Referral', value: consultFields.STATUS_REFER, text: 'Needed Referral' },
 	{ group: 'Referral', value: consultFields.STATUS_REFERRED, text: 'Made Referral' },
 	{ group: 'Referral', value: consultFields.STATUS_REFERRAL_NOT_PICKED_UP, text: 'Not Picked Up' },
 	{ group: 'Referral', value: consultFields.STATUS_REFERRAL_PICKED_UP, text: 'Picked Up' },
 	{ group: 'Impact', value: consultFields.STATUS_POSSIBLE_IMPACT, text: 'Possible' },
 	{ group: 'Impact', value: consultFields.STATUS_IMPACT_CONSIDERED, text: 'Considered' },
-];
+]
 
 // given consultations as an object, return object with only referral-eligible consultations
-export const filterEligibleConsultations = consultations => {
+const filterEligibleConsultations = consultations => {
 	const eligible = {};
 	for (var key in consultations) {
 		const fields = consultations[key];
@@ -42,7 +42,7 @@ export const filterEligibleConsultations = consultations => {
 
 // display short names for dispositions
 
-export const dispoShortNames = {
+const dispoShortNames = {
 	[consultFields.DISPOSITIONS_FEE_BASED]: "Fee-based",
 	[consultFields.DISPOSITIONS_PRO_BONO]: "Pro bono",
 	[consultFields.DISPOSITIONS_COMPELLING]: "Impact",
@@ -51,15 +51,31 @@ export const dispoShortNames = {
 }
 
 // given an array
-export const getDispoShortNames = dispos => {
+const getDispoShortNames = dispos => {
 	if (dispos && dispos.length > 0) return dispos.map(dispo => dispoShortNames[dispo]);
 	return [];
+}
+
+const hotlineDispositions = [
+	'No answer',
+	'Sent follow-up email',
+	'Left voicemail',
+	'Spoke with inquirer',
+	'Plans to attend Clinic',
+	'Referred',
+]
+
+const getHotlineDispoOptions = () => {
+	const options = hotlineDispositions.map((dispo) => {
+		return { value: dispo, text: dispo }
+	})
+	return options
 }
 
 // given a fields object with a long-name Disposition
 // and given a, sometimes empty, Status
 // return non-empty Status
-export const getStatusForEmptyShortName = object => {
+const getStatusForEmptyShortName = object => {
 	const statusField = object[consultFields.STATUS];
 	const dispoField = dispoShortNames[object[consultFields.DISPOSITIONS]];
 	// fee-base or pro-bono => reference needed
@@ -78,7 +94,7 @@ export const getStatusForEmptyShortName = object => {
 }
 
 // given an array of Dispostion short names, get antd Tag components
-export const getDispoTagsFromShortNames = dispos => {
+const getDispoTagsFromShortNames = dispos => {
 	return <span>
 		{dispos.map((dispo, index) => {
 			let color = '#8c8c8c';
@@ -97,7 +113,7 @@ export const getDispoTagsFromShortNames = dispos => {
 
 // given an array of long-name dispositions
 // return either long- or short-name Tag
-export const getDispoTags = (dispos, returnShortName = false) => {
+const getDispoTags = (dispos, returnShortName = false) => {
 	return <span>
 		{dispos.map((dispo) => {
 			return getDispoTag(dispo, returnShortName);
@@ -105,7 +121,7 @@ export const getDispoTags = (dispos, returnShortName = false) => {
 	</span>
 }
 
-export const getDispoTag = (dispo, returnShortName = false) => {
+const getDispoTag = (dispo, returnShortName = false) => {
 	let color = '#8c8c8c';
 	if (dispo === consultFields.DISPOSITIONS_FEE_BASED) color = DISPO_FEE_BASED_COLOR;
 	if (dispo === consultFields.DISPOSITIONS_PRO_BONO) color = DISPO_PRO_BONO_COLOR;
@@ -116,4 +132,17 @@ export const getDispoTag = (dispo, returnShortName = false) => {
 			{returnShortName ? dispoShortNames[dispo] : dispo}
 		</Tag>
 	);
+}
+
+export {
+	TABLE,
+	statuses,
+	filterEligibleConsultations,
+	dispoShortNames,
+	getDispoShortNames,
+	getHotlineDispoOptions,
+	getStatusForEmptyShortName,
+	getDispoTagsFromShortNames,
+	getDispoTags,
+	getDispoTag,
 }

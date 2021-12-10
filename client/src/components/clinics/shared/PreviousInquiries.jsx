@@ -1,17 +1,12 @@
 /** PrevConsultationTable */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 import EditableTable from '../../table/EditableTable';
-import ConsultationList from '../ConsultationList';
+import HelplineList from '../HelplineList';
 // data
 import { getLawyerNames } from '../../../data/peopleData';
 import * as consultFields from '../../../data/consultFields';
-import {
-	statuses,
-	getDispoTagsFromShortNames,
-	getStatusForEmptyShortName,
-	getDispoShortNames,
-} from '../../../data/consultationData';
+import { getHotlineDispoOptions } from '../../../data/consultationData';
 import { getLawTypes } from '../../../data/lawTypeData';
 // utils
 import { isoToStandardDate } from '../../../utils';
@@ -23,44 +18,47 @@ const columns = [
 		key: 'date',
 	},
 	{
-		title: 'Disposition(s)',
-		dataIndex: [consultFields.DISPOSITIONS],
-		key: 'dispos',
-		render: dispos => {
-			if (dispos.length > 0) return getDispoTagsFromShortNames(dispos);
-			return 'None made.';
-		},
+		title: 'Contact type',
+		dataIndex: consultFields.TYPE,
+		key: consultFields.TYPE,
+		responsive: ['md'],
 	},
 	{
-		title: consultFields.STATUS,
-		dataIndex: consultFields.STATUS,
-		key: consultFields.STATUS,
+		title: 'Last response',
+		dataIndex: [consultFields.DISPOSITIONS],
+		key: 'dispos',
 		editable: true,
-		responsive: ['md'],
 	},
 ];
 
-const PreviousConsultations = ({
-	selectedConsultations,
+const PreviousInquiries = ({
+	inquiries,
+	// from context:
 	consultations,
 	updateConsultation,
 	lawyers,
 	lawTypes,
 }) => {
-
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
 	// to not set dataSource more than once for same visitor
 	const [consultIds, setConsultIds] = useState([]);
 
-	// set the fields for the table
+	// useEffect(() => {
+	// 	console.log('dataSource', dataSource)
+	// }, [dataSource])
+
+	// useEffect(() => {
+	// 	console.log('consultIds', consultIds)
+	// }, [consultIds])
+
 	const formatDataSource = (_selectedConsultations) => {
 		const _dataSource = _selectedConsultations.reduce((acc, cur) => {
 			acc.push({
 				key: cur.key,
+				[consultFields.TYPE]: cur[consultFields.TYPE],
 				[consultFields.CREATED_ON]: isoToStandardDate(cur[consultFields.CREATED_ON]),
-				[consultFields.DISPOSITIONS]: getDispoShortNames(cur[consultFields.DISPOSITIONS]),
-				[consultFields.STATUS]: getStatusForEmptyShortName(cur),
+				[consultFields.DISPOSITIONS]: cur[consultFields.DISPOSITIONS],
 				[consultFields.LAWYERS]: getLawyerNames(cur[consultFields.LAWYERS], lawyers),
 				[consultFields.LAW_TYPES]: getLawTypes(cur[consultFields.LAW_TYPES], lawTypes),
 				[consultFields.SITUATION]: cur[consultFields.SITUATION],
@@ -72,37 +70,43 @@ const PreviousConsultations = ({
 		setIsLoading(false);
 	}
 
-	const updateDispoStatus = tableRow => {
+	// update consultFields.DISPOSITIONS
+	const updateLastResponse = tableRow => {
 		// (1) update table
-		const newData = [...dataSource];
-		const index = newData.findIndex(item => tableRow.key === item.key);
-		const item = newData[index];
+		const newData = [...dataSource]
+		const index = newData.findIndex(item => tableRow.key === item.key)
+		const item = newData[index]
 		newData.splice(index, 1, {
 			...item,
 			...tableRow,
-		});
-		setDataSource(newData);
+		})
+		setDataSource(newData)
 
 		// (2) update db >> (3) update redux state
 		const updateObject = {
 			id: tableRow.key,
+			// field put inside an array to update
 			fields: {
-				[consultFields.STATUS]: tableRow[consultFields.STATUS],
+				[consultFields.DISPOSITIONS]: [tableRow[consultFields.DISPOSITIONS]],
 			}
-		};
-		updateConsultation(updateObject);
+		}
+
+		updateConsultation(updateObject)
 	}
 
 	// check that the dataSource not set more than once for same visitor
-	const _consultIds = selectedConsultations.map(consult => consult.key);
-	if (!consultIds.some(id => id === selectedConsultations[0].key)) {
-		setConsultIds(_consultIds);
-		formatDataSource(selectedConsultations);
+	if (inquiries?.length > 0) {
+		const _consultIds = inquiries.map(consult => consult.key);
+		if (!consultIds.some(id => id === inquiries[0].key)) {
+			setConsultIds(_consultIds);
+			formatDataSource(inquiries);
+		}
 	}
 
-	const consultationList = (record) => {
-		return <ConsultationList
-			consultation={{ ...consultations[record.key] }}
+	// expanded row from Consultations table
+	const inquirerContactedList = (record) => {
+		return <HelplineList
+			inquiry={{ ...consultations[record.key] }}
 			lawyers={lawyers}
 			lawTypes={lawTypes}
 		/>
@@ -113,17 +117,18 @@ const PreviousConsultations = ({
 			{dataSource.length > 0 &&
 				<Card className="p-4 mb-3">
 					<Card.Body className="p-0">
-						<Card.Title className="h5 mb-1">Previous Consultations</Card.Title>
+						<Card.Title className="h5 mb-1">Inquiries</Card.Title>
+						{/* should not use Card.Text b/c puts table in a <p> tag, which cause error/warnings */}
 						<Card.Text>
-							<p className="mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p>
+							{/* <p className="mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p> */}
 
 							<EditableTable
 								loading={isLoading}
 								dataSource={dataSource}
 								columns={columns}
-								options={statuses}
-								handleSave={updateDispoStatus}
-								expandedRowRender={consultationList}
+								options={getHotlineDispoOptions()}
+								handleSave={updateLastResponse}
+								expandedRowRender={inquirerContactedList}
 							/>
 						</Card.Text>
 					</Card.Body>
@@ -133,4 +138,4 @@ const PreviousConsultations = ({
 	)
 }
 
-export default PreviousConsultations;
+export default PreviousInquiries;

@@ -6,7 +6,7 @@ import EditableTable from '../../table/EditableTable';
 import ConsultationList from '../ConsultationList';
 import VisitorList from '../VisitorList';
 // data
-import * as consultFields from '../../../data/consultionFields';
+import * as consultFields from '../../../data/consultFields';
 import { statuses, dispoShortNames, getDispoShortNames, getDispoTagsFromShortNames, getStatusForEmptyShortName } from '../../../data/consultationData'; // , filterEligibleConsultations
 import * as peopleFields from '../../../data/peopleFields';
 import { formatName, getLawyerNames, getPeopleByIds } from '../../../data/peopleData';
@@ -295,9 +295,8 @@ const ConsultationsTable = props => {
 	}
 
 	const consultationList = (record) => {
-		const consultSelected = { [record.key]: { ...consultations[record.key] } };
 		return <ConsultationList
-			consultSelected={consultSelected}
+			consultation={{ ...consultations[record.key] }}
 			lawyers={lawyers}
 			lawTypes={lawTypes}
 		/>

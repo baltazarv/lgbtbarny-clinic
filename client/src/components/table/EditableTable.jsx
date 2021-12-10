@@ -28,7 +28,7 @@ class EditableTable extends React.Component {
 		const {
 			columns,
 			dataSource,
-			handleSave,
+			handleSave, // editable field
 			loading,
 			onChange,
 			options,

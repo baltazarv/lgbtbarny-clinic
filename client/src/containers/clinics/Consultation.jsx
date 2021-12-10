@@ -9,7 +9,7 @@ import EditEmailModal from '../../components/clinics/consultationForm/EditEmailM
 import TimerCounter from '../../components/TimerCountdown/index';
 // data
 import * as actions from '../../store/actions/index';
-import * as consultFields from '../../data/consultionFields';
+import * as consultFields from '../../data/consultFields';
 import * as peopleFields from '../../data/peopleFields';
 import { formatName } from '../../data/peopleData';
 // import { getInquirerConsultations } from '../../../data/consultationData';

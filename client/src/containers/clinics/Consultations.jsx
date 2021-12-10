@@ -8,7 +8,7 @@ import ConsultationsTable from '../../components/clinics/consultationsTable/Cons
 import ToggleButtons from '../../components/ToggleButtons';
 // data
 import * as actions from '../../store/actions';
-import * as consultFields from '../../data/consultionFields';
+import * as consultFields from '../../data/consultFields';
 import { dispoShortNames } from '../../data/consultationData';
 
 const adminPageTitles = {

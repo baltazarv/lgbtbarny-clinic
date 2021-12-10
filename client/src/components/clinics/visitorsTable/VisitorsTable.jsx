@@ -3,7 +3,7 @@ import { Table, Avatar } from 'antd';
 import VisitorList from '../VisitorList';
 // data
 import * as peopleFields from '../../../data/peopleFields';
-import * as consultFields from '../../../data/consultionFields';
+import * as consultFields from '../../../data/consultFields';
 import { formatName } from '../../../data/peopleData';
 import { getLawTypes } from '../../../data/lawTypeData';
 import { getPeopleByIds } from '../../../data/peopleData';

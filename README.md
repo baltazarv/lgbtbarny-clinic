@@ -12,6 +12,9 @@
 * `/client/.env.development`
 * `/client/.env.production`
 
+## Running app
+Run for development, `npm run dev`.
+
 ## Code
 
 Forms use React Select pull-down component:
