@@ -1,15 +1,13 @@
-/** PrevConsultationTable */
-import React, { useState, useEffect } from 'react';
-import { Card } from 'react-bootstrap';
-import EditableTable from '../../table/EditableTable';
-import HelplineList from '../HelplineList';
+import React, { useState } from 'react'
+import PreviousTable from '../shared/PreviousTable'
+import HelplineList from '../HelplineList'
 // data
-import { getLawyerNames } from '../../../data/peopleData';
-import * as consultFields from '../../../data/consultFields';
-import { getHotlineDispoOptions } from '../../../data/consultationData';
-import { getLawTypes } from '../../../data/lawTypeData';
+import { getLawyerNames } from '../../../data/peopleData'
+import * as consultFields from '../../../data/consultFields'
+import { getHotlineDispoOptions } from '../../../data/consultationData'
+import { getLawTypes } from '../../../data/lawTypeData'
 // utils
-import { isoToStandardDate } from '../../../utils';
+import { isoToStandardDate } from '../../../utils'
 
 const columns = [
 	{
@@ -29,7 +27,7 @@ const columns = [
 		key: 'dispos',
 		editable: true,
 	},
-];
+]
 
 const PreviousInquiries = ({
 	inquiries,
@@ -39,18 +37,10 @@ const PreviousInquiries = ({
 	lawyers,
 	lawTypes,
 }) => {
-	const [isLoading, setIsLoading] = useState(true);
-	const [dataSource, setDataSource] = useState([]);
+	const [isLoading, setIsLoading] = useState(true)
+	const [dataSource, setDataSource] = useState([])
 	// to not set dataSource more than once for same visitor
-	const [consultIds, setConsultIds] = useState([]);
-
-	// useEffect(() => {
-	// 	console.log('dataSource', dataSource)
-	// }, [dataSource])
-
-	// useEffect(() => {
-	// 	console.log('consultIds', consultIds)
-	// }, [consultIds])
+	const [consultIds, setConsultIds] = useState([])
 
 	const formatDataSource = (_selectedConsultations) => {
 		const _dataSource = _selectedConsultations.reduce((acc, cur) => {
@@ -63,11 +53,11 @@ const PreviousInquiries = ({
 				[consultFields.LAW_TYPES]: getLawTypes(cur[consultFields.LAW_TYPES], lawTypes),
 				[consultFields.SITUATION]: cur[consultFields.SITUATION],
 				[consultFields.REF_SUMMARY]: cur[consultFields.REF_SUMMARY],
-			});
-			return acc;
-		}, []);
-		setDataSource(_dataSource);
-		setIsLoading(false);
+			})
+			return acc
+		}, [])
+		setDataSource(_dataSource)
+		setIsLoading(false)
 	}
 
 	// update consultFields.DISPOSITIONS
@@ -96,10 +86,10 @@ const PreviousInquiries = ({
 
 	// check that the dataSource not set more than once for same visitor
 	if (inquiries?.length > 0) {
-		const _consultIds = inquiries.map(consult => consult.key);
+		const _consultIds = inquiries.map(consult => consult.key)
 		if (!consultIds.some(id => id === inquiries[0].key)) {
-			setConsultIds(_consultIds);
-			formatDataSource(inquiries);
+			setConsultIds(_consultIds)
+			formatDataSource(inquiries)
 		}
 	}
 
@@ -112,30 +102,15 @@ const PreviousInquiries = ({
 		/>
 	}
 
-	return (
-		<>
-			{dataSource.length > 0 &&
-				<Card className="p-4 mb-3">
-					<Card.Body className="p-0">
-						<Card.Title className="h5 mb-1">Inquiries</Card.Title>
-						{/* should not use Card.Text b/c puts table in a <p> tag, which cause error/warnings */}
-						<Card.Text>
-							{/* <p className="mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p> */}
-
-							<EditableTable
-								loading={isLoading}
-								dataSource={dataSource}
-								columns={columns}
-								options={getHotlineDispoOptions()}
-								handleSave={updateLastResponse}
-								expandedRowRender={inquirerContactedList}
-							/>
-						</Card.Text>
-					</Card.Body>
-				</Card>
-			}
-		</>
-	)
+	return <PreviousTable
+	title="Previous Inquiries"
+		columns={columns}
+		dataSource={dataSource}
+		options={getHotlineDispoOptions()}
+		expandedRowRender={inquirerContactedList}
+		isLoading={isLoading}
+		handleSave={updateLastResponse}
+	/>
 }
 
-export default PreviousInquiries;
+export default PreviousInquiries

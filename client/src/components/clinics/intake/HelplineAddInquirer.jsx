@@ -71,7 +71,7 @@ const handleSubmit = (values, actions) => {
 	if (onHide) onHide()
 }
 
-const ContactAddForm = ({
+const HelplineAddInquirer = ({
 	// formik
 	handleSubmit,
 	values,
@@ -367,4 +367,4 @@ export default withFormik({
 	handleSubmit,
 	enableReinitialize: true,
 	displayName: 'visitorForm',
-})(ContactAddForm);
+})(HelplineAddInquirer);

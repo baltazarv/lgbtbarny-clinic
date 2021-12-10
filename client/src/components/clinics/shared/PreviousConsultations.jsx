@@ -1,20 +1,18 @@
-/** PrevConsultationTable */
-import React, { useState } from 'react';
-import { Card } from 'react-bootstrap';
-import EditableTable from '../../table/EditableTable';
-import ConsultationList from '../ConsultationList';
+import React, { useState } from 'react'
+import PreviousTable from './PreviousTable'
+import ConsultationList from '../ConsultationList'
 // data
-import { getLawyerNames } from '../../../data/peopleData';
-import * as consultFields from '../../../data/consultFields';
+import { getLawyerNames } from '../../../data/peopleData'
+import * as consultFields from '../../../data/consultFields'
 import {
 	statuses,
 	getDispoTagsFromShortNames,
 	getStatusForEmptyShortName,
 	getDispoShortNames,
 } from '../../../data/consultationData';
-import { getLawTypes } from '../../../data/lawTypeData';
+import { getLawTypes } from '../../../data/lawTypeData'
 // utils
-import { isoToStandardDate } from '../../../utils';
+import { isoToStandardDate } from '../../../utils'
 
 const columns = [
 	{
@@ -41,7 +39,7 @@ const columns = [
 ];
 
 const PreviousConsultations = ({
-	selectedConsultations,
+	visitorConsultations,
 	consultations,
 	updateConsultation,
 	lawyers,
@@ -94,10 +92,12 @@ const PreviousConsultations = ({
 	}
 
 	// check that the dataSource not set more than once for same visitor
-	const _consultIds = selectedConsultations.map(consult => consult.key);
-	if (!consultIds.some(id => id === selectedConsultations[0].key)) {
-		setConsultIds(_consultIds);
-		formatDataSource(selectedConsultations);
+	if (visitorConsultations?.length > 0) {
+		const _consultIds = visitorConsultations.map(consult => consult.key);
+		if (!consultIds.some(id => id === visitorConsultations[0].key)) {
+			setConsultIds(_consultIds);
+			formatDataSource(visitorConsultations);
+		}
 	}
 
 	const consultationList = (record) => {
@@ -108,29 +108,15 @@ const PreviousConsultations = ({
 		/>
 	}
 
-	return (
-		<>
-			{dataSource.length > 0 &&
-				<Card className="p-4 mb-3">
-					<Card.Body className="p-0">
-						<Card.Title className="h5 mb-1">Previous Consultations</Card.Title>
-						<Card.Text>
-							<p className="mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p>
-
-							<EditableTable
-								loading={isLoading}
-								dataSource={dataSource}
-								columns={columns}
-								options={statuses}
-								handleSave={updateDispoStatus}
-								expandedRowRender={consultationList}
-							/>
-						</Card.Text>
-					</Card.Body>
-				</Card>
-			}
-		</>
-	)
+	return <PreviousTable
+		title="Previous Consultations"
+		columns={columns}
+		dataSource={dataSource}
+		options={statuses}
+		expandedRowRender={consultationList}
+		isLoading={isLoading}
+		handleSave={updateDispoStatus}
+	/>
 }
 
 export default PreviousConsultations;

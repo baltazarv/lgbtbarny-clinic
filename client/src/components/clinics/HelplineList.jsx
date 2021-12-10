@@ -52,7 +52,11 @@ const HelplineList = props => {
 					const moreProps = {}
 					if (item.className) moreProps.className = item.className
 					return (
-						<List.Item key={`${key}_${item.title}`} {...moreProps}>
+						<List.Item
+							key={`${key}_${item.title}`}
+							size="small"
+							{...moreProps}
+						>
 							<Typography.Text code>{item.title}</Typography.Text> {item.value}
 						</List.Item>
 					)

@@ -7,16 +7,16 @@
  * NewAndRepeatVisitor
  *  |_ VisitorSelect
  *  |_ PreviousConsultations
- *  |_ ClinicAddVisitor (clinic) or HotlineAddInquirer (hotline)
+ *  |_ ClinicAddVisitor (clinic) or HelplineAddInquirer (hotline)
  * */
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
 import VisitorSelect from '../intake/VisitorSelect';
 import PreviousConsultations from './PreviousConsultations'
-import PreviousInquiries from './PreviousInquiries'
+import PreviousInquiries from '../intake/PreviousInquiries'
 import ClinicAddVisitor from '../intake/ClinicAddVisitor'
-import HotlineAddInquirer from '../intake/HotlineAddInquirer'
+import HelplineAddInquirer from '../intake/HelplineAddInquirer'
 // data
 import * as peopleFields from '../../../data/peopleFields'
 import * as consultFields from '../../../data/consultFields'
@@ -174,8 +174,7 @@ const NewAndRepeatVisitor = ({
 		}, [])
 		if (visitorConsultations) {
 			return <PreviousConsultations
-				selectedConsultations={visitorConsultations}
-				inquirers={inquirersObject}
+				visitorConsultations={visitorConsultations}
 				consultations={consultations}
 				updateConsultation={updateConsultation}
 				lawyers={lawyersObject}
@@ -224,11 +223,11 @@ const NewAndRepeatVisitor = ({
 					{isRepeat && // switch to contact exists
 						<>
 							{renderRepeatVisitorSelect()}
-							{isHotline && repeatVisitorId &&
-								renderPrevInquiries()
-							}
 							{repeatVisitorId &&
-								renderPreviousConsultations()
+								<>
+									{renderPrevInquiries()}
+									{renderPreviousConsultations()}
+								</>
 							}
 						</>
 					}
@@ -239,7 +238,7 @@ const NewAndRepeatVisitor = ({
 					) &&
 						(
 							isHotline ?
-								<HotlineAddInquirer
+								<HelplineAddInquirer
 									lawTypesObject={lawTypesObject}
 									submitForm={!isRepeat ? submitCreateInquirer : submitUpdateInquirer}
 									serverResponse={serverResponse}
