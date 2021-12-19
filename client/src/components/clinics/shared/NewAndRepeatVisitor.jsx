@@ -32,6 +32,7 @@ const NewAndRepeatVisitor = ({
 	createInquirer,
 	updateInquirer,
 	updateConsultation,
+	deleteConsultation,
 	refreshInquirers,
 	lawyersObject,
 	lawTypesObject,
@@ -148,6 +149,7 @@ const NewAndRepeatVisitor = ({
 				inquirers={inquirersObject}
 				consultations={consultations}
 				updateConsultation={updateConsultation}
+				deleteConsultation={deleteConsultation}
 				lawyers={lawyersObject}
 				lawTypes={lawTypesObject}
 			/>
@@ -177,6 +179,7 @@ const NewAndRepeatVisitor = ({
 				visitorConsultations={visitorConsultations}
 				consultations={consultations}
 				updateConsultation={updateConsultation}
+				deleteConsultation={deleteConsultation}
 				lawyers={lawyersObject}
 				lawTypes={lawTypesObject}
 			/>
@@ -277,9 +280,10 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
 	return {
 		// call from parent Clinics?
-		createInquirer: inq => dispatch(actions.createInquirer(inq)),
-		updateInquirer: inqValues => dispatch(actions.updateInquirer(inqValues)),
-		updateConsultation: updateObject => dispatch(actions.updateConsultation(updateObject)),
+		createInquirer: (inq) => dispatch(actions.createInquirer(inq)),
+		updateInquirer: (inqValues) => dispatch(actions.updateInquirer(inqValues)),
+		updateConsultation: (updateObject) => dispatch(actions.updateConsultation(updateObject)),
+		deleteConsultation: (key) => dispatch(actions.deleteConsultation(key)),
 		refreshInquirers: () => dispatch(actions.getInquirers()),
 	}
 }

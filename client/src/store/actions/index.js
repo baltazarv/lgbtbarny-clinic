@@ -14,4 +14,5 @@ export {
 	getConsultations,
 	createConsultation,
 	updateConsultation,
+	deleteConsultation,
 } from './consultations';

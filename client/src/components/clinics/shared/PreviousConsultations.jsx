@@ -41,7 +41,6 @@ const columns = [
 const PreviousConsultations = ({
 	visitorConsultations,
 	consultations,
-	updateConsultation,
 	lawyers,
 	lawTypes,
 }) => {
@@ -70,27 +69,6 @@ const PreviousConsultations = ({
 		setIsLoading(false);
 	}
 
-	const updateDispoStatus = tableRow => {
-		// (1) update table
-		const newData = [...dataSource];
-		const index = newData.findIndex(item => tableRow.key === item.key);
-		const item = newData[index];
-		newData.splice(index, 1, {
-			...item,
-			...tableRow,
-		});
-		setDataSource(newData);
-
-		// (2) update db >> (3) update redux state
-		const updateObject = {
-			id: tableRow.key,
-			fields: {
-				[consultFields.STATUS]: tableRow[consultFields.STATUS],
-			}
-		};
-		updateConsultation(updateObject);
-	}
-
 	// check that the dataSource not set more than once for same visitor
 	if (visitorConsultations?.length > 0) {
 		const _consultIds = visitorConsultations.map(consult => consult.key);
@@ -110,12 +88,12 @@ const PreviousConsultations = ({
 
 	return <PreviousTable
 		title="Previous Consultations"
+		info={<p className="text-center mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p>}
 		columns={columns}
 		dataSource={dataSource}
 		options={statuses}
 		expandedRowRender={consultationList}
 		isLoading={isLoading}
-		handleSave={updateDispoStatus}
 	/>
 }
 

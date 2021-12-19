@@ -9,6 +9,8 @@ const DISPO_PRO_BONO_COLOR = 'blue';
 const DISPO_COMPELLING_COLOR = 'magenta';
 const DISPO_IMMIGRATION_COLOR = 'volcano';
 
+/** STATUSES */
+
 const statuses = [
 	{ group: 'Referral', value: consultFields.STATUS_REFER, text: 'Needed Referral' },
 	{ group: 'Referral', value: consultFields.STATUS_REFERRED, text: 'Made Referral' },
@@ -17,6 +19,29 @@ const statuses = [
 	{ group: 'Impact', value: consultFields.STATUS_POSSIBLE_IMPACT, text: 'Possible' },
 	{ group: 'Impact', value: consultFields.STATUS_IMPACT_CONSIDERED, text: 'Considered' },
 ]
+
+// given a fields object with a long-name Disposition
+// and given a, sometimes empty, Status
+// return non-empty Status
+const getStatusForEmptyShortName = object => {
+	const statusField = object[consultFields.STATUS];
+	const dispoField = dispoShortNames[object[consultFields.DISPOSITIONS]];
+	// fee-base or pro-bono => reference needed
+	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED] || dispoField === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO])) {
+		return consultFields.STATUS_REFER;
+	}
+	// compelling => high impact
+	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING] || dispoField === dispoShortNames[consultFields.DISPOSITIONS_IMMIGRATION])) {
+		return consultFields.STATUS_POSSIBLE_IMPACT;
+	}
+	if (!statusField && dispoField === dispoShortNames[consultFields.DISPOSITIONS_NO_FURTHER]) {
+		return 'Nothing Further';
+	}
+	// no further action
+	return object[consultFields.STATUS];
+}
+
+/** DISPOSITIONS */
 
 // given consultations as an object, return object with only referral-eligible consultations
 const filterEligibleConsultations = consultations => {
@@ -56,6 +81,15 @@ const getDispoShortNames = dispos => {
 	return [];
 }
 
+// given a dispostion short name, get the long name that can be saved to Airtable
+const getDispoLongNames = (shortName) => {
+	let name = shortName
+	for (const key in dispoShortNames) {
+		if (dispoShortNames[key] === shortName) name = key
+	}
+	return name
+}
+
 const hotlineDispositions = [
 	'No answer',
 	'Sent follow-up email',
@@ -70,27 +104,6 @@ const getHotlineDispoOptions = () => {
 		return { value: dispo, text: dispo }
 	})
 	return options
-}
-
-// given a fields object with a long-name Disposition
-// and given a, sometimes empty, Status
-// return non-empty Status
-const getStatusForEmptyShortName = object => {
-	const statusField = object[consultFields.STATUS];
-	const dispoField = dispoShortNames[object[consultFields.DISPOSITIONS]];
-	// fee-base or pro-bono => reference needed
-	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_FEE_BASED] || dispoField === dispoShortNames[consultFields.DISPOSITIONS_PRO_BONO])) {
-		return consultFields.STATUS_REFER;
-	}
-	// compelling => high impact
-	if (!statusField && (dispoField === dispoShortNames[consultFields.DISPOSITIONS_COMPELLING] || dispoField === dispoShortNames[consultFields.DISPOSITIONS_IMMIGRATION])) {
-		return consultFields.STATUS_POSSIBLE_IMPACT;
-	}
-	if (!statusField && dispoField === dispoShortNames[consultFields.DISPOSITIONS_NO_FURTHER]) {
-		return 'Nothing Further';
-	}
-	// no further action
-	return object[consultFields.STATUS];
 }
 
 // given an array of Dispostion short names, get antd Tag components
@@ -140,6 +153,7 @@ export {
 	filterEligibleConsultations,
 	dispoShortNames,
 	getDispoShortNames,
+	getDispoLongNames,
 	getHotlineDispoOptions,
 	getStatusForEmptyShortName,
 	getDispoTagsFromShortNames,

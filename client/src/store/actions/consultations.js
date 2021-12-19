@@ -5,7 +5,8 @@ import { TABLE } from '../../data/consultationData';
 
 // async action creators
 
-export const getConsultations = () => {
+// TODO: don't limit to view: _Consultations
+const getConsultations = () => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			// let consultations = [];
@@ -42,7 +43,7 @@ export const getConsultations = () => {
 	}
 }
 
-export const createConsultation = submitFields => {
+const createConsultation = submitFields => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			airtableBase(TABLE).create([{
@@ -70,7 +71,7 @@ export const createConsultation = submitFields => {
 }
 
 // takes an oject: { key, fields }
-export const updateConsultation = updateObject => {
+const updateConsultation = (updateObject) => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			let newConsultation = {};
@@ -96,18 +97,51 @@ export const updateConsultation = updateObject => {
 	}
 }
 
+const deleteConsultation = (id) => {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			airtableBase(TABLE).destroy(id,
+				function (error, deletedRecord) {
+					if (error) {
+						console.log('Airtable Error:', error);
+						return reject({
+							status: 'failed',
+							error,
+						});
+					}
+					// console.log('Deleted record', deletedRecord.id)
+					return resolve({
+						status: 'success',
+						type: 'deletedConsultation',
+						payload: deletedRecord,
+					})
+				})
+		});
+	}
+}
+
 // sync action creators
 
-export const initConsultations = consultations => {
+const initConsultations = consultations => {
 	return {
 		type: actionTypes.INIT_CONSULTATIONS,
 		consultations
 	}
 }
 
-export const consultationUpdated = consultation => {
+const consultationUpdated = consultation => {
 	return {
 		type: actionTypes.CONSULTATION_UPDATED,
 		consultation
 	}
+}
+
+export {
+	getConsultations,
+	createConsultation,
+	updateConsultation,
+	deleteConsultation,
+	// init action creators
+	initConsultations,
+	consultationUpdated,
 }

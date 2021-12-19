@@ -34,6 +34,7 @@ const PreviousInquiries = ({
 	// from context:
 	consultations,
 	updateConsultation,
+	deleteConsultation,
 	lawyers,
 	lawTypes,
 }) => {
@@ -60,30 +61,6 @@ const PreviousInquiries = ({
 		setIsLoading(false)
 	}
 
-	// update consultFields.DISPOSITIONS
-	const updateLastResponse = tableRow => {
-		// (1) update table
-		const newData = [...dataSource]
-		const index = newData.findIndex(item => tableRow.key === item.key)
-		const item = newData[index]
-		newData.splice(index, 1, {
-			...item,
-			...tableRow,
-		})
-		setDataSource(newData)
-
-		// (2) update db >> (3) update redux state
-		const updateObject = {
-			id: tableRow.key,
-			// field put inside an array to update
-			fields: {
-				[consultFields.DISPOSITIONS]: [tableRow[consultFields.DISPOSITIONS]],
-			}
-		}
-
-		updateConsultation(updateObject)
-	}
-
 	// check that the dataSource not set more than once for same visitor
 	if (inquiries?.length > 0) {
 		const _consultIds = inquiries.map(consult => consult.key)
@@ -103,13 +80,17 @@ const PreviousInquiries = ({
 	}
 
 	return <PreviousTable
-	title="Previous Inquiries"
+		title="Previous Inquiries"
 		columns={columns}
 		dataSource={dataSource}
 		options={getHotlineDispoOptions()}
 		expandedRowRender={inquirerContactedList}
 		isLoading={isLoading}
-		handleSave={updateLastResponse}
+
+		// send only if need to create, update, delete rows
+		updateConsultation={updateConsultation}
+		deleteConsultation={deleteConsultation}
+		setDataSource={setDataSource}
 	/>
 }
 
