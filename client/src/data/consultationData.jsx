@@ -99,6 +99,7 @@ const hotlineDispositions = [
 	'Referred',
 ]
 
+// options for antd table editable cell
 const getHotlineDispoOptions = () => {
 	const options = hotlineDispositions.map((dispo) => {
 		return { value: dispo, text: dispo }
@@ -147,16 +148,30 @@ const getDispoTag = (dispo, returnShortName = false) => {
 	);
 }
 
+
+/** TYPES */
+
+const hotlineTypes = [
+	consultFields.TYPE_PHONE,
+	consultFields.TYPE_EMAIL,
+	consultFields.TYPE_ONLINE,
+]
+
 export {
 	TABLE,
+	// status
 	statuses,
+	// dispositions
 	filterEligibleConsultations,
 	dispoShortNames,
 	getDispoShortNames,
 	getDispoLongNames,
+	hotlineDispositions,
 	getHotlineDispoOptions,
 	getStatusForEmptyShortName,
 	getDispoTagsFromShortNames,
 	getDispoTags,
 	getDispoTag,
+	// types
+	hotlineTypes,
 }

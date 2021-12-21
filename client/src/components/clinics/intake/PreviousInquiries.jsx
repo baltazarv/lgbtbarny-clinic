@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import PreviousTable from '../shared/PreviousTable'
 import HelplineList from '../HelplineList'
 // data
@@ -16,13 +17,13 @@ const columns = [
 		key: 'date',
 	},
 	{
-		title: 'Contact type',
+		title: 'Inquiry type',
 		dataIndex: consultFields.TYPE,
 		key: consultFields.TYPE,
 		responsive: ['md'],
 	},
 	{
-		title: 'Last response',
+		title: 'Disposition',
 		dataIndex: [consultFields.DISPOSITIONS],
 		key: 'dispos',
 		editable: true,
@@ -31,17 +32,21 @@ const columns = [
 
 const PreviousInquiries = ({
 	inquiries,
-	// from context:
-	consultations,
+	inquirer,
+
+	// TODO: get from redux actions
+	createConsultation,
 	updateConsultation,
 	deleteConsultation,
-	lawyers,
-	lawTypes,
 }) => {
 	const [isLoading, setIsLoading] = useState(true)
 	const [dataSource, setDataSource] = useState([])
 	// to not set dataSource more than once for same visitor
 	const [consultIds, setConsultIds] = useState([])
+	// redux reducers
+	const consultations = useSelector((state) => state.consultations.consultations)
+	const lawyers = useSelector((state) => state.people.lawyersObject)
+	const lawTypes = useSelector((state) => state.lawTypes.lawTypesObject)
 
 	const formatDataSource = (_selectedConsultations) => {
 		const _dataSource = _selectedConsultations.reduce((acc, cur) => {
@@ -88,6 +93,8 @@ const PreviousInquiries = ({
 		isLoading={isLoading}
 
 		// send only if need to create, update, delete rows
+		inquirer={inquirer}
+		createConsultation={createConsultation}
 		updateConsultation={updateConsultation}
 		deleteConsultation={deleteConsultation}
 		setDataSource={setDataSource}

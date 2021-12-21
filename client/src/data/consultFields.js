@@ -2,11 +2,13 @@
 export const CREATED_ON = 'Created On'
 export const NAME = 'Name' // calc field
 export const DATETIME = 'DateTime'
-export const LAWYERS = 'Lawyer' // array
-export const INQUIRERS = 'Inquirer' // array
+export const INQUIRERS = 'Inquirer' // (array)
 export const SITUATION = 'Inquirer\'s Situation'
 
-// clinic type
+// table link to "_Lawyers"
+export const LAWYERS = 'Lawyer' // or coordinator (array)
+
+// clinic/inquiry type
 export const TYPE = 'Type'
 export const TYPE_CLINIC = 'Clinic'
 export const TYPE_PHONE = 'Helpline'
@@ -14,13 +16,13 @@ export const TYPE_EMAIL = 'Email'
 export const TYPE_ONLINE = 'Website'
 
 // clinic name
-export const CLINIC_NAME = 'Clinic Name' // also type of helpline contact, eg, "Phone", "Online", "Email"
+export const CLINIC_NAME = 'Clinic Name' // empty for hotline
 export const CLINIC_TNC = 'Tuesday Night Clinic'
 export const CLINIC_NJ = 'New Jersey Clinic'
 export const CLINIC_YOUTH = 'Youth Qlinic'
 
 // dispositions
-export const DISPOSITIONS = 'Disposition' // array 
+export const DISPOSITIONS = 'Disposition' // (array) 
 export const DISPOSITIONS_NO_FURTHER = 'No further action required or available. Info/counsel provided.'
 export const DISPOSITIONS_FEE_BASED = 'Fee-based - Lawyer Referral Network (LRN) - limited availability'
 export const DISPOSITIONS_PRO_BONO = 'Pro Bono Panel (PBP) - VERY limited availability!'
@@ -34,7 +36,7 @@ export const DISPO_SPOKEN = 'Spoke with inquirer'
 export const DISPO_WILL_VISIT = 'Plans to attend Clinic'
 export const DISPO_REFERRED = 'Referred'
 
-export const LAW_TYPES = 'Type Of Law'; // array
+export const LAW_TYPES = 'Type Of Law'; // (array)
 export const REF_SUMMARY = 'Referral Summary';
 
 // status

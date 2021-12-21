@@ -11,8 +11,11 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons'
 import EditableTable from '../../table/EditableTable'
+import FormModal from '../../modals/FormModal'
+import AddUpdateInquiry from '../intake/AddUpdateInquiry'
 // constants
 import * as consultFields from '../../../data/consultFields'
+import * as peopleFields from '../../../data/peopleFields'
 import { getDispoLongNames } from '../../../data/consultationData'
 
 const PreviousTable = ({
@@ -24,11 +27,16 @@ const PreviousTable = ({
   expandedRowRender,
   isLoading,
 
+  // create, update, delete
+  inquirer,
+  createConsultation,
   updateConsultation,
   deleteConsultation,
   setDataSource,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [rowModalIsOpen, setRowModalIsOpen] = useState(false)
+  const [rowModalKey, setRowModalKey] = useState(null)
 
   // update consultFields.DISPOSITIONS or consultFields.STATUS
   const updateField = (tableRow) => {
@@ -67,12 +75,14 @@ const PreviousTable = ({
     updateConsultation(updateObject)
   }
 
-  const addRow = () => {
-    console.log('addRow')
+  const openAddRowModal = () => {
+    setRowModalKey(null)
+    setRowModalIsOpen(true)
   }
 
-  const updateRow = (key) => {
-    console.log('updateRow', key)
+  const openUpdateRowModal = (key) => {
+    setRowModalKey(key)
+    setRowModalIsOpen(true)
   }
 
   const deleteRow = async (key) => {
@@ -101,7 +111,7 @@ const PreviousTable = ({
               type="primary"
               className="edit-btn mr-2 mb-2 mb-md-0"
               ghost
-              onClick={() => updateRow(record.key)}
+              onClick={() => openUpdateRowModal(record.key)}
               size="small"
               icon={<EditOutlined />}
             />
@@ -120,7 +130,6 @@ const PreviousTable = ({
                 type="danger"
                 className="delete-btn"
                 ghost
-                // onClick={addRow}
                 size="small"
                 icon={<DeleteOutlined />}
               />
@@ -135,37 +144,50 @@ const PreviousTable = ({
 
   return <>
     {dataSource.length > 0 &&
-      <CardStyled
-        className={`card p-3 mb-3${isCollapsed ? ' collapsed' : ' expanded'}`}
-      >
-        <Card.Body className="p-0">
-          <Card.Title
-            onClick={() => setIsCollapsed((state) => !state)}
-            className="d-flex justify-content-center align-items-center h5 mb-1"
-          >{title} {isCollapsed ? <DownOutlined className="ml-2" /> : <UpOutlined className="ml-2" />}</Card.Title>
-          {/* should not use Card.Text b/c puts table in a <p> tag, which cause error/warnings */}
-          <div className="card-text">{/* Card.Text */}
-            {info}
-            <EditableTable
-              loading={isLoading}
-              dataSource={dataSource}
-              columns={columns}
-              options={options}
-              handleSave={updateField}
-              expandedRowRender={expandedRowRender}
-            />
-          </div>
-          {addRow &&
-            <Button
-              type="primary"
-              className="add-btn m-3"
-              onClick={addRow}
-              size="small"
-              icon={<PlusOutlined />}
-            />
-          }
-        </Card.Body>
-      </CardStyled>
+      <>
+        <CardStyled
+          className={`card p-3 mb-3${isCollapsed ? ' collapsed' : ' expanded'}`}
+        >
+          <Card.Body className="p-0">
+            <Card.Title
+              onClick={() => setIsCollapsed((state) => !state)}
+              className="d-flex justify-content-center align-items-center h5 mb-1"
+            >{title} {isCollapsed ? <DownOutlined className="ml-2" /> : <UpOutlined className="ml-2" />}</Card.Title>
+            {/* should not use Card.Text b/c puts table in a <p> tag, which cause error/warnings */}
+            <div className="card-text">{/* Card.Text */}
+              {info}
+              <EditableTable
+                loading={isLoading}
+                dataSource={dataSource}
+                columns={columns}
+                options={options}
+                handleSave={updateField}
+                expandedRowRender={expandedRowRender}
+              />
+            </div>
+            {createConsultation &&
+              <Button
+                type="primary"
+                className="add-btn m-3"
+                onClick={openAddRowModal}
+                size="small"
+                icon={<PlusOutlined />}
+              />
+            }
+          </Card.Body>
+        </CardStyled>
+        <FormModal
+          show={rowModalIsOpen}
+          onHide={() => setRowModalIsOpen(false)}
+          header={`${rowModalKey ? 'Update Inquiry' : 'Add Inquiry'}${inquirer ? ' from' : ''}${inquirer?.[peopleFields.FIRST_NAME] ? ' ' + inquirer[peopleFields.FIRST_NAME] : ''}${inquirer?.[peopleFields.LAST_NAME] ? ' ' + inquirer[peopleFields.LAST_NAME] : ''}`}
+          body={<AddUpdateInquiry
+            id={rowModalKey}
+            onHide={() => setRowModalIsOpen(false)}
+            isSubmitting={isLoading}
+          />}
+          size="lg"
+        />
+      </>
     }
   </>
 }

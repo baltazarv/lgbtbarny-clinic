@@ -32,12 +32,12 @@ const HelplineList = props => {
 			value: consultLawyers,
 		},
 		{
-			title: "Notes", // Inquirer's Situation
-			value: inquiry[consultFields.SITUATION] ? inquiry[consultFields.SITUATION] : "No notes taken.",
-		},
-		{
 			title: "Legal issue(s)", // Type Of Law
 			value: getLawTypes(inquiry[consultFields.LAW_TYPES], lawTypes),
+		},
+		{
+			title: "Notes", // Inquirer's Situation
+			value: inquiry[consultFields.SITUATION] ? inquiry[consultFields.SITUATION] : "No notes taken.",
 		},
 	]
 

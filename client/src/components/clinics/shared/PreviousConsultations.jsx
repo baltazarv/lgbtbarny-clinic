@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import PreviousTable from './PreviousTable'
 import ConsultationList from '../ConsultationList'
 // data
@@ -40,15 +41,16 @@ const columns = [
 
 const PreviousConsultations = ({
 	visitorConsultations,
-	consultations,
-	lawyers,
-	lawTypes,
 }) => {
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataSource, setDataSource] = useState([]);
 	// to not set dataSource more than once for same visitor
 	const [consultIds, setConsultIds] = useState([]);
+	// redux reducers
+	const consultations = useSelector((state) => state.consultations.consultations)
+	const lawyers = useSelector((state) => state.people.lawyersObject)
+	const lawTypes = useSelector((state) => state.lawTypes.lawTypesObject)
 
 	// set the fields for the table
 	const formatDataSource = (_selectedConsultations) => {

@@ -1,9 +1,14 @@
 // TODO: move to ./peopleData.js
 // AirTable table, table view, and field names
 export const REPEAT_VISIT = 'Repeat Visit?';
-export const TYPE = 'Type';
 // export const HOW_FOUND = 'How Found Clinic';
 export const DATETIME = 'Inquirer DateTime';
+
+// types
+export const TYPE = 'Type'
+export const TYPE_LAWYER = 'Lawyer'
+export const TYPE_COORDINATOR = 'Clinic Coordinator'
+export const TYPE_INQUIRER = 'Inquirer'
 
 // clinic name
 export const CLINIC_NAME = 'Clinic Name';

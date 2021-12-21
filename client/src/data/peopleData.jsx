@@ -1,3 +1,5 @@
+// TODO: rename as .js vs .jsx
+
 import React from 'react';
 import { Select as AntSelect } from 'antd';
 // TODO: move vars from ./peopleFields into this file
@@ -7,7 +9,6 @@ import { objectIsEmpty } from '../utils';
 
 export const PEOPLE_TABLE = 'People';
 export const INQUIRERS_VIEW = '_Inquirers';
-export const LAWYERS_VIEW = '_Lawyers';
 
 const { Option } = AntSelect;
 

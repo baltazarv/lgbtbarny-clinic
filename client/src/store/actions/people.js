@@ -4,7 +4,6 @@ import * as peopleFields from '../../data/peopleFields'; //
 import {
 	PEOPLE_TABLE,
 	INQUIRERS_VIEW,
-	LAWYERS_VIEW
 } from '../../data/peopleData';
 import {
 	recordForUpdate
@@ -12,24 +11,30 @@ import {
 
 // async action creators
 
-export const getLawyers = () => {
+// lawyers and coordinators
+const getLawyers = () => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			// TO DO: remove array
 			let lawyersArray = [];
 			let lawyersObject = {};
 			airtableBase(PEOPLE_TABLE).select({
-				view: LAWYERS_VIEW,
+				// view: LAWYERS_VIEW,
 				// filterByFormula: 'Type = ...', // array
 			}).eachPage(function page(records, fetchNextPage) {
 				records.forEach(record => {
 					// array
 					const _record = record.fields;
-					_record.id = record.id;
-					lawyersArray.push(_record);
+					if (
+						_record?.[peopleFields.TYPE]?.includes(peopleFields.TYPE_LAWYER) ||
+						_record?.[peopleFields.TYPE]?.includes(peopleFields.TYPE_COORDINATOR)
+					) {
+						_record.id = record.id
+						lawyersArray.push(_record)
+						// object
+						lawyersObject[record.id] = record.fields
+					}
 
-					// object
-					lawyersObject[record.id] = record.fields;
 				});
 				fetchNextPage(); // next 100
 			}, function done(error) {
@@ -53,7 +58,7 @@ export const getLawyers = () => {
 	}
 }
 
-export const createLawyer = lawyer => {
+const createLawyer = lawyer => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			let payload = {
@@ -85,7 +90,7 @@ export const createLawyer = lawyer => {
 	}
 }
 
-export const getInquirers = () => {
+const getInquirers = () => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			let inquirersArray = [];
@@ -124,7 +129,7 @@ export const getInquirers = () => {
 	}
 }
 
-export const createInquirer = inquirer => {
+const createInquirer = inquirer => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			let payload = {
@@ -157,7 +162,7 @@ export const createInquirer = inquirer => {
 	}
 }
 
-export const updateInquirer = info => {
+const updateInquirer = info => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			let payload = recordForUpdate(info);
@@ -188,7 +193,7 @@ export const updateInquirer = info => {
 
 // sync action creators
 
-export const initLawyers = lawyers => {
+const initLawyers = lawyers => {
 	return {
 		type: actionTypes.INIT_LAWYERS,
 		// array with array & object
@@ -196,7 +201,7 @@ export const initLawyers = lawyers => {
 	}
 }
 
-export const addLawyer = lawyer => {
+const addLawyer = lawyer => {
 	return {
 		type: actionTypes.ADD_LAWYER,
 		lawyer
@@ -204,14 +209,14 @@ export const addLawyer = lawyer => {
 }
 
 // TO DO: inquirers object only
-export const initInquirers = (inquirers) => {
+const initInquirers = (inquirers) => {
 	return {
 		type: actionTypes.INIT_INQUIRERS,
 		inquirers,
 	}
 }
 
-export const addInquirer = inquirer => {
+const addInquirer = inquirer => {
 	return {
 		type: actionTypes.ADD_INQUIRER,
 		inquirer
@@ -219,9 +224,25 @@ export const addInquirer = inquirer => {
 }
 
 // take updated inquirer and replace with new info
-export const updateInquirers = inquirer => {
+const updateInquirers = inquirer => {
 	return {
 		type: actionTypes.UPDATE_INQUIRERS,
 		inquirer
 	}
+}
+
+export {
+	// async action creators
+	getLawyers,
+	createLawyer,
+	getInquirers,
+	createInquirer,
+	updateInquirer,
+
+	// sync action creators
+	initLawyers,
+	addLawyer,
+	initInquirers,
+	addInquirer,
+	updateInquirers,
 }

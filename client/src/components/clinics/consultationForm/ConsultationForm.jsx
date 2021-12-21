@@ -24,8 +24,8 @@ import { objectIsEmpty, isoToStandardDate } from '../../../utils';
 // b/c validate function needs to be outside class, this flag cannot be in the local class state
 let isReferralDispositionChecked = false;
 
-const validate = values => {
-	const errors = {};
+const validate = (values) => {
+	const errors = {}
 	if (values[consultFields.LAWYERS].length < 1) {
 		errors[consultFields.LAWYERS] = 'Select yourself as lawyer.'
 	}
@@ -47,7 +47,7 @@ const validate = values => {
 	}
 
 	// console.log('values', values, 'errors', errors)
-	return errors;
+	return errors
 }
 
 const handleSubmit = (values, actions) => {

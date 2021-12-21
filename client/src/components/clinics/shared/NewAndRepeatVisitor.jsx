@@ -1,6 +1,3 @@
-// TODO: move to /intake/
-// TODO: move to Intake?
-
 /** 
  * Intake component that switches between new contact form or a select field to choose repeat visitor/contact
  * 
@@ -9,7 +6,8 @@
  *  |_ PreviousConsultations
  *  |_ ClinicAddVisitor (clinic) or HelplineAddInquirer (hotline)
  * */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { connect } from 'react-redux';
 import { Form, Row, Col, Card } from 'react-bootstrap';
 import VisitorSelect from '../intake/VisitorSelect';
@@ -27,20 +25,15 @@ const NewAndRepeatVisitor = ({
 	// from parent
 	clinic,
 	isHotline,
+	onSubmit,
 
-	// passed from redux:
+	// reedux actions:
 	createInquirer,
 	updateInquirer,
+	createConsultation,
 	updateConsultation,
 	deleteConsultation,
 	refreshInquirers,
-	lawyersObject,
-	lawTypesObject,
-
-	// passed from context?
-	inquirersObject,
-	consultations,
-	onSubmit,
 }) => {
 
 	// shows or hides repeatVisitorSelect
@@ -49,13 +42,10 @@ const NewAndRepeatVisitor = ({
 	const [serverResponse, setServerResponse] = useState({ status: 'pending' });
 	const [repeatSelectIsRefreshing, setRepeatSelectIsRefreshing] = useState(false);
 	const [repeatSelectPlaceholder, setRepeatSelectPlaceholder] = useState('Select...');
-
-	// default checked at init
-	// TODO: check if works
-	// useEffect(() => {
-	// 	setIsRepeat(isHotline)
-	// }, [])
-
+	// redux reducers
+	const lawTypesObject = useSelector((state) => state.lawTypes.lawTypesObject)
+	const inquirersObject = useSelector((state) => state.people.inquirersObject)
+	const consultations = useSelector((state) => state.consultations.consultations)
 
 	useEffect(() => {
 		if (isRepeat) setRepeatVisitorId('')
@@ -146,12 +136,10 @@ const NewAndRepeatVisitor = ({
 		if (inquiries?.length > 0) {
 			return <PreviousInquiries
 				inquiries={inquiries}
-				inquirers={inquirersObject}
-				consultations={consultations}
+				inquirer={getRepeatVisitor()}
+				createConsultation={createConsultation}
 				updateConsultation={updateConsultation}
 				deleteConsultation={deleteConsultation}
-				lawyers={lawyersObject}
-				lawTypes={lawTypesObject}
 			/>
 		} else {
 			return <Card className="mb-3 text-center">
@@ -177,11 +165,8 @@ const NewAndRepeatVisitor = ({
 		if (visitorConsultations) {
 			return <PreviousConsultations
 				visitorConsultations={visitorConsultations}
-				consultations={consultations}
 				updateConsultation={updateConsultation}
 				deleteConsultation={deleteConsultation}
-				lawyers={lawyersObject}
-				lawTypes={lawTypesObject}
 			/>
 		} else {
 			return <Card className="mb-3 text-center">
@@ -267,25 +252,17 @@ const NewAndRepeatVisitor = ({
 	)
 }
 
-const mapStateToProps = state => {
-	return {
-		inquirers: state.people.inquirers,
-		inquirersObject: state.people.inquirersObject,
-		consultations: state.consultations.consultations,
-		lawyersObject: state.people.lawyersObject,
-		lawTypes: state.lawTypes.lawTypes,
-		lawTypesObject: state.lawTypes.lawTypesObject,
-	}
-}
+// TODO: useDispatch hook instead
 const mapDispatchToProps = dispatch => {
 	return {
 		// call from parent Clinics?
 		createInquirer: (inq) => dispatch(actions.createInquirer(inq)),
 		updateInquirer: (inqValues) => dispatch(actions.updateInquirer(inqValues)),
+		createConsultation: (values) => dispatch(actions.createConsultation(values)),
 		updateConsultation: (updateObject) => dispatch(actions.updateConsultation(updateObject)),
 		deleteConsultation: (key) => dispatch(actions.deleteConsultation(key)),
 		refreshInquirers: () => dispatch(actions.getInquirers()),
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewAndRepeatVisitor);
+export default connect(null, mapDispatchToProps)(NewAndRepeatVisitor);

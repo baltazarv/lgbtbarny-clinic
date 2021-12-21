@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-const ModalForForms = props => {
+const FormModal = props => {
 	const { show, onHide, header, body, size="md" } = props;
 	return (
 		<Modal
@@ -34,4 +34,4 @@ const ModalForForms = props => {
 	)
 }
 
-export default ModalForForms;
+export default FormModal;

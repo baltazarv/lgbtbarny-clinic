@@ -24,6 +24,7 @@ const Select = ({
 
 	// optional
 	label,
+	className = "mb-0",
 	// for asterisk
 	required,
 	mode = '', // multiple, tags
@@ -56,7 +57,7 @@ const Select = ({
 
 	return (
 		<>
-			<Form.Group as={Row} controlId={name} className="mb-0">
+			<Form.Group as={Row} controlId={name} className={className}>
 				{formLabel}
 				<Col sm={inputCols}>
 					{infoTxt}
@@ -72,13 +73,14 @@ const Select = ({
 						onBlur={onBlur}
 						optionFilterProp="children"
 						allowClear={true}
-					// autoFocus={true}
+						// autoFocus={true}
+						className="mt-1" // help vert alignment
 					>
 						{options}
 					</AntSelect>
+					{touched && <InputFeedback error={error} />}
 				</Col>
 			</Form.Group>
-			{touched && <InputFeedback error={error} />}
 		</>
 	)
 }
