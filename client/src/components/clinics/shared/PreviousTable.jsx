@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { Card } from 'react-bootstrap'
 import { Button, Popconfirm } from 'antd'
@@ -17,6 +18,11 @@ import AddUpdateInquiry from '../intake/AddUpdateInquiry'
 import * as consultFields from '../../../data/consultFields'
 import * as peopleFields from '../../../data/peopleFields'
 import { getDispoLongNames } from '../../../data/consultationData'
+import {
+  updateConsultation,
+  deleteConsultation,
+  consultationDeleted,
+} from '../../../store/actions'
 
 const PreviousTable = ({
   title,
@@ -28,29 +34,16 @@ const PreviousTable = ({
   isLoading,
 
   // create, update, delete
+  hasActions,
   inquirer,
-  createConsultation,
-  updateConsultation,
-  deleteConsultation,
-  setDataSource,
 }) => {
+  const dispatch = useDispatch()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [rowModalIsOpen, setRowModalIsOpen] = useState(false)
   const [rowModalKey, setRowModalKey] = useState(null)
 
   // update consultFields.DISPOSITIONS or consultFields.STATUS
   const updateField = (tableRow) => {
-    // (1) update table
-    const newData = [...dataSource]
-    const index = newData.findIndex(item => tableRow.key === item.key)
-    const item = newData[index]
-    newData.splice(index, 1, {
-      ...item,
-      ...tableRow,
-    })
-    setDataSource(newData)
-
-    // (2) update db >> (3) update redux state
     let fields = {}
     // update disposition/"last response"
     if (tableRow[consultFields.DISPOSITIONS]) {
@@ -72,7 +65,8 @@ const PreviousTable = ({
       fields,
     }
 
-    updateConsultation(updateObject)
+    dispatch(updateConsultation(updateObject))
+    //-> dispatch(consultationUpdated(newConsultation))
   }
 
   const openAddRowModal = () => {
@@ -86,20 +80,18 @@ const PreviousTable = ({
   }
 
   const deleteRow = async (key) => {
-    const res = await deleteConsultation(key)
-    // remove from local state
+    const res = await dispatch(deleteConsultation(key))
     if (res.status === 'success') {
-      const deletedRecord = res.payload
-      let data = dataSource.reduce((acc, row) => {
-        if (row.key !== deletedRecord.id) acc.push(row)
-        return acc
-      }, [])
-      setDataSource(data)
+      // remove from consultations local object
+      // ...not removing from inquriers local object
+      dispatch(consultationDeleted(res.payload.id))
     }
   }
 
-  // show create, update, and delete buttons if parent sends those CRUD operations
-  if (columns?.length && updateConsultation && deleteConsultation && setDataSource) {
+  /** RENDERER */
+
+  // show create, update, and delete buttons
+  if (hasActions && columns?.length) {
     columns = [...columns]
     columns.push({
       title: 'actions',
@@ -117,11 +109,9 @@ const PreviousTable = ({
             />
             <Popconfirm
               title="Delete record?"
-              // title={null}
               icon={<ExclamationCircleOutlined
                 style={{ color: 'red' }}
               />}
-              // icon={null}
               okType="danger"
               okText="Delete"
               onConfirm={() => deleteRow(record.key)}
@@ -165,7 +155,7 @@ const PreviousTable = ({
                 expandedRowRender={expandedRowRender}
               />
             </div>
-            {createConsultation &&
+            {hasActions &&
               <Button
                 type="primary"
                 className="add-btn m-3"
@@ -181,7 +171,8 @@ const PreviousTable = ({
           onHide={() => setRowModalIsOpen(false)}
           header={`${rowModalKey ? 'Update Inquiry' : 'Add Inquiry'}${inquirer ? ' from' : ''}${inquirer?.[peopleFields.FIRST_NAME] ? ' ' + inquirer[peopleFields.FIRST_NAME] : ''}${inquirer?.[peopleFields.LAST_NAME] ? ' ' + inquirer[peopleFields.LAST_NAME] : ''}`}
           body={<AddUpdateInquiry
-            id={rowModalKey}
+            id={rowModalKey} // need to send?
+            inquirer={inquirer}
             onHide={() => setRowModalIsOpen(false)}
             isSubmitting={isLoading}
           />}

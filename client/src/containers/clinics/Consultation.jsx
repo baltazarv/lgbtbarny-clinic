@@ -61,49 +61,47 @@ class Consultation extends Component {
 			 **/
 			let payload = {};
 			Object.keys(values).forEach(key => {
-				const value = values[key];
+				const value = values[key]
 				if (Array.isArray(value)) {
 					// convert objects array into array id strings
 					payload[key] = value.map(item => {
-						return item;
-					});
+						return item
+					})
 				} else if (key === consultFields.DISPOSITIONS) {
 					// radio buttons on UI, but multiple select on AirTable -- may make match
-					payload[key] = [value];
+					payload[key] = [value]
 				} else {
-					payload[key] = value;
+					payload[key] = value
 				}
 			})
 
 			// set as type 'Clinic'
-			payload[consultFields.TYPE] = consultFields.TYPE_CLINIC;
+			payload[consultFields.TYPE] = consultFields.TYPE_CLINIC
 
-			// // set old date field -
-			// payload[consultFields.DATE] = new Date().toISOString().substr(0, 10);
 			// set new datetime stamp
-			payload[consultFields.DATETIME] = new Date();
+			payload[consultFields.DATETIME] = new Date()
 
 			// set clinic
-			let clinicValue = consultFields.CLINIC_TNC;
-			if (this.props.clinic === 'nj') clinicValue = consultFields.CLINIC_NJ;
-			if (this.props.clinic === 'youth') clinicValue = consultFields.CLINIC_YOUTH;
-			payload[consultFields.CLINIC_NAME] = clinicValue;
+			let clinicValue = consultFields.CLINIC_TNC
+			if (this.props.clinic === 'nj') clinicValue = consultFields.CLINIC_NJ
+			if (this.props.clinic === 'youth') clinicValue = consultFields.CLINIC_YOUTH
+			payload[consultFields.CLINIC_NAME] = clinicValue
 
 			// add custom email text
-			payload[consultFields.EMAIL_TEXT_SENT] = this.state.customEmailText;
+			payload[consultFields.EMAIL_TEXT_SENT] = this.state.customEmailText
 
 			// reset same lawyer after submission
-			const selectedLawyers = values[consultFields.LAWYERS];
+			const selectedLawyers = values[consultFields.LAWYERS]
 
-			const serverResponse = await this.props.createConsultation(payload);
+			const serverResponse = await this.props.createConsultation(payload)
 			if (serverResponse.status === 'success' && serverResponse.type === 'createConsultation') {
 
 				// ConsultationForm
-				resetForm();
-				setFieldValue(consultFields.LAWYERS, selectedLawyers);
+				resetForm()
+				setFieldValue(consultFields.LAWYERS, selectedLawyers)
 
-				this.sendEmail(); // should return promise?
-				if (this.state.resetEmailEditor) this.state.resetEmailEditor();
+				this.sendEmail() // should return promise?
+				if (this.state.resetEmailEditor) this.state.resetEmailEditor()
 
 				this.setState({
 					serverResponse,
@@ -112,7 +110,7 @@ class Consultation extends Component {
 			}
 
 		} catch (err) {
-			console.log(err)
+      console.log('submitConsultation error', err)
 		}
 	}
 

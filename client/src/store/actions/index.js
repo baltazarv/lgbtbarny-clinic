@@ -11,8 +11,12 @@ export {
 } from './lawtypes';
 
 export {
+	// async action creators
 	getConsultations,
 	createConsultation,
 	updateConsultation,
 	deleteConsultation,
+	// sync action creators
+	consultationCreated,
+	consultationDeleted,
 } from './consultations';

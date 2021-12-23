@@ -2,11 +2,11 @@
 export const CREATED_ON = 'Created On'
 export const NAME = 'Name' // calc field
 export const DATETIME = 'DateTime'
-export const INQUIRERS = 'Inquirer' // (array)
 export const SITUATION = 'Inquirer\'s Situation'
 
-// table link to "_Lawyers"
-export const LAWYERS = 'Lawyer' // or coordinator (array)
+export const INQUIRERS = 'Inquirer' // (array)
+export const LAWYERS = 'Lawyer' // (array)
+export const COORDINATOR = 'Clinic Coordinator' // (array)
 
 // clinic/inquiry type
 export const TYPE = 'Type'
@@ -48,5 +48,6 @@ export const STATUS_REFERRAL_PICKED_UP = 'Referral Picked Up';
 export const STATUS_REFERRAL_NOT_PICKED_UP = 'Referral Not Picked Up';
 export const STATUS_POSSIBLE_IMPACT = 'Possible Impact';
 export const STATUS_IMPACT_CONSIDERED = 'Impact Considered';
+export const STATUS_HOTLINE = 'Hotline'
 
 export const EMAIL_TEXT_SENT = 'Custom Message Emailed';

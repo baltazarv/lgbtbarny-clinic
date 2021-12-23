@@ -7,8 +7,7 @@
  *  |_ ClinicAddVisitor (clinic) or HelplineAddInquirer (hotline)
  * */
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux'
 import { Form, Row, Col, Card } from 'react-bootstrap';
 import VisitorSelect from '../intake/VisitorSelect';
 import PreviousConsultations from './PreviousConsultations'
@@ -19,23 +18,19 @@ import HelplineAddInquirer from '../intake/HelplineAddInquirer'
 import * as peopleFields from '../../../data/peopleFields'
 import * as consultFields from '../../../data/consultFields'
 import { getOptionsForPeople, formatName } from '../../../data/peopleData';
-import * as actions from '../../../store/actions';
+import {
+	getInquirers,
+	createInquirer,
+	updateInquirer,
+} from '../../../store/actions';
 
 const NewAndRepeatVisitor = ({
 	// from parent
 	clinic,
 	isHotline,
 	onSubmit,
-
-	// reedux actions:
-	createInquirer,
-	updateInquirer,
-	createConsultation,
-	updateConsultation,
-	deleteConsultation,
-	refreshInquirers,
 }) => {
-
+	const dispatch = useDispatch()
 	// shows or hides repeatVisitorSelect
 	const [isRepeat, setIsRepeat] = useState(false);
 	const [repeatVisitorId, setRepeatVisitorId] = useState('');
@@ -53,7 +48,7 @@ const NewAndRepeatVisitor = ({
 
 	const submitCreateInquirer = async (values, resetForm) => {
 		let payload = { ...values };
-		const _serverResponse = await createInquirer(payload);
+		const _serverResponse = await dispatch(createInquirer(payload));
 		setServerResponse(_serverResponse);
 		if (_serverResponse.status === 'success' && (_serverResponse.type === 'createInquirer')) {
 			resetForm();
@@ -63,7 +58,7 @@ const NewAndRepeatVisitor = ({
 
 	const submitUpdateInquirer = async (values) => {
 		let payload = { ...values };
-		const _serverResponse = await updateInquirer(payload);
+		const _serverResponse = await dispatch(updateInquirer(payload))
 		setServerResponse(_serverResponse);
 		if (_serverResponse.status === 'success' && _serverResponse.type === 'updateInquirer') {
 			setRepeatVisitorId('');
@@ -74,7 +69,7 @@ const NewAndRepeatVisitor = ({
 		setRepeatVisitorId('');
 		setRepeatSelectIsRefreshing(true);
 		setRepeatSelectPlaceholder('Loading...');
-		await refreshInquirers();
+		await dispatch(getInquirers()) // refresh
 		setRepeatSelectIsRefreshing(false);
 		setRepeatSelectPlaceholder('Select...');
 	}
@@ -122,51 +117,52 @@ const NewAndRepeatVisitor = ({
 	}
 
 	const renderPrevInquiries = () => {
-		const consultIds = getRepeatVisitor()[peopleFields.CONSULTATIONS]
-		const inquiries = consultIds.reduce((acc, id) => {
-			const consultation = consultations[id]
-			if (consultation?.[consultFields.TYPE] !== consultFields.TYPE_CLINIC) {
+		// inquirers object has not been updated!!!!
+		// find inquirer's id and get consultations with inquirer
+		const userId = getRepeatVisitor().id
+		const inquiries = Object.keys(consultations).reduce((acc, consultId) => {
+			const consult = consultations[consultId]
+			if (consult?.[consultFields.INQUIRERS] &&
+				consult?.[consultFields.TYPE] !== consultFields.TYPE_CLINIC &&
+				consult[consultFields.INQUIRERS]?.some((id) => id === userId)
+			) {
 				acc.push({
-					key: id,
-					...consultation,
+					key: consultId,
+					...consult,
 				})
 			}
 			return acc
 		}, [])
-		if (inquiries?.length > 0) {
+		if (inquiries) {
 			return <PreviousInquiries
 				inquiries={inquiries}
 				inquirer={getRepeatVisitor()}
-				createConsultation={createConsultation}
-				updateConsultation={updateConsultation}
-				deleteConsultation={deleteConsultation}
 			/>
 		} else {
 			return <Card className="mb-3 text-center">
-				<Card.Body>
+				< Card.Body >
 					<span className="text-muted">No contacts from the inquirer have been saved.</span>
-				</Card.Body>
-			</Card>
+				</Card.Body >
+			</Card >
 		}
 	}
 
+	// if create or delete table rows, cannot rely on getRepeatVisitor(), which accesses inquirers reducer, b/c inquirers not updated when create or delete previous consultations
 	const renderPreviousConsultations = () => {
 		const consultIds = getRepeatVisitor()[peopleFields.CONSULTATIONS]
-		const visitorConsultations = consultIds.reduce((acc, id) => {
-			const consultation = consultations[id]
-			if (consultation?.[consultFields.TYPE] === consultFields.TYPE_CLINIC) {
-				acc.push({
-					key: id,
-					...consultation,
-				})
-			}
-			return acc
-		}, [])
-		if (visitorConsultations) {
+		if (consultIds) {
+			const visitorConsultations = consultIds.reduce((acc, id) => {
+				const consultation = consultations[id]
+				if (consultation?.[consultFields.TYPE] === consultFields.TYPE_CLINIC) {
+					acc.push({
+						key: id,
+						...consultation,
+					})
+				}
+				return acc
+			}, [])
 			return <PreviousConsultations
 				visitorConsultations={visitorConsultations}
-				updateConsultation={updateConsultation}
-				deleteConsultation={deleteConsultation}
 			/>
 		} else {
 			return <Card className="mb-3 text-center">
@@ -252,17 +248,4 @@ const NewAndRepeatVisitor = ({
 	)
 }
 
-// TODO: useDispatch hook instead
-const mapDispatchToProps = dispatch => {
-	return {
-		// call from parent Clinics?
-		createInquirer: (inq) => dispatch(actions.createInquirer(inq)),
-		updateInquirer: (inqValues) => dispatch(actions.updateInquirer(inqValues)),
-		createConsultation: (values) => dispatch(actions.createConsultation(values)),
-		updateConsultation: (updateObject) => dispatch(actions.updateConsultation(updateObject)),
-		deleteConsultation: (key) => dispatch(actions.deleteConsultation(key)),
-		refreshInquirers: () => dispatch(actions.getInquirers()),
-	}
-}
-
-export default connect(null, mapDispatchToProps)(NewAndRepeatVisitor);
+export default NewAndRepeatVisitor

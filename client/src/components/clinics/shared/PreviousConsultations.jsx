@@ -93,6 +93,7 @@ const PreviousConsultations = ({
 		info={<p className="text-center mb-1"><small>If any referrals have been made, visit <a href="https://www.legal.io/" target="_blank" rel="noopener noreferrer">Legal.io</a> to update status below.</small></p>}
 		columns={columns}
 		dataSource={dataSource}
+		setDataSource={setDataSource}
 		options={statuses}
 		expandedRowRender={consultationList}
 		isLoading={isLoading}

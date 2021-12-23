@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useFormik } from 'formik'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Select as AntSelect, Input, Divider } from 'antd'
 import { Form, Row, Col, Button } from 'react-bootstrap'
 import Select from '../../forms/fields/Select'
@@ -12,27 +12,62 @@ import {
   hotlineTypes,
   hotlineDispositions,
 } from '../../../data/consultationData'
+import {
+  createConsultation,
+  consultationCreated,
+} from '../../../store/actions'
 
 const { Option } = AntSelect
 const { TextArea } = Input
 
 const AddUpdateInquiry = ({
-  id,
+  id, // table row
+  inquirer,
   onHide,
   isSubmitting,
 }) => {
+  const dispatch = useDispatch()
   const lawTypesObject = useSelector((state) => state.lawTypes.lawTypesObject)
   const lawyersObject = useSelector((state) => state.people.lawyersObject)
 
   const validate = (values) => {
     const errors = {}
     if (!values?.[consultFields.TYPE]) {
-			errors[consultFields.TYPE] = 'Input an inquiry type.';
+      errors[consultFields.TYPE] = 'Input an inquiry type.';
     }
-    if (!values?.[consultFields.LAWYERS]) {
-			errors[consultFields.LAWYERS] = 'Enter yourself as coordinator.';
+    if (!values?.[consultFields.COORDINATOR] || values?.[consultFields.COORDINATOR]?.length === 0) {
+      errors[consultFields.COORDINATOR] = 'Enter yourself as coordinator.';
     }
     return errors
+  }
+
+  const submitConsultation = async (values) => {
+    try {
+      let payload = { ...values } // JSON.stringify(payload, null, 2)
+      // inquirer id
+      payload[consultFields.INQUIRERS] = [inquirer.id]
+      // datetime stamp
+      payload[consultFields.DATETIME] = new Date()
+      // hard-code to NYC clinic for now
+      payload[consultFields.CLINIC_NAME] = consultFields.CLINIC_TNC
+      // disposition string to array
+      if (values?.[consultFields.DISPOSITIONS]) {
+        payload[consultFields.DISPOSITIONS] = [values[consultFields.DISPOSITIONS]]
+      }
+      payload[consultFields.STATUS] = consultFields.STATUS_HOTLINE
+
+      const serverResponse = await dispatch(createConsultation(payload))
+      if (serverResponse.status === 'success' && serverResponse.type === 'createConsultation') {
+        // adding to consultations local object
+        // ...not adding to inquirers local object
+        dispatch(consultationCreated(serverResponse.payload))
+        formik.resetForm()
+        onHide()
+      }
+
+    } catch (err) {
+      console.log('submitConsultation error', err)
+    }
   }
 
   const formik = useFormik({
@@ -40,13 +75,11 @@ const AddUpdateInquiry = ({
 
     },
     validate,
-    onSubmit: (values) => {
-      console.log('onSubmit', JSON.stringify(values, null, 2))
-    }
+    onSubmit: submitConsultation,
   })
 
   const reqFieldsHaveValues = () => {
-    return formik.values?.[consultFields.TYPE] && formik.values?.[consultFields.LAWYERS]?.length > 0
+    return formik.values?.[consultFields.TYPE] && formik.values?.[consultFields.COORDINATOR]?.length > 0
   }
 
   // console.log('formik', formik)
@@ -67,7 +100,6 @@ const AddUpdateInquiry = ({
     })
   }
 
-
   return <>
     <form onSubmit={formik.handleSubmit}>
 
@@ -87,16 +119,17 @@ const AddUpdateInquiry = ({
 
       {/* coordinator */}
       <Select
-        name={consultFields.LAWYERS}
+        name={consultFields.COORDINATOR}
+        // options taken from lawyers (+ coordinators)
         options={getOptionsForPeople(lawyersObject)}
         label="Coordinator(s)"
         required={true}
         mode="multiple"
-        value={formik.values[consultFields.LAWYERS]}
-        onChange={values => formik.setFieldValue(consultFields.LAWYERS, values)}
-        onBlur={() => formik.setFieldTouched(consultFields.LAWYERS, true)}
-        touched={formik.touched[consultFields.LAWYERS]}
-        error={formik.errors[consultFields.LAWYERS]}
+        value={formik.values[consultFields.COORDINATOR]}
+        onChange={values => formik.setFieldValue(consultFields.COORDINATOR, values)}
+        onBlur={() => formik.setFieldTouched(consultFields.COORDINATOR, true)}
+        touched={formik.touched[consultFields.COORDINATOR]}
+        error={formik.errors[consultFields.COORDINATOR]}
         className="mb-3"
       />
 

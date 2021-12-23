@@ -17,8 +17,8 @@ const HelplineList = props => {
 	const key = inquiry.key;
 
 	let consultLawyers = 'Clinic coordinator not specified.';
-	if (inquiry[consultFields.LAWYERS]) {
-		consultLawyers = getPeopleByIds(inquiry[consultFields.LAWYERS], lawyers);
+	if (inquiry[consultFields.COORDINATOR]) {
+		consultLawyers = getPeopleByIds(inquiry[consultFields.COORDINATOR], lawyers);
 	}
 
 	let dataSource = [
@@ -28,7 +28,7 @@ const HelplineList = props => {
 			className: 'd-md-none',
 		},
 		{
-			title: 'Coordinator', // Lawyer
+			title: 'Coordinator',
 			value: consultLawyers,
 		},
 		{

@@ -50,23 +50,23 @@ const createConsultation = submitFields => {
 				fields: submitFields
 			}], function (error, records) {
 				if (error) {
-					console.log('Airtable Error:', error);
+					console.log('Airtable Error:', error)
 					return reject({
 						status: 'failed',
 						error,
-					});
+					})
 				}
 				// object with fields: Created On, Date, Disposition, Inquirer, Last Modified On, Lawyer, Name, Type, id
-				const consultRecord = records[0]['fields'];
-				consultRecord['id'] = records[0]['id'];
-				// dispatch(consultationCreated(consultRecord));
+				const consultRecord = records[0]['fields']
+				consultRecord['id'] = records[0]['id']
+				//-> dispatch(consultationCreated(consultRecord))
 				return resolve({
 					status: 'success',
 					type: 'createConsultation',
 					payload: consultRecord,
 				})
 			})
-		});
+		})
 	}
 }
 
@@ -101,22 +101,22 @@ const deleteConsultation = (id) => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			airtableBase(TABLE).destroy(id,
-				function (error, deletedRecord) {
+				(error, deletedRecord) => {
 					if (error) {
-						console.log('Airtable Error:', error);
+						console.log('Airtable Error:', error)
 						return reject({
 							status: 'failed',
 							error,
-						});
+						})
 					}
-					// console.log('Deleted record', deletedRecord.id)
 					return resolve({
 						status: 'success',
 						type: 'deletedConsultation',
+						// deletedRecord almost empty but have deletedRecord.id
 						payload: deletedRecord,
 					})
 				})
-		});
+		})
 	}
 }
 
@@ -129,6 +129,13 @@ const initConsultations = consultations => {
 	}
 }
 
+const consultationCreated = (consultation) => {
+	return {
+		type: actionTypes.CONSULTATION_CREATED,
+		consultation,
+	}
+}
+
 const consultationUpdated = consultation => {
 	return {
 		type: actionTypes.CONSULTATION_UPDATED,
@@ -136,12 +143,22 @@ const consultationUpdated = consultation => {
 	}
 }
 
+const consultationDeleted = (id) => {
+	return {
+		type: actionTypes.CONSULTATION_DELETED,
+		id,
+	}
+}
+
 export {
+	// async action creators
 	getConsultations,
 	createConsultation,
 	updateConsultation,
 	deleteConsultation,
-	// init action creators
+	// sync action creators
 	initConsultations,
+	consultationCreated,
 	consultationUpdated,
+	consultationDeleted,
 }
