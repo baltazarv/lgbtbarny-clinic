@@ -14,12 +14,12 @@ const { Option } = AntSelect;
 
 // utilities
 
-export const formatName = inquirer => {
-	const firstName = inquirer[peopleFields.FIRST_NAME];
-	const middleName = inquirer[peopleFields.MIDDLE_NAME];
-	const otherNames = inquirer[peopleFields.OTHER_NAMES];
-	const lastName = inquirer[peopleFields.LAST_NAME];
-	return (firstName ? firstName : '') + (middleName ? ' ' + middleName[0] : '') + ' ' + (lastName ? lastName : '') + (otherNames ? ' "' + otherNames + '"' : '');
+export const formatName = (inquirer) => {
+	const firstName = inquirer[peopleFields.FIRST_NAME]
+	const middleName = inquirer[peopleFields.MIDDLE_NAME]
+	const otherNames = inquirer[peopleFields.OTHER_NAMES]
+	const lastName = inquirer[peopleFields.LAST_NAME]
+	return (firstName ? firstName : '') + (middleName ? ' ' + middleName[0] : '') + ' ' + (lastName ? lastName : '') + (otherNames ? ' "' + otherNames + '"' : '')
 }
 
 export const formatNameNoNick = inquirer => {
@@ -36,17 +36,17 @@ export const getPeopleByIds = (ids, people) => {
 }
 
 // works with antd Select with people data object
-export const getOptionsForPeople = people => {
-	const options = [];
+export const getOptionsForPeople = (people) => {
+	const options = []
 	if (!objectIsEmpty(people)) {
 		for (var key in people) {
-			const fields = people[key];
+			const fields = people[key]
 			if(fields[peopleFields.FIRST_NAME] || fields[peopleFields.LAST_NAME]) {
 				options.push(<Option key={key} value={key}>{formatName(fields)}</Option>)
 			}
 		}
 	}
-	return options;
+	return options
 }
 
 export const getLawyerNames = (ids, lawyers) => {

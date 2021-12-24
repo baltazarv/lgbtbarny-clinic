@@ -30,7 +30,7 @@ const Select = ({
 	mode = '', // multiple, tags
 	placeholder = 'Select...',
 	loading = false,
-	isDisabled,
+	disabled,
 	info,
 }) => {
 
@@ -40,7 +40,7 @@ const Select = ({
 	}
 
 	const labelTxtStyle = classNames({
-		'text-muted': isDisabled,
+		'text-muted': disabled,
 	})
 
 	let formLabel = null;
@@ -75,6 +75,7 @@ const Select = ({
 						allowClear={true}
 						// autoFocus={true}
 						className="mt-1" // help vert alignment
+						disabled={disabled}
 					>
 						{options}
 					</AntSelect>

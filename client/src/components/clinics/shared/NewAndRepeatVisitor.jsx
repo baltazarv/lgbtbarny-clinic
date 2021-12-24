@@ -8,7 +8,7 @@
  * */
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Form, Row, Col, Card } from 'react-bootstrap';
+import { Form, Row, Col, Card } from 'react-bootstrap'
 import VisitorSelect from '../intake/VisitorSelect';
 import PreviousConsultations from './PreviousConsultations'
 import PreviousInquiries from '../intake/PreviousInquiries'
@@ -31,16 +31,17 @@ const NewAndRepeatVisitor = ({
 	onSubmit,
 }) => {
 	const dispatch = useDispatch()
+	// redux reducers
+	const lawTypesObject = useSelector((state) => state.lawTypes.lawTypesObject)
+	const inquirersObject = useSelector((state) => state.people.inquirersObject)
+	const consultations = useSelector((state) => state.consultations.consultations)
+
 	// shows or hides repeatVisitorSelect
 	const [isRepeat, setIsRepeat] = useState(false);
 	const [repeatVisitorId, setRepeatVisitorId] = useState('');
 	const [serverResponse, setServerResponse] = useState({ status: 'pending' });
 	const [repeatSelectIsRefreshing, setRepeatSelectIsRefreshing] = useState(false);
 	const [repeatSelectPlaceholder, setRepeatSelectPlaceholder] = useState('Select...');
-	// redux reducers
-	const lawTypesObject = useSelector((state) => state.lawTypes.lawTypesObject)
-	const inquirersObject = useSelector((state) => state.people.inquirersObject)
-	const consultations = useSelector((state) => state.consultations.consultations)
 
 	useEffect(() => {
 		if (isRepeat) setRepeatVisitorId('')
@@ -116,41 +117,10 @@ const NewAndRepeatVisitor = ({
 		)
 	}
 
-	const renderPrevInquiries = () => {
-		// inquirers object has not been updated!!!!
-		// find inquirer's id and get consultations with inquirer
-		const userId = getRepeatVisitor().id
-		const inquiries = Object.keys(consultations).reduce((acc, consultId) => {
-			const consult = consultations[consultId]
-			if (consult?.[consultFields.INQUIRERS] &&
-				consult?.[consultFields.TYPE] !== consultFields.TYPE_CLINIC &&
-				consult[consultFields.INQUIRERS]?.some((id) => id === userId)
-			) {
-				acc.push({
-					key: consultId,
-					...consult,
-				})
-			}
-			return acc
-		}, [])
-		if (inquiries) {
-			return <PreviousInquiries
-				inquiries={inquiries}
-				inquirer={getRepeatVisitor()}
-			/>
-		} else {
-			return <Card className="mb-3 text-center">
-				< Card.Body >
-					<span className="text-muted">No contacts from the inquirer have been saved.</span>
-				</Card.Body >
-			</Card >
-		}
-	}
-
 	// if create or delete table rows, cannot rely on getRepeatVisitor(), which accesses inquirers reducer, b/c inquirers not updated when create or delete previous consultations
 	const renderPreviousConsultations = () => {
-		const consultIds = getRepeatVisitor()[peopleFields.CONSULTATIONS]
-		if (consultIds) {
+		const consultIds = getRepeatVisitor()?.[peopleFields.CONSULTATIONS]
+		if (consultIds?.length > 0) {
 			const visitorConsultations = consultIds.reduce((acc, id) => {
 				const consultation = consultations[id]
 				if (consultation?.[consultFields.TYPE] === consultFields.TYPE_CLINIC) {
@@ -161,16 +131,17 @@ const NewAndRepeatVisitor = ({
 				}
 				return acc
 			}, [])
-			return <PreviousConsultations
-				visitorConsultations={visitorConsultations}
-			/>
-		} else {
-			return <Card className="mb-3 text-center">
-				<Card.Body>
-					<span className="text-muted">No consultations have been saved for the visitor.</span>
-				</Card.Body>
-			</Card>
+			if (visitorConsultations?.length > 0) {
+				return <PreviousConsultations
+					visitorConsultations={visitorConsultations}
+				/>
+			}
 		}
+		return <Card className="mb-3 text-center">
+			<Card.Body>
+				<span className="text-muted">There are no <strong>consultations</strong> for {formatName(getRepeatVisitor())}.</span>
+			</Card.Body>
+		</Card>
 	}
 
 	return (
@@ -209,7 +180,9 @@ const NewAndRepeatVisitor = ({
 							{renderRepeatVisitorSelect()}
 							{repeatVisitorId &&
 								<>
-									{renderPrevInquiries()}
+									<PreviousInquiries
+										inquirer={getRepeatVisitor()}
+									/>
 									{renderPreviousConsultations()}
 								</>
 							}

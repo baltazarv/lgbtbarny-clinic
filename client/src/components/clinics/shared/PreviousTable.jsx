@@ -16,13 +16,14 @@ import FormModal from '../../modals/FormModal'
 import AddUpdateInquiry from '../intake/AddUpdateInquiry'
 // constants
 import * as consultFields from '../../../data/consultFields'
-import * as peopleFields from '../../../data/peopleFields'
+// utils
 import { getDispoLongNames } from '../../../data/consultationData'
 import {
   updateConsultation,
   deleteConsultation,
   consultationDeleted,
 } from '../../../store/actions'
+import { formatName } from '../../../data/peopleData'
 
 const PreviousTable = ({
   title,
@@ -32,6 +33,7 @@ const PreviousTable = ({
   options,
   expandedRowRender,
   isLoading,
+  setIsLoading,
 
   // create, update, delete
   hasActions,
@@ -169,12 +171,13 @@ const PreviousTable = ({
         <FormModal
           show={rowModalIsOpen}
           onHide={() => setRowModalIsOpen(false)}
-          header={`${rowModalKey ? 'Update Inquiry' : 'Add Inquiry'}${inquirer ? ' from' : ''}${inquirer?.[peopleFields.FIRST_NAME] ? ' ' + inquirer[peopleFields.FIRST_NAME] : ''}${inquirer?.[peopleFields.LAST_NAME] ? ' ' + inquirer[peopleFields.LAST_NAME] : ''}`}
+          header={`${rowModalKey ? 'Update Inquiry' : 'Add Inquiry'}${inquirer ? ` from ${formatName(inquirer)}` : ''}`}
           body={<AddUpdateInquiry
-            id={rowModalKey} // need to send?
-            inquirer={inquirer}
+            inquirer={inquirer} // need id
             onHide={() => setRowModalIsOpen(false)}
             isSubmitting={isLoading}
+            setIsSubmitting={setIsLoading}
+            updateData={dataSource?.find((row) => rowModalKey === row.key)}
           />}
           size="lg"
         />

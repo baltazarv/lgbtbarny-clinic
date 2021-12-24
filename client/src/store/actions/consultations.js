@@ -43,7 +43,7 @@ const getConsultations = () => {
 	}
 }
 
-const createConsultation = submitFields => {
+const createConsultation = (submitFields) => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
 			airtableBase(TABLE).create([{
@@ -70,30 +70,30 @@ const createConsultation = submitFields => {
 	}
 }
 
-// takes an oject: { key, fields }
+// takes an oject: { id, fields }
 const updateConsultation = (updateObject) => {
 	return dispatch => {
 		return new Promise((resolve, reject) => {
-			let newConsultation = {};
+			let newConsultation = {}
 			airtableBase(TABLE).update(updateObject.id,
 				updateObject.fields,
 				function (error, record) {
 					if (error) {
-						console.log('Airtable Error:', error);
+						console.log('Airtable Error:', error)
 						return reject({
 							status: 'failed',
 							error,
-						});
+						})
 					}
-					newConsultation[record.id] = record.fields;
-					dispatch(consultationUpdated(newConsultation));
+					newConsultation[record.id] = record.fields
+					dispatch(consultationUpdated(newConsultation))
 					return resolve({
 						status: 'success',
 						type: 'updateConsultation',
 						payload: newConsultation,
 					})
 				})
-		});
+		})
 	}
 }
 
