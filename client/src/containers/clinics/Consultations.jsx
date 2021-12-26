@@ -4,7 +4,7 @@ import { Button } from 'antd';
 import { Card, Row, Col } from 'react-bootstrap'
 import { ReloadOutlined } from '@ant-design/icons'
 // components
-import ConsultationsTable from '../../components/clinics/consultationsTable/ConsultationsTable';
+import ConsultationsTable from '../../components/clinics/consultationsTable/ConsultationsTable'
 import ToggleButtons from '../../components/ToggleButtons';
 // data
 import * as actions from '../../store/actions';

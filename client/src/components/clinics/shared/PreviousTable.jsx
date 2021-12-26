@@ -190,6 +190,10 @@ const CardStyled = styled.div`
 	cursor: pointer;
   position: relative;
 
+  .card-text {
+    cursor: auto;
+  }
+
 	// icon
 	span[role="img"] {
 		font-size: 0.8rem;

@@ -11,7 +11,10 @@ import AddUpdateInquiry from './AddUpdateInquiry'
 import { getLawyerNames } from '../../../data/peopleData'
 import * as consultFields from '../../../data/consultFields'
 import { formatName } from '../../../data/peopleData'
-import { getHotlineDispoOptions } from '../../../data/consultationData'
+import {
+	getHotlineDispoOptions,
+	hotlineTypes,
+} from '../../../data/consultationData'
 import { getLawTypes } from '../../../data/lawTypeData'
 // utils
 import { isoToStandardDate } from '../../../utils'
@@ -53,7 +56,8 @@ const PreviousInquiries = ({
 			return Object.keys(consultations).reduce((acc, consultId) => {
 				const consult = consultations[consultId]
 				if (consult?.[consultFields.INQUIRERS] &&
-					consult?.[consultFields.TYPE] !== consultFields.TYPE_CLINIC &&
+					// type is one of "Helpline", "Email", or "Website"
+					hotlineTypes.some((type) => type === consult[consultFields.TYPE]) &&
 					consult[consultFields.INQUIRERS]?.some((id) => id === userId)
 				) {
 					acc.push({

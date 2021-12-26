@@ -37,6 +37,7 @@ const ConsultationsTable = props => {
 
 	// from parent
 	const {
+		// clinic set by Clinics component getClinicPath()
 		clinic,
 		filteredValues,
 		changeFilters,
@@ -65,8 +66,11 @@ const ConsultationsTable = props => {
 		return _dispoFilters;
 	}
 
+	// columns
+
 	const columns = [];
 
+	// clinic icon
 	if (clinic === 'admin') {
 		columns.push({
 			title: '',
@@ -96,11 +100,12 @@ const ConsultationsTable = props => {
 		});
 	}
 
+	// date
 	columns.push({
 		title: 'Date',
 		dataIndex: consultFields.DATETIME,
 		key: 'date',
-		width: 70,
+		width: 74,
 		defaultSortOrder: 'descend',
 		sorter: (a, b) => {
 			const dateA = new Date(a[consultFields.DATETIME]);
@@ -109,6 +114,7 @@ const ConsultationsTable = props => {
 		},
 	});
 
+	// visitor name
 	columns.push({
 		title: 'Visitor(s)',
 		dataIndex: consultFields.INQUIRERS,
@@ -123,6 +129,7 @@ const ConsultationsTable = props => {
 		),
 	});
 
+	// disposition tag
 	columns.push({
 		title: 'Disposition(s)',
 		dataIndex: [consultFields.DISPOSITIONS],
@@ -136,6 +143,7 @@ const ConsultationsTable = props => {
 		render: dispos => getDispoTagsFromShortNames(dispos),
 	});
 
+	// referral status
 	columns.push({
 		title: 'Referral Status',
 		dataIndex: consultFields.STATUS,
@@ -165,12 +173,17 @@ const ConsultationsTable = props => {
 
 	useEffect(() => {
 		const setTableData = () => {
-			let eligible = consultations;
-			// if (clinic === 'admin') eligible = filterEligibleConsultations(consultations);
-			let data = [];
-			for (var key in eligible) {
-				let fields = eligible[key];
-				if (clinic === 'admin' || (clinic === 'tnc' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_TNC) || (clinic === 'youth' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_YOUTH)) {
+			let data = []
+			for (var key in consultations) {
+				let fields = consultations[key]
+				if (
+					fields?.[consultFields.TYPE] === consultFields.TYPE_CLINIC &&
+					(
+						clinic === 'admin' ||
+						(clinic === 'tnc' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_TNC) ||
+						(clinic === 'youth' && fields[consultFields.CLINIC_NAME] === consultFields.CLINIC_YOUTH)
+					)
+				) {
 					const object = {
 						key,
 						[consultFields.CLINIC_NAME]: fields[consultFields.CLINIC_NAME],
@@ -186,8 +199,8 @@ const ConsultationsTable = props => {
 					data.push(object)
 				}
 			}
-			loadingDone();
-			return data;
+			loadingDone()
+			return data
 		}
 
 		if (isLoading && !objectIsEmpty(consultations) && !objectIsEmpty(inquirers) && !objectIsEmpty(lawyers) && !objectIsEmpty(lawTypes)) {

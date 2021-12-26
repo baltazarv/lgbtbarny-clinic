@@ -21,6 +21,7 @@ const InquirerSelect = ({
     controlId,
     label,
     options,
+    autoFocus = false,
   }) => {
     return <Form.Group
       as={Row}
@@ -40,7 +41,7 @@ const InquirerSelect = ({
             // onBlur={handleBlur}
             optionFilterProp="children"
             allowClear={true}
-            autoFocus={true}
+            autoFocus={autoFocus}
           >
             {options}
           </Select>
@@ -66,6 +67,7 @@ const InquirerSelect = ({
         controlId: 'name',
         label: 'by Name:',
         options: getOptionsForPeople(inquirersObject),
+        autoFocus: true,
       })}
       {field({
         controlId: 'email',

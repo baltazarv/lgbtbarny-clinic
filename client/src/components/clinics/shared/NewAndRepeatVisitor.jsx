@@ -130,6 +130,7 @@ const NewAndRepeatVisitor = ({
 		if (consultIds?.length > 0) {
 			const visitorConsultations = consultIds.reduce((acc, id) => {
 				const consultation = consultations[id]
+				// type === 'Clinic'
 				if (consultation?.[consultFields.TYPE] === consultFields.TYPE_CLINIC) {
 					acc.push({
 						key: id,

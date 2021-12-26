@@ -75,13 +75,13 @@ const dispoShortNames = {
 	[consultFields.DISPOSITIONS_NO_FURTHER]: "Info given",
 }
 
-// given an array
+// given an array of Airtable disposition values, get short values to display on table
 const getDispoShortNames = dispos => {
 	if (dispos && dispos.length > 0) return dispos.map(dispo => dispoShortNames[dispo]);
 	return [];
 }
 
-// given a dispostion short name, get the long name that can be saved to Airtable
+// given a dispostion short value, get the Airtable value
 const getDispoLongNames = (shortName) => {
 	let name = shortName
 	for (const key in dispoShortNames) {
@@ -107,7 +107,7 @@ const getHotlineDispoOptions = () => {
 	return options
 }
 
-// given an array of Dispostion short names, get antd Tag components
+// given an array of short dispostion values displayed on table, get antd Tag components
 const getDispoTagsFromShortNames = dispos => {
 	return <span>
 		{dispos.map((dispo, index) => {
@@ -125,14 +125,17 @@ const getDispoTagsFromShortNames = dispos => {
 	</span>
 }
 
-// given an array of long-name dispositions
-// return either long- or short-name Tag
+// given an array of Airtable disposition values
+// return either Airtable or short table-display Tag
 const getDispoTags = (dispos, returnShortName = false) => {
-	return <span>
-		{dispos.map((dispo) => {
-			return getDispoTag(dispo, returnShortName);
-		})}
-	</span>
+	if (dispos?.length > 0) {
+		return <span>
+			{dispos.map((dispo) => {
+				return getDispoTag(dispo, returnShortName);
+			})}
+		</span>
+	}
+	return null
 }
 
 const getDispoTag = (dispo, returnShortName = false) => {
