@@ -6,7 +6,7 @@ import { Button } from 'antd'
 const Intake = ({
 	clinic,
 }) => {
-	const [isHotline, setIsHotline] = useState(true)
+	const [isHotline, setIsHotline] = useState(false)
 
 	return (
 		<>

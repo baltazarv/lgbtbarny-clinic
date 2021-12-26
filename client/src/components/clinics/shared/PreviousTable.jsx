@@ -16,7 +16,7 @@ import FormModal from '../../modals/FormModal'
 import AddUpdateInquiry from '../intake/AddUpdateInquiry'
 // constants
 import * as consultFields from '../../../data/consultFields'
-// utils
+// utils/actions
 import { getDispoLongNames } from '../../../data/consultationData'
 import {
   updateConsultation,

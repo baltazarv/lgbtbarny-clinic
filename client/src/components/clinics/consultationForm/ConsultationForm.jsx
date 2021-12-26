@@ -368,7 +368,7 @@ class ConsultationForm extends Component {
 									/>
 								</Col>
 								<Col xs={3} sm={4} md={3} className="justify-content-left">
-									<Tooltip title="refresh visitor options">
+									<Tooltip title="refresh visitor info">
 										<AntButton
 											shape="circle"
 											onClick={this.refreshInquirers}

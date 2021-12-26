@@ -36,13 +36,20 @@ export const getPeopleByIds = (ids, people) => {
 }
 
 // works with antd Select with people data object
-export const getOptionsForPeople = (people) => {
+export const getOptionsForPeople = (people, fieldName) => {
 	const options = []
 	if (!objectIsEmpty(people)) {
 		for (var key in people) {
-			const fields = people[key]
-			if(fields[peopleFields.FIRST_NAME] || fields[peopleFields.LAST_NAME]) {
-				options.push(<Option key={key} value={key}>{formatName(fields)}</Option>)
+			const person = people[key]
+			if (
+				!fieldName || fieldName === 'name' &&
+				(person[peopleFields.FIRST_NAME] || person[peopleFields.LAST_NAME])
+			) {
+				options.push(<Option key={key} value={key}>{formatName(person)}</Option>)
+			} else if (fieldName === 'email' && person[peopleFields.EMAIL]) {
+				options.push(<Option key={key} value={key}>{person[peopleFields.EMAIL] || ' '}</Option>)
+			} else if (fieldName === 'phone') {
+				options.push(<Option key={key} value={key}>{person[peopleFields.PHONE] || ' '}</Option>)
 			}
 		}
 	}

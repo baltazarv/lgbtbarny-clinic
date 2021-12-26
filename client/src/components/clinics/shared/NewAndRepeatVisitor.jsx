@@ -9,7 +9,8 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Row, Col, Card } from 'react-bootstrap'
-import VisitorSelect from '../intake/VisitorSelect';
+import VisitorSelect from '../intake/VisitorSelect'
+import InquirerSelect from '../intake/InquirerSelect'
 import PreviousConsultations from './PreviousConsultations'
 import PreviousInquiries from '../intake/PreviousInquiries'
 import ClinicAddVisitor from '../intake/ClinicAddVisitor'
@@ -17,7 +18,7 @@ import HelplineAddInquirer from '../intake/HelplineAddInquirer'
 // data
 import * as peopleFields from '../../../data/peopleFields'
 import * as consultFields from '../../../data/consultFields'
-import { getOptionsForPeople, formatName } from '../../../data/peopleData';
+import { formatName } from '../../../data/peopleData';
 import {
 	getInquirers,
 	createInquirer,
@@ -98,18 +99,24 @@ const NewAndRepeatVisitor = ({
 				<div className="mb-3">
 					<Card>
 						<Card.Body>
-							<VisitorSelect
-								name="visitor"
-								label="Repeat Visitor"
-								options={getOptionsForPeople(inquirersObject)}
-								value={repeatVisitorId}
-								onChange={(val) => setRepeatVisitorId(val)}
-								required={true}
-								isDisabled={!repeatVisitorId}
-								onRefresh={handleRefresh}
-								placeholder={repeatSelectPlaceholder}
-								loading={repeatSelectIsRefreshing}
-							/>
+							{isHotline ?
+								<InquirerSelect
+									visitorId={repeatVisitorId}
+									setVisitorId={(val) => setRepeatVisitorId(val)}
+									// refresh
+									onRefresh={handleRefresh}
+									placeholder={repeatSelectPlaceholder}
+									loading={repeatSelectIsRefreshing}
+								/> :
+								<VisitorSelect
+									visitorId={repeatVisitorId}
+									setVisitorId={(val) => setRepeatVisitorId(val)}
+									// refresh
+									onRefresh={handleRefresh}
+									placeholder={repeatSelectPlaceholder}
+									loading={repeatSelectIsRefreshing}
+								/>
+							}
 						</Card.Body>
 					</Card>
 				</div>
@@ -170,7 +177,7 @@ const NewAndRepeatVisitor = ({
 			<Row>
 				{isRepeat ?
 					<Col className="mb-3 small">&nbsp;<strong>Yes &mdash; </strong> {isHotline ? 'Look for person by name, email, or phone number:' : 'Find visitor from pulldown to verify and update info:'}</Col> :
-					<Col className="mb-3 small">&nbsp;<strong>No &mdash; </strong> {isHotline ? 'Enter new potential clinic visitor:' : 'Enter new visitor:'}</Col>}
+					<Col className="mb-3 small">&nbsp;<strong>No &mdash; </strong> {isHotline ? 'Enter new person:' : 'Enter new visitor:'}</Col>}
 			</Row>
 
 			<Card>

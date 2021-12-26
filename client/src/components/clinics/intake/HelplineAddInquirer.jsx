@@ -271,6 +271,8 @@ const HelplineAddInquirer = ({
 								style={{
 									width: "100%",
 									display: "inline",
+									height: 32,
+									fontSize: 14,
 								}}
 								disabled={!(values['boro'] === 'Other')}
 							/>

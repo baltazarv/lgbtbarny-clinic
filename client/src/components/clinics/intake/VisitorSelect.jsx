@@ -1,99 +1,76 @@
-/**
- * Props for antd:
- * * options: <Options>{value}</Options>
- * * mode: 'multiple', 'tags'
- *
- * Props for fornik:
- *  * name: fornik name
- *
- * Props for component functionality:
- *  * onChange: func to call when handle change
- *  * disabled: to add required asterisk
- *  * label: to add field label
- *  *
- */
-import React, { useState } from 'react';
-import { Select, Button, Tooltip } from 'antd';
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { Select, Button, Tooltip } from 'antd'
 import { Form, Row, Col } from 'react-bootstrap'
 import { ReloadOutlined } from '@ant-design/icons'
-import { reqAsterisk } from '../../forms/formElements';
-import classNames from 'classnames';
+import classNames from 'classnames'
+import { reqAsterisk } from '../../forms/formElements'
+import { getOptionsForPeople } from '../../../data/peopleData'
 
 const VisitorSelect = ({
-	options,
-	name,
-	value,
-	onChange,
-	onBlur,
-	label,
-	required,
-	isDisabled,
-	info,
+	visitorId,
+	setVisitorId,
+	// info,
 
 	// refresh
 	onRefresh,
 	placeholder,
 	loading = false,
 }) => {
-	let [touched, setTouched] = useState(false);
-	let [error, setError] = useState(null);
+	const inquirersObject = useSelector((state) => state.people.inquirersObject)
+	let [touched, setTouched] = useState(false)
+	let [error, setError] = useState(null)
 
-	const handleChange = selection => {
-		if (onChange) onChange(selection);
-		setError(validate());
+	const handleChange = (selection) => {
+		setVisitorId(selection)
+		setError(validate())
 	}
 
-	const handleBlur = evt => {
-		setTouched(true);
-		if (onBlur) onBlur(value);
-		setError(validate());
+	const handleBlur = (evt) => {
+		setTouched(true)
+		// onBlur(visitorId)
+		setError(validate())
 	}
 
 	const validate = () => {
-		let _error = '';
-		if (!value) _error = 'Select a repeat visitor to proceed. If not on pulldown, do not enter as repeat visitor';
-		return _error;
-	}
-
-	let _reqAsterisk = <span className="hidden-sm-up">&nbsp;</span>;
-	if (required) {
-		_reqAsterisk = reqAsterisk;
+		let _error = ''
+		if (!visitorId) _error = 'Select a repeat visitor to proceed. If not on pulldown, do not enter as repeat visitor';
+		return _error
 	}
 
 	const labelTxtStyle = classNames({
-		'text-muted': isDisabled,
+		'text-muted': !visitorId,
 	})
 
-	let selectErrorClass = '';
-	if (touched && error) selectErrorClass = 'has-error';
+	let selectErrorClass = ''
+	if (touched && error) selectErrorClass = 'has-error'
 
 	return (
 		<>
-			<Form.Group as={Row} controlId={name} className="mb-0">
+			<Form.Group as={Row} controlId="visitor" className="mb-0">
 				<Form.Label column xs="12" sm="3" md="4" className="text-sm-right">
-					{_reqAsterisk}<span className={labelTxtStyle}>{label}</span>
+					{reqAsterisk}<span className={labelTxtStyle}>Repeat Visitor</span>
 				</Form.Label>
 				<Col xs="9" sm="7" md="6" className="align-self-center">
-					<Form.Text className="text-muted mt-0 mb-1">{info}</Form.Text>
 					<div className={selectErrorClass}>
 						<Select
 							showSearch
 							style={{ width: '100%' }}
 							placeholder={placeholder}
 							loading={loading}
-							value={value}
+							value={visitorId}
 							onChange={handleChange}
 							onBlur={handleBlur}
 							optionFilterProp="children"
 							allowClear={true}
 							autoFocus={true}
 						>
-							{options}
+							{getOptionsForPeople(inquirersObject)}
 						</Select>
 					</div>
 				</Col>
 				<Col xs="3" sm="2" className="justify-content-left align-self-center">
-					<Tooltip title="refresh visitor options">
+					<Tooltip title="refresh visitor info">
 						<Button
 							shape="circle"
 							onClick={onRefresh}
@@ -119,4 +96,4 @@ const VisitorSelect = ({
 	)
 }
 
-export default VisitorSelect;
+export default VisitorSelect
